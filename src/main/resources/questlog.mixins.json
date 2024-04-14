@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.infernalstudios.questlog.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "questlog.refmap.json",
+  "mixins": [
+    "EnchantedItemTriggerMixin",
+    "ServerPlayerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

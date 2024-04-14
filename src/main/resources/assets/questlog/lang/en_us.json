@@ -1,0 +1,10 @@
+{
+    "key.questlog.open.desc": "Opens the Questlog screen",
+    "key.questlog.category": "Questlog",
+    "screen.questlog.title": "QUESTS",
+    "questlog.quest_completed": "Quest Completed!",
+    "questlog.quest_added": "Quest Added!",
+    "questlog.objective.completed": "Completed!",
+    "questlog.objective.in_progress_singular": "Uncompleted",
+    "questlog.objective.in_progress": "Progress: %/%"
+}

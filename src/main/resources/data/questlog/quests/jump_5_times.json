@@ -1,0 +1,16 @@
+{
+  "triggers": [],
+  "objectives": [
+    {
+      "type": "questlog:stat",
+      "stat": "minecraft:jump",
+      "total": 5
+    }
+  ],
+  "rewards": [],
+  "display": {
+    "title": "Jump 5 times",
+    "description": "Jump 5 times to complete this quest",
+    "icon": "minecraft:textures/mob_effect/jump_boost.png"
+  }
+}

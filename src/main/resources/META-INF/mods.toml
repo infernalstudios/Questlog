@@ -1,0 +1,31 @@
+modLoader="javafml"
+loaderVersion="[41,)"
+license="Apache-2.0"
+issueTrackerURL="https://github.com/infernalstudios/Questlog"
+
+[[mods]]
+modId = "questlog"
+version="${file.jarVersion}"
+displayName = "Questlog"
+#updateJSONURL="https://invalid.example"
+#displayURL="https://example.com"
+#logoFile = "Questlog.png"
+credits = "SwanX1"
+authors = "Infernal Studios"
+description = '''
+TODO
+'''
+
+[[dependencies.questlog]]
+modId="forge"
+mandatory=true
+versionRange="[41,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.questlog]]
+modId="minecraft"
+mandatory = true
+versionRange = "[1.19,1.20)"
+ordering = "NONE"
+side="BOTH"
