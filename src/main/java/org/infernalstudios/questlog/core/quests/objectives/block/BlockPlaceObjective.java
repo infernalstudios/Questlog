@@ -22,7 +22,7 @@ public class BlockPlaceObjective extends AbstractBlockObjective {
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getState().getBlock().equals(this.getBlock())
+        this.test(event.getState())
     ) {
       this.setUnits(this.getUnits() + 1);
     }

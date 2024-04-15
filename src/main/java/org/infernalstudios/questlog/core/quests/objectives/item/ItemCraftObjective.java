@@ -22,7 +22,7 @@ public class ItemCraftObjective extends AbstractItemObjective {
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getCrafting().getItem().equals(this.getItem())
+        this.test(event.getCrafting())
     ) {
       this.setUnits(this.getUnits() + event.getCrafting().getCount());
     }

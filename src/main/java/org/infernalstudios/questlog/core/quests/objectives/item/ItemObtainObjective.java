@@ -24,7 +24,7 @@ public class ItemObtainObjective extends AbstractItemObjective {
     if (this.uniqueTagCache == null) {
       this.uniqueTagCache = "questlog_tracked_" + Objects.hash(
         this.getTotalUnits(),
-        this.getItem(),
+        this.item,
         this.getParent().getId(),
         this.getParent().objectives.indexOf(this),
         this.getParent().manager.player.getUUID()
@@ -52,7 +52,7 @@ public class ItemObtainObjective extends AbstractItemObjective {
 
       for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
         ItemStack stack = player.getInventory().getItem(i);
-        if (stack.getItem().equals(this.getItem())) {
+        if (this.test(stack)) {
           stacks.add(stack);
         }
       }

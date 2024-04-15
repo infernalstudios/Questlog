@@ -22,7 +22,7 @@ public class ItemDropObjective extends AbstractItemObjective {
     if (
         event.getPlayer() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getEntity().getItem().getItem().equals(this.getItem())
+        this.test(event.getEntity().getItem())
     ) {
       this.setUnits(this.getUnits() + event.getEntity().getItem().getCount());
     }

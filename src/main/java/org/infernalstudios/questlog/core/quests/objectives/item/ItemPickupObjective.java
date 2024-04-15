@@ -22,7 +22,7 @@ public class ItemPickupObjective extends AbstractItemObjective {
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getStack().getItem().equals(this.getItem())
+        this.test(event.getStack())
     ) {
       this.setUnits(this.getUnits() + event.getStack().getCount());
     }

@@ -22,7 +22,7 @@ public class ItemUseObjective extends AbstractItemObjective {
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getItem().getItem().equals(this.getItem())
+        this.test(event.getItem())
     ) {
       this.setUnits(this.getUnits() + 1);
     }

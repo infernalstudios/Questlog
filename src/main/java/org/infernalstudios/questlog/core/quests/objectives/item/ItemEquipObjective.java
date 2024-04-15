@@ -36,7 +36,7 @@ public class ItemEquipObjective extends AbstractItemObjective {
       event.player instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player) &&
       --ticksUntilCheck <= 0 &&
-      player.getItemBySlot(this.slot).getItem().equals(this.getItem())
+      this.test(player.getItemBySlot(this.slot))
     ) {
       this.setUnits(this.getUnits() + 1);
       ticksUntilCheck = 20;
