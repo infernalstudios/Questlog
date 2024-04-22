@@ -2,12 +2,9 @@ package org.infernalstudios.questlog.core.quests.objectives.item;
 
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.commands.TagCommand;
 import net.minecraft.tags.TagKey;
-import net.minecraft.tags.TagManager;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;

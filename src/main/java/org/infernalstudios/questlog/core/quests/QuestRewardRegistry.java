@@ -3,7 +3,11 @@ package org.infernalstudios.questlog.core.quests;
 import com.google.gson.JsonObject;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.core.quests.rewards.*;
+import org.infernalstudios.questlog.core.quests.rewards.CommandReward;
+import org.infernalstudios.questlog.core.quests.rewards.ExperienceReward;
+import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
+import org.infernalstudios.questlog.core.quests.rewards.LootTableReward;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.PlayerReportableException;
 
 import java.util.HashMap;

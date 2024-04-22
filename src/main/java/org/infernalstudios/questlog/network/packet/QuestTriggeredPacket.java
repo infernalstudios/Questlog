@@ -1,14 +1,13 @@
 package org.infernalstudios.questlog.network.packet;
 
-import java.util.function.Supplier;
-
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.network.NetworkEvent;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.QuestTriggeredEvent;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.network.NetworkEvent;
+import java.util.function.Supplier;
 
 // Indicates to the client that a quest has been freshly triggered
 // and should be displayed in the quest log.

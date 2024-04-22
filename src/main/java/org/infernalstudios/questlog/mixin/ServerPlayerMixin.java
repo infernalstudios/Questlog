@@ -1,14 +1,13 @@
 package org.infernalstudios.questlog.mixin;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stat;
+import net.minecraftforge.common.MinecraftForge;
 import org.infernalstudios.questlog.event.StatAwardEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.stats.Stat;
-import net.minecraftforge.common.MinecraftForge;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {

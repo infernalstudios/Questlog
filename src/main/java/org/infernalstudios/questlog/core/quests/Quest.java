@@ -8,12 +8,13 @@ import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
-import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.infernalstudios.questlog.util.Util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   private final QuestDisplayData display;

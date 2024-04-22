@@ -1,19 +1,33 @@
 package org.infernalstudios.questlog.core.quests;
 
+import com.google.gson.JsonObject;
+import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceLocation;
+import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.core.quests.objectives.block.BlockMineObjective;
+import org.infernalstudios.questlog.core.quests.objectives.block.BlockPlaceObjective;
+import org.infernalstudios.questlog.core.quests.objectives.entity.EntityBreedObjective;
+import org.infernalstudios.questlog.core.quests.objectives.entity.EntityDeathObjective;
+import org.infernalstudios.questlog.core.quests.objectives.entity.EntityKillObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemCraftObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemDropObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemEquipObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemObtainObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemPickupObjective;
+import org.infernalstudios.questlog.core.quests.objectives.item.ItemUseObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.EffectAddedObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.EnchantObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.QuestCompleteObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.StatisticObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.TrampleObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.VisitBiomeObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.VisitDimensionObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.VisitPositionObjective;
+import org.infernalstudios.questlog.util.PlayerReportableException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
-import com.google.gson.JsonObject;
-import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.core.quests.objectives.block.*;
-import org.infernalstudios.questlog.core.quests.objectives.entity.*;
-import org.infernalstudios.questlog.core.quests.objectives.item.*;
-import org.infernalstudios.questlog.core.quests.objectives.misc.*;
-import org.infernalstudios.questlog.util.PlayerReportableException;
-
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
 
 public class QuestTypeRegistry {
   private static final Map<ResourceLocation, Function<JsonObject, Objective>> REGISTRY = new HashMap<>();

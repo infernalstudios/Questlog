@@ -6,7 +6,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.network.NetworkEvent;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
-import org.infernalstudios.questlog.event.QuestTriggeredEvent;
 
 import java.util.function.Supplier;
 

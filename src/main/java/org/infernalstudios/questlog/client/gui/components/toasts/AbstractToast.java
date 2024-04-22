@@ -1,20 +1,16 @@
 package org.infernalstudios.questlog.client.gui.components.toasts;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.infernalstudios.questlog.util.Texture;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public abstract class AbstractToast implements Toast {
   protected abstract Component getTitle();
