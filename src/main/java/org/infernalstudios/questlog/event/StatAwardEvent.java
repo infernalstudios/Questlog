@@ -8,6 +8,18 @@ public class StatAwardEvent extends PlayerEvent {
   private final Stat<?> stat;
   private final int amount;
 
+  /**
+   * Used in forge event bus for some reason.
+   * DO NOT USE.
+   * @deprecated
+   */
+  @Deprecated
+  public StatAwardEvent() {
+    super(null);
+    this.stat = null;
+    this.amount = 0;
+  }
+
   public StatAwardEvent(Player player, Stat<?> stat, int amount) {
     super(player);
     this.stat = stat;

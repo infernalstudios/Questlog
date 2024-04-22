@@ -8,6 +8,18 @@ public class ItemEnchantedEvent extends PlayerEvent {
   private final ItemStack enchantedStack;
   private final int enchantSlot;
 
+  /**
+   * Used in forge event bus for some reason.
+   * DO NOT USE.
+   * @deprecated
+   */
+  @Deprecated
+  public ItemEnchantedEvent() {
+    super(null);
+    this.enchantedStack = null;
+    this.enchantSlot = 0;
+  }
+
   public ItemEnchantedEvent(Player player, ItemStack enchantedStack, int enchantSlot) {
     super(player);
     this.enchantedStack = enchantedStack;

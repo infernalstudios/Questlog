@@ -8,6 +8,18 @@ public class QuestCompletedEvent extends PlayerEvent {
   private final Quest quest;
   private final boolean isClient;
 
+  /**
+   * Used in forge event bus for some reason.
+   * DO NOT USE.
+   * @deprecated
+   */
+  @Deprecated
+  public QuestCompletedEvent() {
+    super(null);
+    this.quest = null;
+    this.isClient = false;
+  }
+
   public QuestCompletedEvent(Player player, Quest quest, boolean isClient) {
     super(player);
     this.quest = quest;
