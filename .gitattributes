@@ -1,0 +1,6 @@
+*.json  eol=lf
+*.java  eol=lf
+*.gradle  eol=lf
+*.properties  eol=lf
+*.toml  eol=lf
+
