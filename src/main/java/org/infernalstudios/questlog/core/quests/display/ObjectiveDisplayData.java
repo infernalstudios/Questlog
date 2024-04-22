@@ -34,7 +34,7 @@ public class ObjectiveDisplayData {
 
   public Component getProgress() {
     if (this.objective == null) {
-      throw new IllegalStateException("QuestTypeDisplayData has not been assigned a quest type");
+      throw new IllegalStateException("ObjectiveDisplayData has not been assigned a quest type");
     }
 
     return this.objective.isCompleted() ?

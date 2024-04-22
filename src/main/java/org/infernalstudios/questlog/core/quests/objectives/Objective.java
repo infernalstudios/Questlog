@@ -45,7 +45,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
 
   public final Quest getParent() {
     if (this.parent == null) {
-      throw new IllegalStateException("QuestType has not been assigned a parent quest");
+      throw new IllegalStateException("Objective has not been assigned a parent quest");
     }
 
     return this.parent;
