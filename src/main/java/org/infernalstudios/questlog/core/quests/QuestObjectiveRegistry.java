@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class QuestTypeRegistry {
+public class QuestObjectiveRegistry {
   private static final Map<ResourceLocation, Function<JsonObject, Objective>> REGISTRY = new HashMap<>();
 
   static {
@@ -73,7 +73,7 @@ public class QuestTypeRegistry {
       throw new IllegalStateException("Invalid quest type: " + definition.get("type").getAsString());
     }
 
-    return QuestTypeRegistry.create(type, definition);
+    return QuestObjectiveRegistry.create(type, definition);
   }
 
   public static Objective create(ResourceLocation type, JsonObject definition) {

@@ -142,13 +142,13 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
     for (JsonElement triggerElement : definition.get("triggers").getAsJsonArray()) {
       JsonObject trigger = triggerElement.getAsJsonObject();
-      Objective triggerType = QuestTypeRegistry.create(trigger);
+      Objective triggerType = QuestObjectiveRegistry.create(trigger);
       triggers.add(triggerType);
     }
 
     for (JsonElement objectiveElement : definition.get("objectives").getAsJsonArray()) {
       JsonObject objective = objectiveElement.getAsJsonObject();
-      Objective objectiveType = QuestTypeRegistry.create(objective);
+      Objective objectiveType = QuestObjectiveRegistry.create(objective);
       objectives.add(objectiveType);
     }
 
