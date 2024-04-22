@@ -44,6 +44,7 @@ public class QuestTypeRegistry {
     register(new ResourceLocation("questlog", "visit_biome"), VisitBiomeObjective::new);
     register(new ResourceLocation("questlog", "visit_dimension"), VisitDimensionObjective::new);
     register(new ResourceLocation("questlog", "visit_position"), VisitPositionObjective::new);
+    register(new ResourceLocation("questlog", "quest_complete"), QuestCompleteObjective::new);
   }
 
   public static void register(ResourceLocation id, Function<JsonObject, Objective> factory) {
