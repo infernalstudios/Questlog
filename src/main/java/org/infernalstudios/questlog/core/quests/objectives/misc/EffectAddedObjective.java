@@ -36,7 +36,7 @@ public class EffectAddedObjective extends Objective {
   }
 
   private void onPlayerMove(MobEffectEvent.Added event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.getEntity() instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player)

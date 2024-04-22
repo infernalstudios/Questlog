@@ -42,7 +42,7 @@ public class EnchantObjective extends Objective {
   }
 
   private void onItemEnchanted(ItemEnchantedEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.getEntity() instanceof ServerPlayer &&
       event.getEntity().equals(this.getParent().manager.player) &&

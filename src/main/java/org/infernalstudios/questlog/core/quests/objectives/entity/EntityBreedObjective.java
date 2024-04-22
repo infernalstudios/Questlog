@@ -18,7 +18,7 @@ public class EntityBreedObjective extends AbstractEntityObjective {
   }
 
   private void onPlayerMove(BabyEntitySpawnEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.getCausedByPlayer() instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player) &&

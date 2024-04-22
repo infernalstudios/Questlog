@@ -18,7 +18,7 @@ public class ItemDropObjective extends AbstractItemObjective {
   }
 
   private void onItemDrop(ItemTossEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
         event.getPlayer() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&

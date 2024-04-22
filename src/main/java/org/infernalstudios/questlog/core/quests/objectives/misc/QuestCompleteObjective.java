@@ -23,7 +23,7 @@ public class QuestCompleteObjective extends Objective {
   }
 
   private void onQuestCompleted(QuestCompletedEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     Quest quest = event.getQuest().manager.getQuest(event.getQuest().getId());
     if (quest.getId().equals(this.quest)) {
       this.setUnits(this.getUnits() + 1);

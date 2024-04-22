@@ -36,7 +36,7 @@ public class StatisticObjective extends Objective {
   }
 
   private void onStatAward(StatAwardEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.getEntity().equals(this.getParent().manager.player) &&
       event.getEntity() instanceof ServerPlayer &&

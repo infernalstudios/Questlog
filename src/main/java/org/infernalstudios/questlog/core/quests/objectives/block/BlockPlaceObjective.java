@@ -18,7 +18,7 @@ public class BlockPlaceObjective extends AbstractBlockObjective {
   }
 
   private void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&

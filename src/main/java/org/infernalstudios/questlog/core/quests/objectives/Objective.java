@@ -43,17 +43,16 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     this.parent = parent;
   }
 
+  @Nullable
   public final Quest getParent() {
-    if (this.parent == null) {
-      throw new IllegalStateException("Objective has not been assigned a parent quest");
-    }
-
     return this.parent;
   }
 
   public final void setUnits(int units) {
     this.units = Math.min(units, this.totalUnits);
-    this.getParent().markForUpdate();
+    if (this.getParent() != null) {
+      this.getParent().markForUpdate();
+    }
   }
 
   public final int getUnits() {

@@ -41,11 +41,8 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
     this.parent = parent;
   }
 
+  @Nullable
   public Quest getParent() {
-    if (this.parent == null) {
-      throw new IllegalStateException("Reward has no parent quest");
-    }
-
     return this.parent;
   }
 
@@ -62,7 +59,9 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
 
   public void applyReward(ServerPlayer player) {
     this.rewarded = true;
-    this.getParent().markForUpdate();
+    if (this.getParent() != null) {
+      this.getParent().markForUpdate();
+    }
   }
 
   public boolean hasRewarded() {

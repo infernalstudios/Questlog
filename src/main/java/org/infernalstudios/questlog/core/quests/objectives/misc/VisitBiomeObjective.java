@@ -25,7 +25,7 @@ public class VisitBiomeObjective extends Objective {
   // Checks every second for performance
   private int ticksUntilCheck = 0;
   private void onPlayerMove(TickEvent.PlayerTickEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.player instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player) &&

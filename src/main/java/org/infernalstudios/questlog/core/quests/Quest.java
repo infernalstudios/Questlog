@@ -28,7 +28,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
   public Quest(QuestDisplayData display, List<Objective> triggers, List<Objective> objectives, List<Reward> rewards, ResourceLocation id, QuestManager manager) {
     this.display = display;
-    display.setQuest(this);
     this.triggers = triggers;
     this.objectives = objectives;
     this.rewards = rewards;
@@ -38,6 +37,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     this.triggers.forEach(trigger -> trigger.setParent(this));
     this.objectives.forEach(objective -> objective.setParent(this));
     this.rewards.forEach(reward -> reward.setParent(this));
+    display.setQuest(this);
   }
 
   public ResourceLocation getId() {

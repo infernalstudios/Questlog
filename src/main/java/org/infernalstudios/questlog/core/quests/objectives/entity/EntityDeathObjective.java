@@ -18,7 +18,7 @@ public class EntityDeathObjective extends AbstractEntityObjective {
   }
 
   private void onEntityDeath(LivingDeathEvent event) {
-    if (this.isCompleted()) return;
+    if (this.isCompleted() || this.getParent() == null) return;
     if (
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
