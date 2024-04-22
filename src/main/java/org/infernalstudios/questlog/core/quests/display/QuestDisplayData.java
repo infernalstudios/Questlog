@@ -11,37 +11,37 @@ import java.util.List;
 import java.util.Objects;
 
 public class QuestDisplayData {
+  private final Component title;
+  private final Component description;
   @Nullable
-  private Quest quest;
-  private final String title;
-  private final String description;
-  private final boolean translatable;
-  @Nullable
-  private final ResourceLocation icon;
+  private final Texture icon;
   @Nullable
   private List<ObjectiveDisplayData> objectiveDisplay = null;
   @Nullable
   private List<RewardDisplayData> rewardDisplay = null;
 
   public QuestDisplayData(JsonObject data) {
-    this.title = data.get("title").getAsString();
-    this.description = data.get("description").getAsString();
-    this.translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
-    this.icon = data.has("icon") ? new ResourceLocation(data.get("icon").getAsString()) : null;
+    boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
+    String title = data.get("title").getAsString();
+    String description = data.get("description").getAsString();
+    String icon = data.has("icon") ? data.get("icon").getAsString() : null;
+
+    this.title = translatable ? Component.translatable(title) : Component.literal(title);
+    this.description = translatable ? Component.translatable(description) : Component.literal(description);
+    this.icon = icon != null ? new Texture(new ResourceLocation(icon), 16, 16, 0, 0, 16, 16) : null;
   }
 
   public void setQuest(Quest quest) {
-    this.quest = quest;
-    this.objectiveDisplay = this.quest.objectives.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
-    this.rewardDisplay = this.quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
+    this.objectiveDisplay = quest.objectives.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
+    this.rewardDisplay = quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
   }
 
   public Component getTitle() {
-    return this.translatable ? Component.translatable(this.title) : Component.literal(this.title);
+    return this.title;
   }
 
   public Component getDescription() {
-    return this.translatable ? Component.translatable(this.description) : Component.literal(this.description);
+    return this.description;
   }
 
   public List<ObjectiveDisplayData> getObjectiveDisplayData() {
@@ -60,6 +60,6 @@ public class QuestDisplayData {
 
   @Nullable
   public Texture getIcon() {
-    return new Texture(this.icon, 16, 16, 0, 0, 16, 16);
+    return this.icon;
   }
 }

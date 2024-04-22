@@ -11,15 +11,17 @@ import javax.annotation.Nullable;
 public class ObjectiveDisplayData {
   @Nullable
   private Objective objective;
-  private final String name;
-  private final boolean translatable;
   @Nullable
-  private final ResourceLocation icon;
+  private final Texture icon;
+  private final Component name;
 
   public ObjectiveDisplayData(JsonObject data) {
-    this.name = data.get("name").getAsString();
-    this.translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
-    this.icon = data.has("icon") ? new ResourceLocation(data.get("icon").getAsString()) : null;
+    boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
+    String name = data.get("name").getAsString();
+    String icon = data.has("icon") ? data.get("icon").getAsString() : null;
+
+    this.name = translatable ? Component.translatable(name) : Component.literal(name);
+    this.icon = icon != null ? new Texture(new ResourceLocation(icon), 16, 16, 0, 0, 16, 16) : null;
   }
 
   public void setObjective(Objective objective) {
@@ -27,10 +29,10 @@ public class ObjectiveDisplayData {
   }
 
   public Component getName() {
-    return this.translatable ? Component.translatable(this.name) : Component.literal(this.name);
+    return this.name;
   }
 
-  public Component getProgress(int taskIndex) {
+  public Component getProgress() {
     if (this.objective == null) {
       throw new IllegalStateException("QuestTypeDisplayData has not been assigned a quest type");
     }
@@ -44,6 +46,6 @@ public class ObjectiveDisplayData {
 
   @Nullable
   public Texture getIcon() {
-    return new Texture(this.icon, 16, 16, 0, 0, 16, 16);
+    return this.icon;
   }
 }

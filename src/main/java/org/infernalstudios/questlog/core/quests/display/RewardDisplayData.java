@@ -11,15 +11,17 @@ import javax.annotation.Nullable;
 public class RewardDisplayData {
   @Nullable
   private Reward reward;
-  private final String name;
-  private final boolean translatable;
+  private final Component name;
   @Nullable
-  private final ResourceLocation icon;
+  private final Texture icon;
 
   public RewardDisplayData(JsonObject data) {
-    this.name = data.get("name").getAsString();
-    this.translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
-    this.icon = data.has("icon") ? new ResourceLocation(data.get("icon").getAsString()) : null;
+    boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
+    String name = data.get("name").getAsString();
+    String icon = data.has("icon") ? data.get("icon").getAsString() : null;
+
+    this.name = translatable ? Component.translatable(name) : Component.literal(name);
+    this.icon = icon != null ? new Texture(new ResourceLocation(icon), 16, 16, 0, 0, 16, 16) : null;
   }
 
   public void setReward(Reward reward) {
@@ -27,7 +29,7 @@ public class RewardDisplayData {
   }
 
   public Component getName() {
-    return this.translatable ? Component.translatable(this.name) : Component.literal(this.name);
+    return this.name;
   }
 
   public boolean hasRewarded() {
@@ -39,6 +41,6 @@ public class RewardDisplayData {
 
   @Nullable
   public Texture getIcon() {
-    return new Texture(this.icon, 16, 16, 0, 0, 16, 16);
+    return this.icon;
   }
 }
