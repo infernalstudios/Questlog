@@ -58,6 +58,7 @@ public class NetworkHandler {
         try {
           encodeMethod.invoke(packet, friendlyByteBuf);
         } catch (IllegalAccessException | InvocationTargetException e) {
+          Questlog.LOGGER.error("Failed to encode " + packetClass.getName(), e);
           throw new RuntimeException(e);
         }
       };
@@ -69,6 +70,7 @@ public class NetworkHandler {
         try {
           return (M) decodeMethod.invoke(null, friendlyByteBuf);
         } catch (IllegalAccessException | InvocationTargetException e) {
+          Questlog.LOGGER.error("Failed to decode " + packetClass.getName(), e);
           throw new RuntimeException(e);
         }
       };
@@ -80,6 +82,7 @@ public class NetworkHandler {
         try {
           handleMethod.invoke(null, packet, supplier);
         } catch (IllegalAccessException | InvocationTargetException e) {
+          Questlog.LOGGER.error("Failed to handle " + packetClass.getName(), e);
           throw new RuntimeException(e);
         }
       };

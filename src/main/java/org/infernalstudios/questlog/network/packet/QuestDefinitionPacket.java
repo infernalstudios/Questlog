@@ -30,7 +30,7 @@ public class QuestDefinitionPacket {
     buf.writeResourceLocation(this.id);
 
     String json = GSON.toJson(this.definition);
-    buf.writeInt(json.length());
+    buf.writeInt(json.getBytes(StandardCharsets.UTF_8).length);
     buf.writeCharSequence(json, StandardCharsets.UTF_8);
   }
 
