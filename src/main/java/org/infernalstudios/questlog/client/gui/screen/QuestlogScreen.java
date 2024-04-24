@@ -6,19 +6,26 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
-import org.infernalstudios.questlog.client.gui.components.QuestDetails;
 import org.infernalstudios.questlog.client.gui.components.QuestList;
+import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.core.QuestManager;
+import org.infernalstudios.questlog.util.Texture;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class QuestlogScreen extends Screen {
+  private static final Texture BACKGROUND_TEXTURE = new Texture(
+      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
+      275, 166, 0, 0, 512, 512
+  );
+
   private final Screen previousScreen;
   @Nullable
-  private QuestList questList;
+  private ScrollableComponent questList;
   private final QuestManager manager;
 
   public QuestlogScreen(@Nullable Screen previousScreen) {
@@ -34,14 +41,32 @@ public class QuestlogScreen extends Screen {
       this.removeWidget(this.questList);
     }
 
-    // Added - 2 to width to fix some weird rendering issue
-    this.questList = new QuestList(Minecraft.getInstance(), this.manager.getAllQuests(), this.width / 2 - 2, this.height / 2, displayData -> {
+    this.questList = this.getList();
+
+    this.addRenderableWidget(this.questList);
+  }
+
+  private ScrollableComponent getList() {
+    int width = 245;
+    int height = 137;
+    int x = (this.width - width) / 2;
+    int y = (this.height - height) / 2;
+
+    return new ScrollableComponent(x, y, width, height, new QuestList(Minecraft.getInstance(), this.manager.getAllQuests(), displayData -> {
       if (this.minecraft != null) {
         this.minecraft.setScreen(new QuestDetails(this, displayData));
       }
-    });
+    }));
+  }
 
-    this.addWidget(this.questList);
+  @Override
+  public void renderBackground(PoseStack ps) {
+    super.renderBackground(ps);
+
+    int x = (this.width - BACKGROUND_TEXTURE.width()) / 2;
+    int y = (this.height - BACKGROUND_TEXTURE.height()) / 2;
+
+    BACKGROUND_TEXTURE.blit(ps, x, y);
   }
 
   @Override

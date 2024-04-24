@@ -15,7 +15,7 @@ public class QuestCompletedToast extends AbstractToast {
 
   @Override
   protected Component getTitle() {
-    return Component.translatable("questlog.quest_completed");
+    return Component.translatable("questlog.toast.quest_completed");
   }
 
   @Override
