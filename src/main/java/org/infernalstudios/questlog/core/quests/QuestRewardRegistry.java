@@ -8,7 +8,6 @@ import org.infernalstudios.questlog.core.quests.rewards.ExperienceReward;
 import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
 import org.infernalstudios.questlog.core.quests.rewards.LootTableReward;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
-import org.infernalstudios.questlog.util.PlayerReportableException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -41,8 +40,13 @@ public class QuestRewardRegistry {
 
   public static Reward create(ResourceLocation type, JsonObject definition) {
     if (!REGISTRY.containsKey(type)) {
-      throw new PlayerReportableException("Quest type not found: " + type);
+      throw new NullPointerException("Reward type not found: " + type);
     }
-    return REGISTRY.get(type).apply(definition);
+
+    try {
+      return REGISTRY.get(type).apply(definition);
+    } catch (Exception e) {
+      throw new IllegalStateException("Failed to create reward of type " + type, e);
+    }
   }
 }

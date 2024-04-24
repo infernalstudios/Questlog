@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import org.infernalstudios.questlog.util.PlayerReportableException;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.Util;
 
 import java.io.IOException;
@@ -21,7 +21,8 @@ public class DefinitionUtil {
     List<Resource> allQuestFiles = manager.getResourceStack(new ResourceLocation("questlog", "quests.json"));
 
     if (allQuestFiles.isEmpty()) {
-      throw new PlayerReportableException("No quests found");
+      Questlog.LOGGER.error("No quest definition file found!");
+      Questlog.LOGGER.error("Not crashing simply because it can happen.");
     }
     
     List<ResourceLocation> quests = new ArrayList<>();
@@ -39,7 +40,7 @@ public class DefinitionUtil {
     QUEST_DEFINITION_CACHE.clear();
 
     if (quests.isEmpty()) {
-      throw new PlayerReportableException("No quests found");
+      Questlog.LOGGER.warn("No quests found!");
     }
 
     for (ResourceLocation quest : quests) {
@@ -53,7 +54,7 @@ public class DefinitionUtil {
 
   public static JsonObject getCached(ResourceLocation path) {
     if (!QUEST_DEFINITION_CACHE.containsKey(path)) {
-      throw new PlayerReportableException("Quest not found: " + path);
+      throw new NullPointerException("Quest not found: " + path);
     }
 
     return QUEST_DEFINITION_CACHE.get(path);

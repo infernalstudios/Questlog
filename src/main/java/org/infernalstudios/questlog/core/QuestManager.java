@@ -15,7 +15,6 @@ import org.infernalstudios.questlog.event.QuestTriggeredEvent;
 import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestDataPacket;
 import org.infernalstudios.questlog.network.packet.QuestRemovePacket;
-import org.infernalstudios.questlog.util.PlayerReportableException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -80,13 +79,13 @@ public class QuestManager {
 
     for (ResourceLocation id : ids) {
       if (!this.quests.containsKey(id)) {
-        JsonObject definition;
+        JsonObject definition = DefinitionUtil.getCached(id);
+        Quest quest;
         try {
-          definition = DefinitionUtil.getCached(id);
-        } catch (PlayerReportableException e) {
-          throw new IllegalStateException("UNREACHABLE", e);
+          quest = Quest.create(definition, id, this);
+        } catch (Exception e) {
+          throw new RuntimeException("Failed to create quest " + id, e);
         }
-        Quest quest = Quest.create(definition, id, this);
         CompoundTag data = new CompoundTag();
         quest.writeInitialData(data);
         quest.deserialize(data);

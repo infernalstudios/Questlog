@@ -23,7 +23,6 @@ import org.infernalstudios.questlog.core.quests.objectives.misc.TrampleObjective
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitBiomeObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitDimensionObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitPositionObjective;
-import org.infernalstudios.questlog.util.PlayerReportableException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +77,12 @@ public class QuestObjectiveRegistry {
 
   public static Objective create(ResourceLocation type, JsonObject definition) {
     if (!REGISTRY.containsKey(type)) {
-      throw new PlayerReportableException("Quest type not found: " + type);
+      throw new NullPointerException("Objective type not found: " + type);
     }
-    return REGISTRY.get(type).apply(definition);
+    try {
+      return REGISTRY.get(type).apply(definition);
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to create objective of type " + type, e);
+    }
   }
 }
