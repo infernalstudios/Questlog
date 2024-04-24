@@ -160,12 +160,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     QuestDisplayData displayData = this.quest.getDisplay();
 
     // Icon
-    float titleWidth = this.font.width(displayData.getTitle()) + (displayData.getIcon() != null ? displayData.getIcon().width() : 0);
+    float titleWidth = this.font.width(displayData.getTitle()) + (displayData.getIcon() != null ? displayData.getIcon().width() + 4 : 0);
     float x = this.x + TITLE_X + (TITLE_WIDTH - titleWidth) / 2;
     float y = this.y + TITLE_Y;
     if (displayData.getIcon() != null) {
       displayData.getIcon().blit(ps, (int) x, this.y + TITLE_Y);
-      x += displayData.getIcon().width();
+      x += displayData.getIcon().width() + 4; // + padding
     }
 
     // Title

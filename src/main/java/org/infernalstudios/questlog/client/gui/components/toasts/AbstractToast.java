@@ -17,8 +17,17 @@ public abstract class AbstractToast implements Toast {
   protected abstract Component getDescription();
   @Nullable
   protected abstract Texture getIcon();
+
   protected Texture getBackground() {
     return new Texture(Toast.TEXTURE, 160, 32, 0, 0, 256, 256);
+  }
+
+  protected int titleColor() {
+    return 0xFFFF00FF;
+  }
+
+  protected int descriptionColor() {
+    return 0xFFFFFFFF;
   }
 
   public Toast.Visibility render(PoseStack ps, ToastComponent toastComponent, long time) {
@@ -27,10 +36,11 @@ public abstract class AbstractToast implements Toast {
     Font font = toastComponent.getMinecraft().font;
     
     List<FormattedCharSequence> list = font.split(this.getDescription(), 125);
-    int titleColor = 0xFFFF00;
+    int titleColor = this.titleColor();
+    int descriptionColor = this.descriptionColor();
     if (list.size() == 1) {
-      font.draw(ps, this.getTitle(), 30.0F, 7.0F, titleColor | -0x1000000);
-      font.draw(ps, list.get(0), 30.0F, 18.0F, -1);
+      font.draw(ps, this.getTitle(), 30.0F, 7.0F, titleColor | 0xFF000000);
+      font.draw(ps, list.get(0), 30.0F, 18.0F, descriptionColor | 0xFF000000);
     } else {
       if (time < 1500L) {
         int opacity = Mth.floor(Mth.clamp((float)(1500L - time) / 300.0F, 0.0F, 1.0F) * 255.0F) << 24 | 0x4000000;
@@ -40,7 +50,7 @@ public abstract class AbstractToast implements Toast {
         int lineHeight = this.height() / 2 - list.size() * 9 / 2;
         
         for(FormattedCharSequence formattedcharsequence : list) {
-          font.draw(ps, formattedcharsequence, 30.0F, (float)lineHeight, 0xFFFFFF | opacity);
+          font.draw(ps, formattedcharsequence, 30.0F, (float)lineHeight, descriptionColor | opacity);
           lineHeight += 9;
         }
       }

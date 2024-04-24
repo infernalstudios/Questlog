@@ -6,9 +6,9 @@ import org.infernalstudios.questlog.util.Texture;
 
 import javax.annotation.Nullable;
 
-public class QuestAddedToast extends AbstractToast {
+public class QuestAddedToast extends QuestlogToast {
   private final QuestDisplayData displayData;
-  
+
   public QuestAddedToast(QuestDisplayData displayData) {
     this.displayData = displayData;
   }

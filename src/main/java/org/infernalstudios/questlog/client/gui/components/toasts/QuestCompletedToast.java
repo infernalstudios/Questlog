@@ -6,7 +6,7 @@ import org.infernalstudios.questlog.util.Texture;
 
 import javax.annotation.Nullable;
 
-public class QuestCompletedToast extends AbstractToast {
+public class QuestCompletedToast extends QuestlogToast {
   private final QuestDisplayData displayData;
   
   public QuestCompletedToast(QuestDisplayData displayData) {
