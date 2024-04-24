@@ -1,23 +1,15 @@
 package org.infernalstudios.questlog;
 
-import com.electronwill.nightconfig.core.io.ParsingException;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.infernalstudios.questlog.config.QuestlogConfig;
-import org.infernalstudios.questlog.network.NetworkHandler;
-import org.lwjgl.glfw.GLFW;
-
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.infernalstudios.config.Config;
-import org.infernalstudios.config.Config.ReloadStage;
-
-import java.io.IOException;
+import org.infernalstudios.questlog.network.NetworkHandler;
+import org.lwjgl.glfw.GLFW;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Questlog.MODID)
