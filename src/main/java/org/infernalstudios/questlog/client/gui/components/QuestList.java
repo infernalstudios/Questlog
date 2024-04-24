@@ -213,7 +213,11 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         int dy = (height - linesHeight) / 2;
 
         font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + dx, yPosition + dy, 0x4C381B);
-        font.draw(ps, Component.translatable("questlog.quest.completed"), xPosition + dx, yPosition + dy + font.lineHeight, 0X529E52);
+        if (!this.quest.isRewarded()) {
+          font.draw(ps, Component.translatable("questlog.quest.uncollected"), xPosition + dx, yPosition + dy + font.lineHeight, 0x9e6632);
+        } else {
+          font.draw(ps, Component.translatable("questlog.quest.completed"), xPosition + dx, yPosition + dy + font.lineHeight, 0x529E52);
+        }
       } else {
         int y = yPosition + (height - font.lineHeight) / 2;
         font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + dx, y, 0x4C381B);

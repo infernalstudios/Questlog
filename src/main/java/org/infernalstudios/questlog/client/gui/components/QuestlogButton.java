@@ -20,6 +20,16 @@ public class QuestlogButton extends AbstractButton {
       54, 18, 343, 0, 512, 512
   );
 
+
+  public static final Texture TEXTURE_LONG = new Texture(
+      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
+      88, 18, 287, 18, 512, 512
+  );
+  public static final Texture TEXTURE_HOVERED_LONG = new Texture(
+      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
+      88, 18, 375, 18, 512, 512
+  );
+
   private final Callable onPress;
 
   public QuestlogButton(int x, int y, Component message, Callable onPress) {
@@ -27,12 +37,25 @@ public class QuestlogButton extends AbstractButton {
     this.onPress = onPress;
   }
 
+  private boolean isLong() {
+    return Minecraft.getInstance().font.width(this.getMessage()) > 46;
+  }
+
   @Override
   protected void renderBg(PoseStack poseStack, Minecraft minecraft, int mouseX, int mouseY) {
-    if (this.isHovered) {
-      TEXTURE_HOVERED.blit(poseStack, this.x, this.y);
+    if (this.isLong()) {
+      int actualX = this.x - (34 / 2); // Hacky
+      if (this.isHovered) {
+        TEXTURE_HOVERED_LONG.blit(poseStack, actualX, this.y);
+      } else {
+        TEXTURE_LONG.blit(poseStack, actualX, this.y);
+      }
     } else {
-      TEXTURE.blit(poseStack, this.x, this.y);
+      if (this.isHovered) {
+        TEXTURE_HOVERED.blit(poseStack, this.x, this.y);
+      } else {
+        TEXTURE.blit(poseStack, this.x, this.y);
+      }
     }
   }
 

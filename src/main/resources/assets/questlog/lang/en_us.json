@@ -5,6 +5,7 @@
     "questlog.toast.quest_completed": "Quest Completed!",
     "questlog.toast.quest_added": "Quest Added!",
     "questlog.quest.completed": "Completed",
+    "questlog.quest.uncollected": "Collect Rewards",
     "questlog.objective.completed": "Completed",
     "questlog.objective.in_progress_singular": "Uncompleted",
     "questlog.objective.in_progress": "%s/%s",
