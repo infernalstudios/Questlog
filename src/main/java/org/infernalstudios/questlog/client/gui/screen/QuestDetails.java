@@ -126,7 +126,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(ps);
-    if (this.quest.isComplete() && !this.quest.isRewarded()) {
+    if (this.quest.isCompleted() && !this.quest.isRewarded()) {
       if (this.backButton != null) {
         this.backButton.setMessage(Component.translatable("screen.questlog.quest.collect_rewards"));
       }
@@ -163,7 +163,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   }
 
   private int getInfoHeight() {
-    return Math.min(2, this.quest.isComplete() ? this.getDisplay().getRewardDisplayData().size() : this.getDisplay().getObjectiveDisplayData().size()) * InfoEntry.INFO_ENTRY_HEIGHT;
+    return Math.min(2, this.quest.isCompleted() ? this.getDisplay().getRewardDisplayData().size() : this.getDisplay().getObjectiveDisplayData().size()) * InfoEntry.INFO_ENTRY_HEIGHT;
   }
 
   private void renderInfo(PoseStack ps) {
@@ -200,7 +200,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     private List<InfoEntry> getInfoEntries() {
-      if (this.quest.isComplete()) {
+      if (this.quest.isCompleted()) {
         if (this.rewards == null) {
           this.rewards = new ArrayList<>();
           List<RewardDisplayData> rewardDisplayData = this.quest.getDisplay().getRewardDisplayData();

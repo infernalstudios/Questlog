@@ -59,7 +59,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     return true;
   }
 
-  public boolean isComplete() {
+  public boolean isCompleted() {
     for (Objective objective : this.objectives) {
       if (!objective.isCompleted()) {
         return false;

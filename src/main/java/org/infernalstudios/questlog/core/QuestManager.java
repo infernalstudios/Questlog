@@ -46,7 +46,7 @@ public class QuestManager {
     // If quest is already triggered/completed when adding to manager, the state either has already been
     // sent to the client, or it should not be sent at all.
     this.hasTriggeredYet.put(quest.getId(), quest.isTriggered());
-    this.hasCompletedYet.put(quest.getId(), quest.isComplete());
+    this.hasCompletedYet.put(quest.getId(), quest.isCompleted());
   }
 
   /**
@@ -130,7 +130,7 @@ public class QuestManager {
           Questlog.LOGGER.trace("Sent quest triggered event for {}", id);
         }
 
-        if (!this.hasCompletedYet.getOrDefault(id, false) && quest.isComplete()) {
+        if (!this.hasCompletedYet.getOrDefault(id, false) && quest.isCompleted()) {
           this.hasCompletedYet.put(id, true);
           MinecraftForge.EVENT_BUS.post(new QuestCompletedEvent(this.player, quest, false));
           Questlog.LOGGER.trace("Sent quest completed event for {}", id);

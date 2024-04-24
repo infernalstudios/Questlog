@@ -44,9 +44,9 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     this.children.sort((a, b) -> {
       Quest qa = a.quest;
       Quest qb = b.quest;
-      if (qa.isComplete() && !qb.isComplete()) {
+      if (qa.isCompleted() && !qb.isCompleted()) {
         return 1;
-      } else if (!qa.isComplete() && qb.isComplete()) {
+      } else if (!qa.isCompleted() && qb.isCompleted()) {
         return -1;
       } else if (!qa.isRewarded() && qb.isRewarded()) {
         return -1;
@@ -208,7 +208,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         this.quest.getDisplay().getIcon().blit(ps, xPosition + dx, yPosition + 5);
         dx += 20;
       }
-      if (this.quest.isComplete()) {
+      if (this.quest.isCompleted()) {
         int linesHeight = font.lineHeight * 2;
         int dy = (height - linesHeight) / 2;
 
