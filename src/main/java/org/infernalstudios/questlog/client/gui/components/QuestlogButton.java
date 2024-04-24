@@ -17,9 +17,8 @@ public class QuestlogButton extends AbstractButton {
   );
   public static final Texture TEXTURE_HOVERED = new Texture(
       new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      54, 18, 343, 0, 512, 512
+      54, 18, 341, 0, 512, 512
   );
-
 
   public static final Texture TEXTURE_LONG = new Texture(
       new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
