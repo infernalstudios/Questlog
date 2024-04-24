@@ -1,0 +1,19 @@
+{
+  "triggers": [],
+  "objectives": [
+    {
+      "type": "questlog:block_mine",
+      "block": "minecraft:oak_log",
+      "total": 1,
+      "display": {
+        "name": "Mine a log"
+      }
+    }
+  ],
+  "rewards": [],
+  "display": {
+    "title": "Punch that tree!",
+    "description": "Start your adventure by punching a tree!\nThis will give you an invaluable lesson in resource gathering.",
+    "icon": "minecraft:textures/block/oak_log.png"
+  }
+}

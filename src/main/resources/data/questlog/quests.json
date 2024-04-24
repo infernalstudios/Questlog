@@ -1,5 +1,9 @@
 {
   "quests": [
-    "questlog:quests/jump_5_times"
+    "questlog:quests/do_some_stuff",
+    "questlog:quests/kill_some_mobs",
+    "questlog:quests/mine_a_block",
+    "questlog:quests/craft_a_tool",
+    "questlog:quests/mine_more_blocks"
   ]
 }

@@ -1,0 +1,25 @@
+{
+  "triggers": [
+    {
+      "type": "questlog:quest_complete",
+      "quest": "questlog:quests/mine_a_block",
+      "total": 1
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_craft",
+      "item": "minecraft:wooden_pickaxe",
+      "total": 1,
+      "display": {
+        "name": "Craft a wooden pickaxe"
+      }
+    }
+  ],
+  "rewards": [],
+  "display": {
+    "title": "Punch that tree!",
+    "description": "Start your adventure by punching a tree!\nThis will give you an invaluable lesson in resource gathering.",
+    "icon": "minecraft:textures/item/wooden_pickaxe.png"
+  }
+}
