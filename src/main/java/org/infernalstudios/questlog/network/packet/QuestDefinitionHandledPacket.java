@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.QuestManager;
+import org.infernalstudios.questlog.core.ServerPlayerManager;
 
 import java.util.function.Supplier;
 
@@ -33,7 +34,7 @@ public class QuestDefinitionHandledPacket {
 
     Questlog.LOGGER.trace("Client handled definition for quest {}", packet.id.toString());
 
-    QuestManager manager = QuestManager.getLocal();
+    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSender());
     manager.sync(packet.id);
   }
 }

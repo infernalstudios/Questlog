@@ -66,7 +66,7 @@ public class StatisticObjective extends Objective {
   @Override
   public CompoundTag serialize() {
     CompoundTag data = super.serialize();
-    if (!this.trackSinceStart) {
+    if (this.trackSinceStart) {
       data.putInt("statAtStart", this.statAtStart);
     }
     return data;
