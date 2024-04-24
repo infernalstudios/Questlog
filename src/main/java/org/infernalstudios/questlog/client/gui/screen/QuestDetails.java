@@ -20,6 +20,9 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
+import org.infernalstudios.questlog.network.NetworkHandler;
+import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.util.Texture;
 
 import javax.annotation.CheckForNull;
@@ -90,7 +93,15 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     if (this.backButton != null) this.removeWidget(this.backButton);
     this.backButton = new QuestlogButton(this.x + BUTTON_X, this.y + BUTTON_Y, Component.translatable("gui.back"), () -> {
-      if (this.minecraft != null) {
+      if (this.quest.isCompleted() && !this.quest.isRewarded()) {
+        for (int i = 0; i < this.quest.rewards.size(); i++) {
+          Reward reward = this.quest.rewards.get(i);
+          if (!reward.hasRewarded()) {
+            // Send a packet to the server to collect the reward.
+            NetworkHandler.sendToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
+          }
+        }
+      } else if (this.minecraft != null) {
         this.minecraft.setScreen(this.previousScreen);
       }
     });
@@ -126,9 +137,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     this.renderBackground(ps);
-    if (this.quest.isCompleted() && !this.quest.isRewarded()) {
-      if (this.backButton != null) {
-        this.backButton.setMessage(Component.translatable("screen.questlog.quest.collect_rewards"));
+    if (this.backButton != null) {
+      if (this.quest.isCompleted() && !this.quest.isRewarded()) {
+        this.backButton.setMessage(Component.translatable("questlog.reward.collect"));
+      } else {
+        this.backButton.setMessage(Component.translatable("gui.back"));
       }
     }
     super.render(ps, mouseX, mouseY, partialTicks);
@@ -309,9 +322,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
       Component progress = this.objectiveDisplayData.getProgress();
 
-      progress = Component.literal("- ").append(progress);
-
-      font.draw(ps, progress, x, y, 0x9E7852);
+      font.draw(ps, "- ", x, y, 0x9E7852);
+      font.draw(ps, progress, x + font.width("- "), y, this.objectiveDisplayData.isCompleted() ? 0x529E52 : 0x9E7852);
     }
 
     private void drawCollected(PoseStack ps, int x) {
@@ -324,11 +336,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
       Component collected = this.rewardDisplayData.hasRewarded() ?
         Component.translatable("questlog.reward.collected") :
-        Component.translatable("questlog.reward.collect");
+        Component.translatable("questlog.reward.uncollected");
 
-      collected = Component.literal("- ").append(collected);
 
-      font.draw(ps, collected, x, y, this.rewardDisplayData.hasRewarded() ? 0x529E52 : 0x9E7852);
+      font.draw(ps, "- ", x, y, 0x9E7852);
+      font.draw(ps, collected, x + font.width("- "), y, this.rewardDisplayData.hasRewarded() ? 0x529E52 : 0x9E7852);
     }
 
     private void renderReward(PoseStack ps) {

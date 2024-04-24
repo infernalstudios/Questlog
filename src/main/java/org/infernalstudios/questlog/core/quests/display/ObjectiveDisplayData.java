@@ -32,12 +32,20 @@ public class ObjectiveDisplayData {
     return this.name;
   }
 
+  public boolean isCompleted() {
+    if (this.objective == null) {
+      throw new IllegalStateException("ObjectiveDisplayData has not been assigned a quest type");
+    }
+
+    return this.objective.isCompleted();
+  }
+
   public Component getProgress() {
     if (this.objective == null) {
       throw new IllegalStateException("ObjectiveDisplayData has not been assigned a quest type");
     }
 
-    return this.objective.isCompleted() ?
+    return this.isCompleted() ?
       Component.translatable("questlog.objective.completed") :
       this.objective.getTotalUnits() > 1 ?
         Component.translatable("questlog.objective.in_progress", this.objective.getUnits(), this.objective.getTotalUnits()) :

@@ -9,5 +9,6 @@
     "questlog.objective.in_progress_singular": "Uncompleted",
     "questlog.objective.in_progress": "%s/%s",
     "questlog.reward.collect": "Collect Rewards",
-    "questlog.reward.collected": "Rewards Collected"
+    "questlog.reward.collected": "Collected",
+    "questlog.reward.uncollected": "Uncollected"
 }
