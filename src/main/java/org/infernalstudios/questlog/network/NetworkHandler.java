@@ -13,6 +13,7 @@ import org.infernalstudios.questlog.network.packet.QuestDataPacket;
 import org.infernalstudios.questlog.network.packet.QuestDefinitionHandledPacket;
 import org.infernalstudios.questlog.network.packet.QuestDefinitionPacket;
 import org.infernalstudios.questlog.network.packet.QuestRemovePacket;
+import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.network.packet.QuestTriggeredPacket;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,6 +43,7 @@ public class NetworkHandler {
     registerPacket(QuestRemovePacket.class);
     registerPacket(QuestTriggeredPacket.class);
     registerPacket(QuestCompletedPacket.class);
+    registerPacket(QuestRewardCollectPacket.class);
   }
 
   @SuppressWarnings("unchecked")
