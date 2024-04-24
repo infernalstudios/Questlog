@@ -54,13 +54,6 @@ public final class Util {
     return tag;
   }
 
-  public static List<Tag> readNbtList(Tag tag) {
-    if (tag.getType() != ListTag.TYPE) {
-      return new ArrayList<>();
-    }
-    return (ListTag) tag;
-  }
-
   private static final Gson GSON = new GsonBuilder().create();
 
   public static JsonObject getJsonResource(Resource resource) throws IOException {

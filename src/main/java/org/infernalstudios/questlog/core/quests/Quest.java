@@ -108,17 +108,17 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   /** {@inheritDoc} */
   @Override
   public void deserialize(CompoundTag data) {
-    List<Tag> triggerData = Util.readNbtList(data.getCompound("triggers"));
+    List<Tag> triggerData = data.getList("triggers", Tag.TAG_COMPOUND);
     for (int i = 0; i < triggerData.size(); i++) {
       this.triggers.get(i).deserialize((CompoundTag) triggerData.get(i));
     }
 
-    List<Tag> objectiveData = Util.readNbtList(data.getCompound("objectives"));
+    List<Tag> objectiveData = data.getList("objectives", Tag.TAG_COMPOUND);
     for (int i = 0; i < objectiveData.size(); i++) {
       this.objectives.get(i).deserialize((CompoundTag) objectiveData.get(i));
     }
 
-    List<Tag> rewardData = Util.readNbtList(data.getCompound("rewards"));
+    List<Tag> rewardData = data.getList("rewards", Tag.TAG_COMPOUND);
     for (int i = 0; i < rewardData.size(); i++) {
       this.rewards.get(i).deserialize((CompoundTag) rewardData.get(i));
     }
