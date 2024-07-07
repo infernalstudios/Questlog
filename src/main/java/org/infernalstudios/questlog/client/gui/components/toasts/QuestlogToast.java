@@ -2,7 +2,7 @@ package org.infernalstudios.questlog.client.gui.components.toasts;
 
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 public abstract class QuestlogToast extends AbstractToast {
   private static final Texture BACKGROUND = new Texture(

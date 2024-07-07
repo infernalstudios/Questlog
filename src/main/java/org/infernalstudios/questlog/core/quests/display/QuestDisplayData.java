@@ -4,7 +4,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.Quest;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.ItemRenderable;
+import org.infernalstudios.questlog.util.texture.Renderable;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -14,7 +16,7 @@ public class QuestDisplayData {
   private final Component title;
   private final Component description;
   @Nullable
-  private final Texture icon;
+  private final Renderable icon;
   @Nullable
   private List<ObjectiveDisplayData> objectiveDisplay = null;
   @Nullable
@@ -24,11 +26,22 @@ public class QuestDisplayData {
     boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
     String title = data.get("title").getAsString();
     String description = data.get("description").getAsString();
-    String icon = data.has("icon") ? data.get("icon").getAsString() : null;
+    JsonObject icon = data.has("icon") ? data.get("icon").getAsJsonObject() : null;
 
     this.title = translatable ? Component.translatable(title) : Component.literal(title);
     this.description = translatable ? Component.translatable(description) : Component.literal(description);
-    this.icon = icon != null ? new Texture(new ResourceLocation(icon), 16, 16, 0, 0, 16, 16) : null;
+
+    if (icon != null) {
+      if (icon.has("texture")) {
+        this.icon = new Texture(new ResourceLocation(icon.get("texture").getAsString()), 16, 16, 0, 0, 16, 16);
+      } else if (icon.has("item")) {
+        this.icon = new ItemRenderable(new ResourceLocation(icon.get("item").getAsString()));
+      } else {
+        this.icon = null;
+      }
+    } else {
+      this.icon = null;
+    }
   }
 
   public void setQuest(Quest quest) {
@@ -59,7 +72,7 @@ public class QuestDisplayData {
   }
 
   @Nullable
-  public Texture getIcon() {
+  public Renderable getIcon() {
     return this.icon;
   }
 }

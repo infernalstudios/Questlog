@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.Callable;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 public class QuestlogButton extends AbstractButton {
   public static final Texture TEXTURE = new Texture(

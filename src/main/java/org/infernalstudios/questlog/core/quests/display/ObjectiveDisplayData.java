@@ -4,7 +4,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.ItemRenderable;
+import org.infernalstudios.questlog.util.texture.Renderable;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
 
@@ -12,16 +14,26 @@ public class ObjectiveDisplayData {
   @Nullable
   private Objective objective;
   @Nullable
-  private final Texture icon;
+  private final Renderable icon;
   private final Component name;
 
   public ObjectiveDisplayData(JsonObject data) {
     boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
     String name = data.get("name").getAsString();
-    String icon = data.has("icon") ? data.get("icon").getAsString() : null;
+    JsonObject icon = data.has("icon") ? data.get("icon").getAsJsonObject() : null;
 
     this.name = translatable ? Component.translatable(name) : Component.literal(name);
-    this.icon = icon != null ? new Texture(new ResourceLocation(icon), 16, 16, 0, 0, 16, 16) : null;
+    if (icon != null) {
+      if (icon.has("texture")) {
+        this.icon = new Texture(new ResourceLocation(icon.get("texture").getAsString()), 16, 16, 0, 0, 16, 16);
+      } else if (icon.has("item")) {
+        this.icon = new ItemRenderable(new ResourceLocation(icon.get("item").getAsString()));
+      } else {
+        this.icon = null;
+      }
+    } else {
+      this.icon = null;
+    }
   }
 
   public void setObjective(Objective objective) {
@@ -53,7 +65,7 @@ public class ObjectiveDisplayData {
   }
 
   @Nullable
-  public Texture getIcon() {
+  public Renderable getIcon() {
     return this.icon;
   }
 }

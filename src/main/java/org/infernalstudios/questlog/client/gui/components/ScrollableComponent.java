@@ -9,7 +9,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.ScrollbarTexture;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.lwjgl.glfw.GLFW;
 
 /**

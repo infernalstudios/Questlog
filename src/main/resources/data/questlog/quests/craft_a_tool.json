@@ -20,6 +20,6 @@
   "display": {
     "title": "Punch that tree!",
     "description": "Start your adventure by punching a tree!\nThis will give you an invaluable lesson in resource gathering.",
-    "icon": "minecraft:textures/item/wooden_pickaxe.png"
+    "icon": { "item": "minecraft:wooden_pickaxe.png" }
   }
 }

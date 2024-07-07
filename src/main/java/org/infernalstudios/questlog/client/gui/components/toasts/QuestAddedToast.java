@@ -2,7 +2,7 @@ package org.infernalstudios.questlog.client.gui.components.toasts;
 
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Renderable;
 
 import javax.annotation.Nullable;
 
@@ -25,7 +25,7 @@ public class QuestAddedToast extends QuestlogToast {
 
   @Override
   @Nullable
-  protected Texture getIcon() {
+  protected Renderable getIcon() {
     return this.displayData.getIcon();
   }
 }

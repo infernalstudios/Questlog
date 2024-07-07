@@ -7,7 +7,7 @@
       "total": 5,
       "display": {
         "name": "Jump 5 times",
-        "icon": "minecraft:textures/mob_effect/jump_boost.png"
+        "icon": { "texture": "minecraft:textures/mob_effect/jump_boost.png" }
       }
     },
     {
@@ -16,7 +16,7 @@
       "total": 1,
       "display": {
         "name": "Kill a zombie",
-        "icon": "minecraft:textures/mob_effect/strength.png"
+        "icon": { "texture": "minecraft:textures/mob_effect/strength.png" }
       }
     }
   ],
@@ -27,13 +27,13 @@
       "isInstant": false,
       "display": {
         "name": "1 Diamond",
-        "icon": "minecraft:textures/item/diamond.png"
+        "icon": { "item": "minecraft:diamond" }
       }
     }
   ],
   "display": {
     "title": "Do some stuff",
     "description": "This\nis\na\nmultiline\ndescription\nand\nit\nshould\nbe\nscrollable\nif\nit\nis\nlong\nenough",
-    "icon": "minecraft:textures/mob_effect/luck.png"
+    "icon": { "texture": "minecraft:textures/mob_effect/luck.png" }
   }
 }

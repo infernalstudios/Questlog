@@ -7,7 +7,8 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Renderable;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -16,7 +17,7 @@ public abstract class AbstractToast implements Toast {
   protected abstract Component getTitle();
   protected abstract Component getDescription();
   @Nullable
-  protected abstract Texture getIcon();
+  protected abstract Renderable getIcon();
 
   protected Texture getBackground() {
     return new Texture(Toast.TEXTURE, 160, 32, 0, 0, 256, 256);

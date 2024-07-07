@@ -23,7 +23,8 @@ import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Renderable;
+import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -295,7 +296,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       }
     }
 
-    private boolean drawIcon(PoseStack ps, @Nullable Texture icon) {
+    private boolean drawIcon(PoseStack ps, @Nullable Renderable icon) {
       if (icon != null) {
         icon.blit(ps, this.x, this.y);
         return true;

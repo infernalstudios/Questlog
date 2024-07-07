@@ -9,7 +9,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.components.QuestList;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.core.QuestManager;
-import org.infernalstudios.questlog.util.Texture;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
