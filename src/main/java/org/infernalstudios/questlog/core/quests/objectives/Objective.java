@@ -2,11 +2,11 @@ package org.infernalstudios.questlog.core.quests.objectives;
 
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
+import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.NbtSaveable;
 
 import javax.annotation.CheckForNull;
@@ -32,11 +32,11 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
       this.display = null;
     }
 
-    this.registerEventListeners(MinecraftForge.EVENT_BUS);
+    this.registerEventListeners(Questlog.GENERIC_EVENT_BUS);
   }
 
   // This is required due to EVENT_BUS.register(this) does not work for superclasses
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
   }
 
   public final void setParent(Quest parent) {

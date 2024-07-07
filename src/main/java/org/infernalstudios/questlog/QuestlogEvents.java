@@ -56,6 +56,7 @@ public class QuestlogEvents {
   public static void onServerStop(ServerStoppingEvent event) {
     ServerPlayerManager.INSTANCE.save();
     ServerPlayerManager.INSTANCE = null;
+    Questlog.GENERIC_EVENT_BUS.removeAllListeners();
   }
   
   @SubscribeEvent

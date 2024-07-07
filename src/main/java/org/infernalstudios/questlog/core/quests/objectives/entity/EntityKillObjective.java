@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.entity;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class EntityKillObjective extends AbstractEntityObjective {
   public EntityKillObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class EntityKillObjective extends AbstractEntityObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onEntityDeath);
+    bus.addListener(this::onEntityDeath);
   }
 
   private void onEntityDeath(LivingDeathEvent event) {

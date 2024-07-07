@@ -2,10 +2,9 @@ package org.infernalstudios.questlog.core.quests.objectives.misc;
 
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
 
 public class QuestCompleteObjective extends Objective {
@@ -17,9 +16,9 @@ public class QuestCompleteObjective extends Objective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-     bus.addListener(EventPriority.LOWEST, this::onQuestCompleted);
+     bus.addListener(this::onQuestCompleted);
   }
 
   private void onQuestCompleted(QuestCompletedEvent event) {

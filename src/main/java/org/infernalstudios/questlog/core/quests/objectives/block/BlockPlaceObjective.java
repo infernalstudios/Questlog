@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.block;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class BlockPlaceObjective extends AbstractBlockObjective {
   public BlockPlaceObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class BlockPlaceObjective extends AbstractBlockObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onBlockPlace);
+    bus.addListener(this::onBlockPlace);
   }
 
   private void onBlockPlace(BlockEvent.EntityPlaceEvent event) {

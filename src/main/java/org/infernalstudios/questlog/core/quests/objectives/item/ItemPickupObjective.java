@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.item;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemPickupObjective extends AbstractItemObjective {
   public ItemPickupObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class ItemPickupObjective extends AbstractItemObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onItemPickup);
+    bus.addListener(this::onItemPickup);
   }
 
   private void onItemPickup(PlayerEvent.ItemPickupEvent event) {

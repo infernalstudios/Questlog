@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.item;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemUseObjective extends AbstractItemObjective {
   public ItemUseObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class ItemUseObjective extends AbstractItemObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onItemUse);
+    bus.addListener(this::onItemUse);
   }
 
   private void onItemUse(LivingEntityUseItemEvent event) {

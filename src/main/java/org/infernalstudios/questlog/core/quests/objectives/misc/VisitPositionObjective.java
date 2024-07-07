@@ -4,9 +4,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.Util;
 
 public class VisitPositionObjective extends Objective {
@@ -18,9 +17,9 @@ public class VisitPositionObjective extends Objective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onPlayerMove);
+    bus.addListener(this::onPlayerMove);
   }
 
   // Checks every second for performance

@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.item;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemDropObjective extends AbstractItemObjective {
   public ItemDropObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class ItemDropObjective extends AbstractItemObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onItemDrop);
+    bus.addListener(this::onItemDrop);
   }
 
   private void onItemDrop(ItemTossEvent event) {

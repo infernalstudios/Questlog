@@ -4,9 +4,8 @@ import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class VisitDimensionObjective extends Objective {
   private final ResourceLocation dimension;
@@ -17,9 +16,9 @@ public class VisitDimensionObjective extends Objective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onPlayerMove);
+    bus.addListener(this::onPlayerMove);
   }
 
   // Checks every second for performance

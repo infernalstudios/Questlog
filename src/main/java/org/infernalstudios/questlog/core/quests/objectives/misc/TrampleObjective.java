@@ -3,9 +3,8 @@ package org.infernalstudios.questlog.core.quests.objectives.misc;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class TrampleObjective extends Objective {
   public TrampleObjective(JsonObject definition) {
@@ -13,9 +12,9 @@ public class TrampleObjective extends Objective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onBlockTrample);
+    bus.addListener(this::onBlockTrample);
   }
 
   private void onBlockTrample(BlockEvent.FarmlandTrampleEvent event) {

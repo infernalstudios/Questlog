@@ -8,10 +8,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 import javax.annotation.Nullable;
 
@@ -58,9 +57,9 @@ public class BlockMineObjective extends AbstractBlockObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onBlockDestroy);
+    bus.addListener(this::onBlockDestroy);
   }
 
   private void onBlockDestroy(BlockEvent.BreakEvent event) {

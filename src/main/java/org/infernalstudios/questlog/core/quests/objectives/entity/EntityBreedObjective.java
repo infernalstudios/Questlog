@@ -3,8 +3,7 @@ package org.infernalstudios.questlog.core.quests.objectives.entity;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class EntityBreedObjective extends AbstractEntityObjective {
   public EntityBreedObjective(JsonObject definition) {
@@ -12,9 +11,9 @@ public class EntityBreedObjective extends AbstractEntityObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onPlayerMove);
+    bus.addListener(this::onPlayerMove);
   }
 
   private void onPlayerMove(BabyEntitySpawnEvent event) {

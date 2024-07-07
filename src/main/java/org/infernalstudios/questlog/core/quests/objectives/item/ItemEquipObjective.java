@@ -4,8 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemEquipObjective extends AbstractItemObjective {
   private final EquipmentSlot slot;
@@ -23,9 +22,9 @@ public class ItemEquipObjective extends AbstractItemObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onPlayerTick);
+    bus.addListener(this::onPlayerTick);
   }
 
   // Checks every second for performance

@@ -6,9 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.StatAwardEvent;
 import org.infernalstudios.questlog.util.Util;
 
@@ -30,9 +29,9 @@ public class StatisticObjective extends Objective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onStatAward);
+    bus.addListener(this::onStatAward);
   }
 
   private void onStatAward(StatAwardEvent event) {

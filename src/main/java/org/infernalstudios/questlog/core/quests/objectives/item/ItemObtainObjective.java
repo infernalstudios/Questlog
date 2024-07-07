@@ -5,8 +5,7 @@ import net.minecraft.nbt.ByteTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
+import org.infernalstudios.questlog.event.GenericEventBus;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -34,9 +33,9 @@ public class ItemObtainObjective extends AbstractItemObjective {
   }
 
   @Override
-  protected void registerEventListeners(IEventBus bus) {
+  protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(EventPriority.LOWEST, this::onPlayerTick);
+    bus.addListener(this::onPlayerTick);
   }
 
   // Checks every second for performance
