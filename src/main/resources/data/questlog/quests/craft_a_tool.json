@@ -18,8 +18,8 @@
   ],
   "rewards": [],
   "display": {
-    "title": "Punch that tree!",
-    "description": "Start your adventure by punching a tree!\nThis will give you an invaluable lesson in resource gathering.",
-    "icon": { "item": "minecraft:wooden_pickaxe.png" }
+    "title": "Craft a wooden pickaxe",
+    "description": "Craft a wooden pickaxe to mine some stone.",
+    "icon": { "item": "minecraft:wooden_pickaxe" }
   }
 }
