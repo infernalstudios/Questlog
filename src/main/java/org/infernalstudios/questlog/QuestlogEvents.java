@@ -1,13 +1,10 @@
 package org.infernalstudios.questlog;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.infernalstudios.questlog.client.gui.components.toasts.QuestAddedToast;
-import org.infernalstudios.questlog.client.gui.components.toasts.QuestCompletedToast;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
@@ -70,19 +67,17 @@ public class QuestlogEvents {
   public static void onQuestAdded(QuestTriggeredEvent event) {
     if (!event.isClient()) {
       NetworkHandler.sendToPlayer(new QuestTriggeredPacket(event.getQuest().getId()), (ServerPlayer) event.getEntity());
-      return;
+    } else {
+      QuestlogClientEvents.onQuestAdded(event); // Deduplication of listeners, organization
     }
-
-    Minecraft.getInstance().getToasts().addToast(new QuestAddedToast(event.getQuest().getDisplay()));
   }
 
   @SubscribeEvent
   public static void onQuestCompleted(QuestCompletedEvent event) {
     if (!event.isClient()) {
       NetworkHandler.sendToPlayer(new QuestCompletedPacket(event.getQuest().getId()), (ServerPlayer) event.getEntity());
-      return;
+    } else {
+      QuestlogClientEvents.onQuestCompleted(event); // Deduplication of listeners, organization
     }
-
-    Minecraft.getInstance().getToasts().addToast(new QuestCompletedToast(event.getQuest().getDisplay()));
   }
 }
