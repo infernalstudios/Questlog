@@ -74,6 +74,14 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
     this.scrollable.setScrollableComponent(this);
   }
 
+  public double getXOffset() {
+    return this.left;
+  }
+
+  public double getYOffset() {
+    return this.top - this.getScrollAmount();
+  }
+
   protected int getScrollbarX() {
     return this.left + this.width - this.scrollbar.bar().width();
   }
@@ -93,18 +101,12 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   // Renderers
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
-    // Offset pose stack so that 0, 0 would be at x, y - this.getScrollAmount();
-    ps.pushPose();
-    ps.translate(this.left, this.top - this.getScrollAmount(), 0.0F);
-
     this.scrollable.renderBackground(ps, mouseX - this.left, (int) (mouseY - this.top + this.getScrollAmount()), partialTicks);
 
     // Clip offscreen rendering
     GuiComponent.enableScissor(this.left, this.top, this.left + this.width, this.top + this.height);
     this.scrollable.render(ps, mouseX - this.left, (int) (mouseY - this.top + this.getScrollAmount()), partialTicks);
     GuiComponent.disableScissor();
-
-    ps.popPose();
 
     if (this.canScroll()) {
       this.renderScrollbar(ps, mouseX, mouseY);

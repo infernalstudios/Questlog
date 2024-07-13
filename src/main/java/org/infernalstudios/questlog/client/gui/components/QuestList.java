@@ -144,7 +144,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
       ps.pushPose();
       ps.scale(scale, scale, scale);
       String text = "No quests available";
-      font.draw(ps, text, (int) (scale + ((float) this.getWidth() / 2) - (font.width(text) * scale / 2)) / scale, (int) (5 + font.lineHeight * 5) / scale, 0x4C381B);
+      font.draw(ps, text, (float) this.scroller.getXOffset() + (int) (scale + ((float) this.getWidth() / 2) - (font.width(text) * scale / 2)) / scale, (float) this.scroller.getYOffset() + (int) (5 + font.lineHeight * 5) / scale, 0x4C381B);
       ps.popPose();
     } else {
       this.renderList(ps, mouseX, mouseY, partialTicks);
@@ -205,31 +205,31 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
       Font font = Minecraft.getInstance().font;
       int dx = 5;
       if (this.quest.getDisplay().getIcon() != null) {
-        this.quest.getDisplay().getIcon().blit(ps, xPosition + dx, yPosition + 5);
+        this.quest.getDisplay().getIcon().blit(ps, xPosition + dx + (int) this.list.scroller.getXOffset(), yPosition + 5 + (int) this.list.scroller.getYOffset());
         dx += 20;
       }
       if (this.quest.isCompleted()) {
         int linesHeight = font.lineHeight * 2;
         int dy = (height - linesHeight) / 2;
 
-        font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + dx, yPosition + dy, 0x4C381B);
+        font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + dy + (int) this.list.scroller.getYOffset() , 0x4C381B);
         if (!this.quest.isRewarded()) {
-          font.draw(ps, Component.translatable("questlog.quest.uncollected"), xPosition + dx, yPosition + dy + font.lineHeight, 0x9e6632);
+          font.draw(ps, Component.translatable("questlog.quest.uncollected"), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight, 0x9e6632);
         } else {
-          font.draw(ps, Component.translatable("questlog.quest.completed"), xPosition + dx, yPosition + dy + font.lineHeight, 0x529E52);
+          font.draw(ps, Component.translatable("questlog.quest.completed"), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight, 0x529E52);
         }
       } else {
-        int y = yPosition + (height - font.lineHeight) / 2;
-        font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + dx, y, 0x4C381B);
+        int y = yPosition + (int) this.list.scroller.getYOffset() + (height - font.lineHeight) / 2;
+        font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, y, 0x4C381B);
       }
 
       if (isHovered) {
-        fill(ps, xPosition - 2, yPosition, xPosition + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0), yPosition + height, 0x80FFFFFF);
+        fill(ps, xPosition + (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset(), xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0), yPosition + (int) this.list.scroller.getYOffset() + height, 0x80FFFFFF);
       }
 
       if (this.hasNext()) {
         // Draw line
-        GuiComponent.fill(ps, xPosition + 5, yPosition + height - 1, xPosition + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0) - 5, yPosition + height, 0xFF000000);
+        GuiComponent.fill(ps, xPosition + (int) this.list.scroller.getXOffset() + 5, yPosition + (int) this.list.scroller.getYOffset() + height - 1, xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0) - 5, yPosition + (int) this.list.scroller.getYOffset() + height, 0xFF000000);
       }
     }
 

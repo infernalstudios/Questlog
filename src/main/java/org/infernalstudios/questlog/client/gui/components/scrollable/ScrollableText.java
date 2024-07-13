@@ -38,7 +38,7 @@ public class ScrollableText implements Scrollable {
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     for (int i = 0; i < this.getLines().size(); i++) {
-      this.font.draw(ps, this.getLines().get(i), 0, i * this.font.lineHeight, 0x000000);
+      this.font.draw(ps, this.getLines().get(i), (float) this.scroller.getXOffset(), (float) this.scroller.getYOffset() + i * this.font.lineHeight, 0x000000);
     }
   }
 
