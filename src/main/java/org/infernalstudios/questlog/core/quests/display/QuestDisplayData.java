@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
@@ -28,6 +30,7 @@ public class QuestDisplayData {
   private final ResourceLocation completedSound;
   @Nullable
   private final ResourceLocation triggeredSound;
+  private final ResourceLocation guiTexture;
 
   public QuestDisplayData(JsonObject data) {
     boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
@@ -51,6 +54,14 @@ public class QuestDisplayData {
     );
 
     this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
+
+    String backgroundLoc = data.has("background") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "background", new JsonObject()), "texture", (String) null) : null;
+
+    if (backgroundLoc == null) {
+      backgroundLoc = Questlog.MODID + ":textures/gui/questlog.png";
+    }
+
+    this.guiTexture = new ResourceLocation(backgroundLoc);
   }
 
   public void setQuest(Quest quest) {
@@ -95,5 +106,9 @@ public class QuestDisplayData {
   public SoundInstance getTriggeredSound() {
     SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(this.triggeredSound);
     return soundEvent != null ? SimpleSoundInstance.forUI(soundEvent, 1, 1) : null;
+  }
+
+  public QuestlogGuiSet getGuiSet() {
+    return this.guiTexture.equals(QuestlogGuiSet.DEFAULT.location) ? QuestlogGuiSet.DEFAULT : new QuestlogGuiSet(this.guiTexture);
   }
 }

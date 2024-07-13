@@ -10,8 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
@@ -24,7 +23,6 @@ import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.util.texture.Renderable;
-import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -32,11 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestDetails extends Screen implements NarrationSupplier {
-  private static final Texture BACKGROUND_TEXTURE = new Texture(
-      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      275, 166, 0, 166, 512, 512
-  );
-
   private static final int TITLE_X = 71;
   private static final int TITLE_Y = 13;
   private static final int TITLE_WIDTH = 132;
@@ -73,12 +66,16 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.previousScreen = previousScreen;
     this.quest = quest;
 
-    this.x = (this.width - BACKGROUND_TEXTURE.width()) / 2;
-    this.y = (this.height - BACKGROUND_TEXTURE.height()) / 2;
+    this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2;
+    this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2;
   }
 
   private QuestDisplayData getDisplay() {
     return this.quest.getDisplay();
+  }
+
+  private QuestlogGuiSet getGuiSet() {
+    return this.getDisplay().getGuiSet();
   }
 
   @Override
@@ -89,8 +86,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       throw new IllegalStateException("Minecraft is null, UNREACHABLE");
     }
 
-    this.x = (this.width - BACKGROUND_TEXTURE.width()) / 2;
-    this.y = (this.height - BACKGROUND_TEXTURE.height()) / 2;
+    this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2;
+    this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2;
 
     if (this.backButton != null) this.removeWidget(this.backButton);
     this.backButton = new QuestlogButton(this.x + BUTTON_X, this.y + BUTTON_Y, Component.translatable("gui.back"), () -> {
@@ -105,7 +102,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       } else if (this.minecraft != null) {
         this.minecraft.setScreen(this.previousScreen);
       }
-    });
+    }, this.getGuiSet());
     this.addRenderableWidget(this.backButton);
 
     if (this.description != null) this.removeWidget(this.description);
@@ -154,7 +151,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   @Override
   public void renderBackground(PoseStack ps) {
     super.renderBackground(ps);
-    BACKGROUND_TEXTURE.blit(ps, this.x, this.y);
+    this.getGuiSet().detailBackground.blit(ps, this.x, this.y);
   }
 
   private void renderTitle(PoseStack ps) {

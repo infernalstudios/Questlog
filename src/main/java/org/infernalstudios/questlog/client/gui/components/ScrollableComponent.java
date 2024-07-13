@@ -6,10 +6,8 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.util.ScrollbarTexture;
-import org.infernalstudios.questlog.util.texture.Texture;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -26,25 +24,6 @@ import org.lwjgl.glfw.GLFW;
  * The scrollbar is rendered on the right side of the component and is draggable.<p>
  */
 public class ScrollableComponent implements Widget, NarratableEntry, GuiEventListener {
-  private static final ScrollbarTexture SCROLLBAR_TEXTURE = new ScrollbarTexture(
-      new Texture(
-          new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-          8, 12, 277, 0, 512, 512
-      ),
-      new Texture(
-          new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-          4, 1, 279, 14, 512, 512
-      ),
-      new Texture(
-          new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-          4, 1, 279, 13, 512, 512
-      ),
-      new Texture(
-          new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-          4, 1, 279, 15, 512, 512
-      )
-  );
-
   private final Scrollable scrollable;
   public final int width;
   public final int height;
@@ -57,7 +36,7 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   private final ScrollbarTexture scrollbar;
 
   public ScrollableComponent(int x, int y, int width, int height, Scrollable scrollable) {
-    this(x, y, width, height, scrollable, SCROLLBAR_TEXTURE);
+    this(x, y, width, height, scrollable, QuestlogGuiSet.DEFAULT.scrollbar);
   }
 
   public ScrollableComponent(int x, int y, int width, int height, Scrollable scrollable, ScrollbarTexture scrollbar) {

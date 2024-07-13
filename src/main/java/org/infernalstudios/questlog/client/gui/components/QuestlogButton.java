@@ -5,34 +5,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.util.Callable;
-import org.infernalstudios.questlog.util.texture.Texture;
 
 public class QuestlogButton extends AbstractButton {
-  public static final Texture TEXTURE = new Texture(
-      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      54, 18, 287, 0, 512, 512
-  );
-  public static final Texture TEXTURE_HOVERED = new Texture(
-      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      54, 18, 341, 0, 512, 512
-  );
-
-  public static final Texture TEXTURE_LONG = new Texture(
-      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      88, 18, 287, 18, 512, 512
-  );
-  public static final Texture TEXTURE_HOVERED_LONG = new Texture(
-      new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      88, 18, 375, 18, 512, 512
-  );
-
+  private final QuestlogGuiSet guiSet;
   private final Callable onPress;
 
-  public QuestlogButton(int x, int y, Component message, Callable onPress) {
-    super(x, y, TEXTURE.width(), TEXTURE.height(), message);
+  public QuestlogButton(int x, int y, Component message, Callable onPress, QuestlogGuiSet guiSet) {
+    super(x, y, guiSet.button.width(), guiSet.button.height(), message);
+    this.guiSet = guiSet;
     this.onPress = onPress;
   }
 
@@ -45,15 +27,15 @@ public class QuestlogButton extends AbstractButton {
     if (this.isLong()) {
       int actualX = this.x - (34 / 2); // Hacky
       if (this.isHovered) {
-        TEXTURE_HOVERED_LONG.blit(poseStack, actualX, this.y);
+        this.guiSet.buttonLongHovered.blit(poseStack, actualX, this.y);
       } else {
-        TEXTURE_LONG.blit(poseStack, actualX, this.y);
+        this.guiSet.buttonLong.blit(poseStack, actualX, this.y);
       }
     } else {
       if (this.isHovered) {
-        TEXTURE_HOVERED.blit(poseStack, this.x, this.y);
+        this.guiSet.buttonHovered.blit(poseStack, this.x, this.y);
       } else {
-        TEXTURE.blit(poseStack, this.x, this.y);
+        this.guiSet.button.blit(poseStack, this.x, this.y);
       }
     }
   }
