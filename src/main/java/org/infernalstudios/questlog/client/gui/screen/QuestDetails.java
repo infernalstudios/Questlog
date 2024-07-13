@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
@@ -97,6 +98,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
           if (!reward.hasRewarded()) {
             // Send a packet to the server to collect the reward.
             NetworkHandler.sendToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
+
+            // Play sound
+            SoundInstance sound = reward.getDisplay().getClaimSound();
+            if (sound != null) {
+              this.minecraft.getSoundManager().play(sound);
+            }
           }
         }
       } else if (this.minecraft != null) {
