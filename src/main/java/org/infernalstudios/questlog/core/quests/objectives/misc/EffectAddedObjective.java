@@ -31,10 +31,10 @@ public class EffectAddedObjective extends Objective {
   @Override
   protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-    bus.addListener(this::onPlayerMove);
+    bus.addListener(this::onEffectAdded);
   }
 
-  private void onPlayerMove(MobEffectEvent.Added event) {
+  private void onEffectAdded(MobEffectEvent.Added event) {
     if (this.isCompleted() || this.getParent() == null) return;
     if (
       event.getEntity() instanceof ServerPlayer player &&
