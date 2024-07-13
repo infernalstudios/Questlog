@@ -11,5 +11,6 @@
     "questlog.objective.in_progress": "%s/%s",
     "questlog.reward.collect": "Collect Rewards",
     "questlog.reward.collected": "Collected",
-    "questlog.reward.uncollected": "Uncollected"
+    "questlog.reward.uncollected": "Uncollected",
+    "questlog.gui.open": "Open Quest Log"
 }

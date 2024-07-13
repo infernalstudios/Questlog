@@ -3,11 +3,14 @@ package org.infernalstudios.questlog;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.infernalstudios.questlog.client.gui.components.QuestlogOpenButton;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestAddedToast;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestCompletedToast;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
@@ -19,10 +22,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestlogClientEvents {
-  // These register and use 
   @SubscribeEvent
   public static void registerKeys(RegisterKeyMappingsEvent event) {
     event.register(Questlog.OPEN_SCREEN_KEY);
+  }
+
+  @SubscribeEvent
+  public static void onScreenInit(ScreenEvent.Init.Post event) {
+    if (event.getScreen() instanceof InventoryScreen screen) {
+      event.addListener(new QuestlogOpenButton(screen));
+    }
   }
 
   @SubscribeEvent
