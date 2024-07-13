@@ -209,6 +209,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private List<InfoEntry> rewards;
     private List<InfoEntry> objectives;
 
+    @Nullable
+    private ScrollableComponent parent = null;
+
     public InfoScrollable(Quest quest) {
       this.quest = quest;
     }
@@ -246,7 +249,20 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
-      this.getInfoEntries().forEach(entry -> entry.render(ps, mouseX, mouseY, partialTicks));
+      List<InfoEntry> infoEntries = this.getInfoEntries();
+      for (int i = 0; i < infoEntries.size(); i++) {
+        InfoEntry entry = infoEntries.get(i);
+
+        entry.x = this.parent != null ? (int) this.parent.getXOffset() : 0;
+        entry.y = this.parent != null ? (int) this.parent.getYOffset() + InfoEntry.INFO_ENTRY_HEIGHT * i : 0;
+
+        entry.render(ps, mouseX, mouseY, partialTicks);
+      }
+    }
+
+    @Override
+    public void setScrollableComponent(ScrollableComponent parent) {
+      this.parent = parent;
     }
   }
 
@@ -258,8 +274,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @CheckForNull
     private final ObjectiveDisplayData objectiveDisplayData;
 
-    private final int x;
-    private final int y;
+    protected int x;
+    protected int y;
 
     public InfoEntry(RewardDisplayData rewardDisplayData, int x, int y) {
       this.rewardDisplayData = rewardDisplayData;
@@ -310,7 +326,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
       font.draw(ps, name, x, y, 0x4C381B);
 
-      return font.width(name) + x;
+      return font.width(name) + (hasIcon ? 18 : 0);
     }
 
     private void drawProgress(PoseStack ps, int x) {
