@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
@@ -14,10 +15,17 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public abstract class AbstractToast implements Toast {
+  private boolean playedSound = false;
+
   protected abstract Component getTitle();
   protected abstract Component getDescription();
   @Nullable
   protected abstract Renderable getIcon();
+
+  @Nullable
+  protected SoundInstance getSound() {
+    return null;
+  }
 
   protected Texture getBackground() {
     return new Texture(Toast.TEXTURE, 160, 32, 0, 0, 256, 256);
@@ -59,6 +67,15 @@ public abstract class AbstractToast implements Toast {
     
     if (this.getIcon() != null) {
       this.getIcon().blit(ps, 8, 8);
+    }
+
+    if (!this.playedSound && time > 0L) {
+      this.playedSound = true;
+
+      SoundInstance sound = this.getSound();
+      if (sound != null) {
+        toastComponent.getMinecraft().getSoundManager().play(sound);
+      }
     }
 
     return time >= 5000L ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;

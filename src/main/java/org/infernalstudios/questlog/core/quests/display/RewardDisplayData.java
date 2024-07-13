@@ -1,12 +1,15 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
-import org.infernalstudios.questlog.util.texture.ItemRenderable;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
-import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
 
@@ -16,25 +19,20 @@ public class RewardDisplayData {
   private final Component name;
   @Nullable
   private final Renderable icon;
+  @Nullable
+  private final ResourceLocation claimSound;
 
   public RewardDisplayData(JsonObject data) {
-    boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
     String name = data.get("name").getAsString();
-    JsonObject icon = data.has("icon") ? data.get("icon").getAsJsonObject() : null;
     
-    this.name = translatable ? Component.translatable(name) : Component.literal(name);
+    this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
+    this.icon = JsonUtils.getIcon(data, "icon");
+    String sound = JsonUtils.getOrDefault(
+      JsonUtils.getOrDefault(data, "sound", new JsonObject()),
+      "claimed", (String) null
+    );
 
-    if (icon != null) {
-      if (icon.has("texture")) {
-        this.icon = new Texture(new ResourceLocation(icon.get("texture").getAsString()), 16, 16, 0, 0, 16, 16);
-      } else if (icon.has("item")) {
-        this.icon = new ItemRenderable(new ResourceLocation(icon.get("item").getAsString()));
-      } else {
-        this.icon = null;
-      }
-    } else {
-      this.icon = null;
-    }
+    this.claimSound = sound == null ? null : new ResourceLocation(sound);
   }
 
   public void setReward(Reward reward) {
@@ -55,5 +53,11 @@ public class RewardDisplayData {
   @Nullable
   public Renderable getIcon() {
     return this.icon;
+  }
+
+  @Nullable
+  public SoundInstance getClaimSound() {
+    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(this.claimSound);
+    return soundEvent != null ? SimpleSoundInstance.forUI(soundEvent, 1, 1) : null;
   }
 }

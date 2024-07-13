@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.client.gui.components.toasts;
 
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.util.texture.Renderable;
@@ -27,5 +28,11 @@ public class QuestAddedToast extends QuestlogToast {
   @Nullable
   protected Renderable getIcon() {
     return this.displayData.getIcon();
+  }
+
+  @Override
+  @Nullable
+  protected SoundInstance getSound() {
+    return this.displayData.getTriggeredSound();
   }
 }

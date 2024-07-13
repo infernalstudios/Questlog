@@ -1,12 +1,15 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.Quest;
-import org.infernalstudios.questlog.util.texture.ItemRenderable;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
-import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -21,27 +24,33 @@ public class QuestDisplayData {
   private List<ObjectiveDisplayData> objectiveDisplay = null;
   @Nullable
   private List<RewardDisplayData> rewardDisplay = null;
+  @Nullable
+  private final ResourceLocation completedSound;
+  @Nullable
+  private final ResourceLocation triggeredSound;
 
   public QuestDisplayData(JsonObject data) {
-    boolean translatable = data.has("translatable") ? data.get("translatable").getAsBoolean() : false;
+    boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
     String title = data.get("title").getAsString();
     String description = data.get("description").getAsString();
-    JsonObject icon = data.has("icon") ? data.get("icon").getAsJsonObject() : null;
 
     this.title = translatable ? Component.translatable(title) : Component.literal(title);
     this.description = translatable ? Component.translatable(description) : Component.literal(description);
+    this.icon = JsonUtils.getIcon(data, "icon");
 
-    if (icon != null) {
-      if (icon.has("texture")) {
-        this.icon = new Texture(new ResourceLocation(icon.get("texture").getAsString()), 16, 16, 0, 0, 16, 16);
-      } else if (icon.has("item")) {
-        this.icon = new ItemRenderable(new ResourceLocation(icon.get("item").getAsString()));
-      } else {
-        this.icon = null;
-      }
-    } else {
-      this.icon = null;
-    }
+    String completedSoundLoc = JsonUtils.getOrDefault(
+        JsonUtils.getOrDefault(data, "sound", new JsonObject()),
+        "completed", (String) null
+    );
+
+    this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
+
+    String triggeredSoundLoc = JsonUtils.getOrDefault(
+        JsonUtils.getOrDefault(data, "sound", new JsonObject()),
+        "triggered", (String) null
+    );
+
+    this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
   }
 
   public void setQuest(Quest quest) {
@@ -74,5 +83,17 @@ public class QuestDisplayData {
   @Nullable
   public Renderable getIcon() {
     return this.icon;
+  }
+
+  @Nullable
+  public SoundInstance getCompletedSound() {
+    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(this.completedSound);
+    return soundEvent != null ? SimpleSoundInstance.forUI(soundEvent, 1, 1) : null;
+  }
+
+  @Nullable
+  public SoundInstance getTriggeredSound() {
+    SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(this.triggeredSound);
+    return soundEvent != null ? SimpleSoundInstance.forUI(soundEvent, 1, 1) : null;
   }
 }
