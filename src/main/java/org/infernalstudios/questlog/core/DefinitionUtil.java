@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.core;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.MalformedJsonException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -28,7 +29,13 @@ public class DefinitionUtil {
     List<ResourceLocation> quests = new ArrayList<>();
     
     for (Resource res : allQuestFiles) {
-      JsonObject json = Util.getJsonResource(res);
+      JsonObject json;
+
+      try {
+        json = Util.getJsonResource(res);
+      } catch (MalformedJsonException e) {
+        throw new MalformedJsonException("Malformed JSON in the quests.json file in datapack " + res.sourcePackId(), e);
+      }
 
       JsonArray locArray = json.getAsJsonArray("quests");
 
@@ -44,7 +51,11 @@ public class DefinitionUtil {
     }
 
     for (ResourceLocation quest : quests) {
-      QUEST_DEFINITION_CACHE.put(quest, Util.getJsonResource(manager, quest));
+      try {
+        QUEST_DEFINITION_CACHE.put(quest, Util.getJsonResource(manager, quest));
+      } catch (MalformedJsonException e) {
+        throw new MalformedJsonException("Malformed JSON in quest definition: " + quest.toString(), e);
+      }
     }
   }
 

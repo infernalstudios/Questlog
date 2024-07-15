@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.MalformedJsonException;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -59,6 +60,8 @@ public final class Util {
   public static JsonObject getJsonResource(Resource resource) throws IOException {
     try (InputStream stream = resource.open()) {
       return GSON.fromJson(new String(stream.readAllBytes()), JsonObject.class);
+    } catch (MalformedJsonException e) {
+      throw new MalformedJsonException("Malformed JSON in resource " + resource, e);
     }
   }
 
