@@ -18,12 +18,15 @@ import java.util.List;
 
 public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   private final QuestDisplayData display;
-  private final List<Objective> triggers;
+  public final List<Objective> triggers;
   public final List<Objective> objectives;
   public final List<Reward> rewards;
 
   private final ResourceLocation id;
   public final QuestManager manager;
+
+  public boolean hasSentCompletion = false;
+  public boolean hasSentTrigger = false;
 
 
   public Quest(QuestDisplayData display, List<Objective> triggers, List<Objective> objectives, List<Reward> rewards, ResourceLocation id, QuestManager manager) {
@@ -86,6 +89,9 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   /** {@inheritDoc} */
   @Override
   public void writeInitialData(CompoundTag data) {
+    data.putBoolean("completed", this.hasSentCompletion);
+    data.putBoolean("triggered", this.hasSentTrigger);
+
     data.put("triggers", Util.toNbtList(this.triggers, trigger -> {
       CompoundTag tag = new CompoundTag();
       trigger.writeInitialData(tag);
@@ -108,6 +114,9 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   /** {@inheritDoc} */
   @Override
   public void deserialize(CompoundTag data) {
+    this.hasSentCompletion = data.getBoolean("completed");
+    this.hasSentTrigger = data.getBoolean("triggered");
+
     List<Tag> triggerData = data.getList("triggers", Tag.TAG_COMPOUND);
     for (int i = 0; i < triggerData.size(); i++) {
       this.triggers.get(i).deserialize((CompoundTag) triggerData.get(i));
@@ -128,6 +137,8 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   @Override
   public CompoundTag serialize() {
     CompoundTag tag = new CompoundTag();
+    tag.putBoolean("completed", this.hasSentCompletion);
+    tag.putBoolean("triggered", this.hasSentTrigger);
     tag.put("triggers", Util.toNbtList(this.triggers, Objective::serialize));
     tag.put("objectives", Util.toNbtList(this.objectives, Objective::serialize));
     tag.put("rewards", Util.toNbtList(this.rewards, Reward::serialize));

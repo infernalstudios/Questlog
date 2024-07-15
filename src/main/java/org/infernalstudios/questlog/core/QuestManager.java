@@ -25,9 +25,6 @@ public class QuestManager {
 
   public final Player player;
   private final Map<ResourceLocation, Quest> quests = new HashMap<>();
-  // Used server-side only!
-  private final Map<ResourceLocation, Boolean> hasTriggeredYet = new HashMap<>();
-  private final Map<ResourceLocation, Boolean> hasCompletedYet = new HashMap<>();
 
   public QuestManager(Player player) {
     this.player = player;
@@ -42,11 +39,6 @@ public class QuestManager {
       return;
     }
     this.quests.put(quest.getId(), quest);
-    // Since we're adding a new quest, it either has been freshly added or it has been loaded from disk.
-    // If quest is already triggered/completed when adding to manager, the state either has already been
-    // sent to the client, or it should not be sent at all.
-    this.hasTriggeredYet.put(quest.getId(), quest.isTriggered());
-    this.hasCompletedYet.put(quest.getId(), quest.isCompleted());
   }
 
   /**
@@ -124,27 +116,19 @@ public class QuestManager {
         CompoundTag data = this.getQuest(id).serialize();
         NetworkHandler.sendToPlayer(new QuestDataPacket(id, data), (ServerPlayer) this.player);
         Questlog.LOGGER.trace("Sent quest data for {} to client", id);
-        if (!this.hasTriggered(id) && quest.isTriggered()) {
-          this.setTriggered(id);
+        if (!quest.hasSentTrigger && quest.isTriggered()) {
+          quest.hasSentTrigger = true;
           MinecraftForge.EVENT_BUS.post(new QuestTriggeredEvent(this.player, quest, false)); // This handles sending of packet
           Questlog.LOGGER.trace("Sent quest triggered event for {}", id);
         }
 
-        if (!this.hasCompletedYet.getOrDefault(id, false) && quest.isCompleted()) {
-          this.hasCompletedYet.put(id, true);
+        if (!quest.hasSentCompletion && quest.isCompleted()) {
+          quest.hasSentCompletion = true;
           MinecraftForge.EVENT_BUS.post(new QuestCompletedEvent(this.player, quest, false));
           Questlog.LOGGER.trace("Sent quest completed event for {}", id);
         }
       }
     }
-  }
-
-  public boolean hasTriggered(ResourceLocation id) {
-    return this.hasTriggeredYet.getOrDefault(id, false);
-  }
-
-  public void setTriggered(ResourceLocation id) {
-    this.hasTriggeredYet.put(id, true);
   }
 
   /**
