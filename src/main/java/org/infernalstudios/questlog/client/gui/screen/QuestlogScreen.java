@@ -50,11 +50,15 @@ public class QuestlogScreen extends Screen {
     int x = (this.width - width) / 2;
     int y = (this.height - height) / 2;
 
-    return new ScrollableComponent(x, y, width, height, new QuestList(Minecraft.getInstance(), this.manager.getAllQuests(), displayData -> {
-      if (this.minecraft != null) {
-        this.minecraft.setScreen(new QuestDetails(this, displayData));
+    return new ScrollableComponent(x, y, width, height, new QuestList(
+      Minecraft.getInstance(),
+      this.manager.getAllQuests().stream().filter(quest -> !quest.getDisplay().isHidden()).toList(),
+      displayData -> {
+        if (this.minecraft != null) {
+          this.minecraft.setScreen(new QuestDetails(this, displayData));
+        }
       }
-    }));
+    ));
   }
 
   @Override
@@ -79,7 +83,7 @@ public class QuestlogScreen extends Screen {
 
   @Override
   public boolean isPauseScreen() {
-    return false;
+    return true;
   }
 
   @Override

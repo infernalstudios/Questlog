@@ -18,19 +18,27 @@ import java.util.List;
 import java.util.Objects;
 
 public class QuestDisplayData {
-  private final Component title;
-  private final Component description;
-  @Nullable
-  private final Renderable icon;
   @Nullable
   private List<ObjectiveDisplayData> objectiveDisplay = null;
   @Nullable
   private List<RewardDisplayData> rewardDisplay = null;
+
+  private final Component title;
+  private final Component description;
+  @Nullable
+  private final Renderable icon;
+
   @Nullable
   private final ResourceLocation completedSound;
   @Nullable
   private final ResourceLocation triggeredSound;
+
   private final ResourceLocation guiTexture;
+
+  private final boolean toastOnTrigger;
+  private final boolean toastOnComplete;
+  private final boolean popup;
+  private final boolean hidden;
 
   public QuestDisplayData(JsonObject data) {
     boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
@@ -62,6 +70,23 @@ public class QuestDisplayData {
     }
 
     this.guiTexture = new ResourceLocation(backgroundLoc);
+
+    this.toastOnTrigger = JsonUtils.getOrDefault(
+        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
+        "toastOnTrigger", true
+    );
+
+    this.toastOnComplete = JsonUtils.getOrDefault(
+        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
+        "toastOnComplete", true
+    );
+
+    this.popup = JsonUtils.getOrDefault(
+        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
+        "popup", false
+    );
+
+    this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
   }
 
   public void setQuest(Quest quest) {
@@ -110,5 +135,21 @@ public class QuestDisplayData {
 
   public QuestlogGuiSet getGuiSet() {
     return this.guiTexture.equals(QuestlogGuiSet.DEFAULT.location) ? QuestlogGuiSet.DEFAULT : new QuestlogGuiSet(this.guiTexture);
+  }
+
+  public boolean shouldToastOnTrigger() {
+    return this.toastOnTrigger;
+  }
+
+  public boolean shouldToastOnComplete() {
+    return this.toastOnComplete;
+  }
+
+  public boolean shouldPopup() {
+    return this.popup;
+  }
+
+  public boolean isHidden() {
+    return this.hidden;
   }
 }

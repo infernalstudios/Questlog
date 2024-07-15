@@ -13,6 +13,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.infernalstudios.questlog.client.gui.components.QuestlogOpenButton;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestAddedToast;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestCompletedToast;
+import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
@@ -82,14 +83,21 @@ public class QuestlogClientEvents {
 
   // Called by QuestlogEvents.onQuestAdded
   public static void onQuestAdded(QuestTriggeredEvent event) {
-    QuestToastState.resetCheckDelay();
-    QuestToastState.addedToasts.add(new QuestAddedToast(event.getQuest().getDisplay()));
+    // Popup only if singleplayer and not opened to lan, because the QuestDetails screen is a pauseable screen
+    if (event.getQuest().getDisplay().shouldPopup() && Minecraft.getInstance().hasSingleplayerServer() && !Minecraft.getInstance().getSingleplayerServer().isPublished()) {
+      Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, event.getQuest()));
+    } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
+      QuestToastState.resetCheckDelay();
+      QuestToastState.addedToasts.add(new QuestAddedToast(event.getQuest().getDisplay()));
+    }
   }
 
   // Called by QuestlogEvents.onQuestCompleted
   public static void onQuestCompleted(QuestCompletedEvent event) {
-    QuestToastState.resetCheckDelay();
-    QuestToastState.completedToasts.add(new QuestCompletedToast(event.getQuest().getDisplay()));
+    if (event.getQuest().getDisplay().shouldToastOnComplete()) {
+      QuestToastState.resetCheckDelay();
+      QuestToastState.completedToasts.add(new QuestCompletedToast(event.getQuest().getDisplay()));
+    }
   }
 
   private static void displayQueuedToasts() {

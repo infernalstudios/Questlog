@@ -199,7 +199,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
   @Override
   public boolean isPauseScreen() {
-    return false;
+    return true;
   }
 
   @Override
