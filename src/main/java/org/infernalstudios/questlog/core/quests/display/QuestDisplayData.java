@@ -78,7 +78,7 @@ public class QuestDisplayData {
 
     this.palette = new Palette(
       JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
-      JsonUtils.getOrDefault(style, "detailColor", "#987C5300"),
+      JsonUtils.getOrDefault(style, "detailColor", "#987C53"),
       JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
       JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
       JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
