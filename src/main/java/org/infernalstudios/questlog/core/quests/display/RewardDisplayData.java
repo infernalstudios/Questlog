@@ -23,7 +23,7 @@ public class RewardDisplayData {
   private final ResourceLocation claimSound;
 
   public RewardDisplayData(JsonObject data) {
-    String name = data.get("name").getAsString();
+    String name = JsonUtils.getOrDefault(data, "name", "Reward");
     
     this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
     this.icon = JsonUtils.getIcon(data, "icon");

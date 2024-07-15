@@ -11,11 +11,15 @@ import org.infernalstudios.questlog.util.Callable;
 public class QuestlogButton extends AbstractButton {
   private final QuestlogGuiSet guiSet;
   private final Callable onPress;
+  private final int textColor;
+  private final int textColorHovered;
 
-  public QuestlogButton(int x, int y, Component message, Callable onPress, QuestlogGuiSet guiSet) {
+  public QuestlogButton(int x, int y, int textColor, int textColorHovered, Component message, Callable onPress, QuestlogGuiSet guiSet) {
     super(x, y, guiSet.button.width(), guiSet.button.height(), message);
     this.guiSet = guiSet;
     this.onPress = onPress;
+    this.textColor = textColor;
+    this.textColorHovered = textColorHovered;
   }
 
   private boolean isLong() {
@@ -48,7 +52,7 @@ public class QuestlogButton extends AbstractButton {
     int x = this.x + (this.width - minecraft.font.width(this.getMessage())) / 2 + 1;
     int y = this.y + (this.height - 8) / 2;
 
-    minecraft.font.draw(ps, this.getMessage(), x, y, this.isHovered ? 0xFFFFFF : 0x4C381B);
+    minecraft.font.draw(ps, this.getMessage(), x, y, this.isHovered ? this.textColorHovered : this.textColor);
   }
 
   @Override

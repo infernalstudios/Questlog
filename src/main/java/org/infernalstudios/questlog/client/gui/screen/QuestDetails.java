@@ -91,25 +91,33 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2;
 
     if (this.backButton != null) this.removeWidget(this.backButton);
-    this.backButton = new QuestlogButton(this.x + BUTTON_X, this.y + BUTTON_Y, Component.translatable("gui.back"), () -> {
-      if (this.quest.isCompleted() && !this.quest.isRewarded()) {
-        for (int i = 0; i < this.quest.rewards.size(); i++) {
-          Reward reward = this.quest.rewards.get(i);
-          if (!reward.hasRewarded()) {
-            // Send a packet to the server to collect the reward.
-            NetworkHandler.sendToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
+    this.backButton = new QuestlogButton(
+      this.x + BUTTON_X,
+      this.y + BUTTON_Y,
+      this.quest.getDisplay().getPalette().textColor,
+      this.quest.getDisplay().getPalette().hoveredTextColor,
+      this.quest.getDisplay().getButtonText(),
+      () -> {
+        if (this.quest.isCompleted() && !this.quest.isRewarded()) {
+          for (int i = 0; i < this.quest.rewards.size(); i++) {
+            Reward reward = this.quest.rewards.get(i);
+            if (!reward.hasRewarded()) {
+              // Send a packet to the server to collect the reward.
+              NetworkHandler.sendToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
 
-            // Play sound
-            SoundInstance sound = reward.getDisplay().getClaimSound();
-            if (sound != null) {
-              this.minecraft.getSoundManager().play(sound);
+              // Play sound
+              SoundInstance sound = reward.getDisplay().getClaimSound();
+              if (sound != null) {
+                this.minecraft.getSoundManager().play(sound);
+              }
             }
           }
+        } else if (this.minecraft != null) {
+          this.minecraft.setScreen(this.previousScreen);
         }
-      } else if (this.minecraft != null) {
-        this.minecraft.setScreen(this.previousScreen);
-      }
-    }, this.getGuiSet());
+      },
+      this.getGuiSet()
+    );
     this.addRenderableWidget(this.backButton);
 
     if (this.description != null) this.removeWidget(this.description);
@@ -129,7 +137,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight() + DESCRIPTION_INFO_PADDING,
         CONTENT_WIDTH,
       this.getInfoHeight(),
-      new InfoScrollable(this.quest)
+      new InfoScrollable()
     );
     // We render this ourselves, don't use addRenderableWidget.
     this.addWidget(this.info);
@@ -175,9 +183,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     // Title
     y += (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
-    font.draw(ps, displayData.getTitle(), (int) x, (int) y, 0x4C381B);
+    font.draw(ps, displayData.getTitle(), (int) x, (int) y, this.quest.getDisplay().getPalette().titleColor);
 
-    this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, TITLE_WIDTH, 0x987C5300);
+    this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, TITLE_WIDTH, this.quest.getDisplay().getPalette().detailColor);
   }
 
   private int getInfoHeight() {
@@ -188,7 +196,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     if (this.info == null) throw new IllegalStateException("Info is null");
     this.info.render(ps, 0, 0, 0);
     if (this.info.height != 0) {
-      this.drawHorizontalLine(ps, this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), CONTENT_WIDTH, 0x9C765000);
+      this.drawHorizontalLine(ps, this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), CONTENT_WIDTH, this.quest.getDisplay().getPalette().detailColor);
     }
   }
 
@@ -207,24 +215,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     // TODO
   }
 
-  private static class InfoScrollable implements Scrollable {
-    private final Quest quest;
-
+  private class InfoScrollable implements Scrollable {
     private List<InfoEntry> rewards;
     private List<InfoEntry> objectives;
 
     @Nullable
     private ScrollableComponent parent = null;
 
-    public InfoScrollable(Quest quest) {
-      this.quest = quest;
-    }
-
     private List<InfoEntry> getInfoEntries() {
-      if (this.quest.isCompleted()) {
+      if (QuestDetails.this.quest.isCompleted()) {
         if (this.rewards == null) {
           this.rewards = new ArrayList<>();
-          List<RewardDisplayData> rewardDisplayData = this.quest.getDisplay().getRewardDisplayData();
+          List<RewardDisplayData> rewardDisplayData = QuestDetails.this.quest.getDisplay().getRewardDisplayData();
           for (int i = 0; i < rewardDisplayData.size(); i++) {
             RewardDisplayData reward = rewardDisplayData.get(i);
             this.rewards.add(new InfoEntry(reward, 0, i * InfoEntry.INFO_ENTRY_HEIGHT));
@@ -235,7 +237,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       } else {
         if (this.objectives == null) {
           this.objectives = new ArrayList<>();
-          List<ObjectiveDisplayData> objectiveDisplayData = this.quest.getDisplay().getObjectiveDisplayData();
+          List<ObjectiveDisplayData> objectiveDisplayData = QuestDetails.this.quest.getDisplay().getObjectiveDisplayData();
           for (int i = 0; i < objectiveDisplayData.size(); i++) {
             ObjectiveDisplayData objective = objectiveDisplayData.get(i);
             this.objectives.add(new InfoEntry(objective, 0, i * InfoEntry.INFO_ENTRY_HEIGHT));
@@ -270,7 +272,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
   }
 
-  private static class InfoEntry implements Widget, GuiEventListener {
+  private class InfoEntry implements Widget, GuiEventListener {
     private static final int INFO_ENTRY_HEIGHT = 18;
 
     @CheckForNull
@@ -328,7 +330,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       Font font = Minecraft.getInstance().font;
       int x = this.x + (hasIcon ? 18 : 0);
       int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
-      font.draw(ps, name, x, y, 0x4C381B);
+      font.draw(ps, name, x, y, QuestDetails.this.quest.getDisplay().getPalette().textColor);
 
       return font.width(name) + (hasIcon ? 18 : 0);
     }
@@ -343,8 +345,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
       Component progress = this.objectiveDisplayData.getProgress();
 
-      font.draw(ps, "- ", x, y, 0x9E7852);
-      font.draw(ps, progress, x + font.width("- "), y, this.objectiveDisplayData.isCompleted() ? 0x529E52 : 0x9E7852);
+      font.draw(ps, "- ", x, y, QuestDetails.this.quest.getDisplay().getPalette().progressTextColor);
+      font.draw(
+          ps, progress, x + font.width("- "), y,
+          this.objectiveDisplayData.isCompleted() ? QuestDetails.this.quest.getDisplay().getPalette().completedTextColor : QuestDetails.this.quest.getDisplay().getPalette().progressTextColor
+      );
     }
 
     private void drawCollected(PoseStack ps, int x) {
@@ -360,8 +365,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         Component.translatable("questlog.reward.uncollected");
 
 
-      font.draw(ps, "- ", x, y, 0x9E7852);
-      font.draw(ps, collected, x + font.width("- "), y, this.rewardDisplayData.hasRewarded() ? 0x529E52 : 0x9E7852);
+      font.draw(ps, "- ", x, y, QuestDetails.this.quest.getDisplay().getPalette().progressTextColor);
+      font.draw(
+          ps, collected, x + font.width("- "), y,
+          this.rewardDisplayData.hasRewarded() ? QuestDetails.this.quest.getDisplay().getPalette().completedTextColor : QuestDetails.this.quest.getDisplay().getPalette().progressTextColor
+      );
     }
 
     private void renderReward(PoseStack ps) {

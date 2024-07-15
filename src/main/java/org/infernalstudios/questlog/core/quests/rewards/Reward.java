@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 
 import javax.annotation.CheckForNull;
@@ -14,7 +15,6 @@ import javax.annotation.Nullable;
 public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDisplayData> {
   @CheckForNull
   private Quest parent;
-  @Nullable
   private final RewardDisplayData display;
   private final boolean isInstant;
   private boolean rewarded = false;
@@ -29,12 +29,8 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
       this.isInstant = false;
     }
 
-    if (definition.has("display")) {
-      this.display = new RewardDisplayData(definition.getAsJsonObject("display"));
-      this.display.setReward(this);
-    } else {
-      this.display = null;
-    }
+    this.display = new RewardDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+    this.display.setReward(this);
   }
 
   public final void setParent(Quest parent) {

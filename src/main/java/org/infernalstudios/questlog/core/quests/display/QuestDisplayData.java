@@ -33,12 +33,15 @@ public class QuestDisplayData {
   @Nullable
   private final ResourceLocation triggeredSound;
 
-  private final ResourceLocation guiTexture;
-
   private final boolean toastOnTrigger;
   private final boolean toastOnComplete;
   private final boolean popup;
   private final boolean hidden;
+
+  private final ResourceLocation guiTexture;
+  private final Component buttonText;
+
+  private final Palette palette;
 
   public QuestDisplayData(JsonObject data) {
     boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
@@ -63,7 +66,9 @@ public class QuestDisplayData {
 
     this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
-    String backgroundLoc = data.has("background") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "background", new JsonObject()), "texture", (String) null) : null;
+    JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
+
+    String backgroundLoc = style.has("background") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null) : null;
 
     if (backgroundLoc == null) {
       backgroundLoc = Questlog.MODID + ":textures/gui/questlog.png";
@@ -71,20 +76,27 @@ public class QuestDisplayData {
 
     this.guiTexture = new ResourceLocation(backgroundLoc);
 
-    this.toastOnTrigger = JsonUtils.getOrDefault(
-        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
-        "toastOnTrigger", true
+    this.palette = new Palette(
+      JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
+      JsonUtils.getOrDefault(style, "detailColor", "#987C5300"),
+      JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
+      JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
+      JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
+      JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
     );
 
-    this.toastOnComplete = JsonUtils.getOrDefault(
-        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
-        "toastOnComplete", true
-    );
+    String buttonTextRaw = JsonUtils.getOrDefault(style, "buttonText", (String) null);
+    if (buttonTextRaw == null) {
+      this.buttonText = Component.translatable("gui.back");
+    } else {
+      this.buttonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
+    }
 
-    this.popup = JsonUtils.getOrDefault(
-        JsonUtils.getOrDefault(data, "notification", new JsonObject()),
-        "popup", false
-    );
+    JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
+
+    this.toastOnTrigger = JsonUtils.getOrDefault(notification, "toastOnTrigger", true);
+    this.toastOnComplete = JsonUtils.getOrDefault(notification, "toastOnComplete", true);
+    this.popup = JsonUtils.getOrDefault(notification, "popup", false);
 
     this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
   }
@@ -151,5 +163,13 @@ public class QuestDisplayData {
 
   public boolean isHidden() {
     return this.hidden;
+  }
+
+  public Palette getPalette() {
+    return this.palette;
+  }
+
+  public Component getButtonText() {
+    return this.buttonText;
   }
 }

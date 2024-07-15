@@ -13,8 +13,13 @@
   "rewards": [],
   "display": {
     "title": "Punch that tree!",
-    "description": "Start your adventure by punching a tree!\nThis will give you an invaluable lesson in resource gathering.",
+    "description": "§e§l§n§m§oStart your adventure by punching a tree!§r\nThis will give you an invaluable lesson in resource gathering.",
     "icon": { "item": "minecraft:oak_log" },
-    "background": { "texture": "questlog:textures/gui/questlog_blue.png" }
+    "style": {
+      "gui": { "texture": "questlog:textures/gui/questlog_blue.png" },
+      "buttonText": "I want to go back",
+      "textColor": "#FFFFFF",
+      "detailColor": "#FF0000"
+    }
   }
 }
