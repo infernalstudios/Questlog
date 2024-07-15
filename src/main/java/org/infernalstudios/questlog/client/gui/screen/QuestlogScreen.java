@@ -27,7 +27,7 @@ public class QuestlogScreen extends Screen {
   private final QuestManager manager;
 
   public QuestlogScreen(@Nullable Screen previousScreen) {
-    super(Component.translatable("screen.questlog.title"));
+    super(Component.empty());
     this.previousScreen = previousScreen;
     this.manager = Objects.requireNonNull(QuestManager.getLocal());
   }
