@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,11 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestlogClientEvents {
-  @SubscribeEvent
-  public static void registerKeys(RegisterKeyMappingsEvent event) {
-    event.register(Questlog.OPEN_SCREEN_KEY);
-  }
-
   @SubscribeEvent
   public static void onScreenInit(ScreenEvent.Init.Post event) {
     if (event.getScreen() instanceof InventoryScreen screen) {

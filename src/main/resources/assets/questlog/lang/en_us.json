@@ -1,5 +1,5 @@
 {
-    "key.questlog.open.desc": "Opens the Questlog screen",
+    "key.questlog.open": "Opens the Questlog screen",
     "key.questlog.category": "Questlog",
     "screen.questlog.title": "QUESTS",
     "questlog.toast.quest_completed": "Quest Completed!",
