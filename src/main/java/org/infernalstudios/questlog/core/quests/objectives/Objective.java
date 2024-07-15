@@ -26,6 +26,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     this.units = 0;
 
     this.display = new ObjectiveDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+    this.display.setObjective(this);
 
     this.registerEventListeners(Questlog.GENERIC_EVENT_BUS);
   }
