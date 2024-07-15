@@ -23,9 +23,13 @@ public class RewardDisplayData {
   private final ResourceLocation claimSound;
 
   public RewardDisplayData(JsonObject data) {
-    String name = JsonUtils.getOrDefault(data, "name", "Reward");
-    
-    this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
+    String name = JsonUtils.getOrDefault(data, "name", (String) null);
+
+    if (name == null) {
+      this.name = Component.translatable("questlog.reward.default");
+    } else {
+      this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
+    }
     this.icon = JsonUtils.getIcon(data, "icon");
     String sound = JsonUtils.getOrDefault(
       JsonUtils.getOrDefault(data, "sound", new JsonObject()),

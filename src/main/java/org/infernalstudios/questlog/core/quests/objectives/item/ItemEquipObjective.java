@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraftforge.event.TickEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 public class ItemEquipObjective extends AbstractItemObjective {
   private final EquipmentSlot slot;
@@ -18,7 +19,7 @@ public class ItemEquipObjective extends AbstractItemObjective {
 
   public ItemEquipObjective(JsonObject definition) {
     super(definition);
-    this.slot = EquipmentSlot.byName(definition.get("slot").getAsString());
+    this.slot = EquipmentSlot.byName(JsonUtils.getString(definition, "slot"));
   }
 
   @Override

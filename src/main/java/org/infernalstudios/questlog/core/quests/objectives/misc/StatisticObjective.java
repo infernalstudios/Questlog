@@ -9,6 +9,7 @@ import net.minecraft.stats.Stats;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.StatAwardEvent;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 import java.util.HashMap;
@@ -22,9 +23,9 @@ public class StatisticObjective extends Objective {
 
   public StatisticObjective(JsonObject definition) {
     super(definition);
-    this.stat = STAT_MAP.get(new ResourceLocation(definition.get("stat").getAsString()));
+    this.stat = STAT_MAP.get(new ResourceLocation(JsonUtils.getString(definition, "stat")));
     if (definition.has("trackSinceStart")) {
-      this.trackSinceStart = definition.get("trackSinceStart").getAsBoolean();
+      this.trackSinceStart = JsonUtils.getBoolean(definition, "trackSinceStart");
     }
   }
 

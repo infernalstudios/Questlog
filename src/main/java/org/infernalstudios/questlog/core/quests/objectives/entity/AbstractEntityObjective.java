@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
@@ -16,7 +17,7 @@ public abstract class AbstractEntityObjective extends Objective {
   public AbstractEntityObjective(JsonObject definition) {
     super(definition);
 
-    this.entity = new ResourceLocation(definition.get("entity").getAsString());
+    this.entity = new ResourceLocation(JsonUtils.getString(definition, "entity"));
   }
 
   protected EntityType<?> getEntity() {

@@ -7,13 +7,13 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
-  @Nullable
   private final ObjectiveDisplayData display;
 
   @CheckForNull
@@ -22,15 +22,10 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
   private int units;
 
   public Objective(JsonObject definition) {
-    this.totalUnits = definition.get("total").getAsInt();
+    this.totalUnits = JsonUtils.getOrDefault(definition, "total", 1);
     this.units = 0;
 
-    if (definition.has("display")) {
-      this.display = new ObjectiveDisplayData(definition.getAsJsonObject("display"));
-      this.display.setObjective(this);
-    } else {
-      this.display = null;
-    }
+    this.display = new ObjectiveDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
 
     this.registerEventListeners(Questlog.GENERIC_EVENT_BUS);
   }
@@ -68,7 +63,6 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
   }
 
   @Override
-  @Nullable
   public ObjectiveDisplayData getDisplay() {
     return this.display;
   }

@@ -6,13 +6,14 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 public class QuestCompleteObjective extends Objective {
   private final ResourceLocation quest;
 
   public QuestCompleteObjective(JsonObject definition) {
     super(definition);
-    this.quest = new ResourceLocation(definition.get("quest").getAsString());
+    this.quest = new ResourceLocation(JsonUtils.getString(definition, "quest"));
   }
 
   @Override

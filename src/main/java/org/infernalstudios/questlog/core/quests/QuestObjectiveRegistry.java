@@ -23,6 +23,7 @@ import org.infernalstudios.questlog.core.quests.objectives.misc.TrampleObjective
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitBiomeObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitDimensionObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitPositionObjective;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +68,9 @@ public class QuestObjectiveRegistry {
   public static Objective create(JsonObject definition) {
     ResourceLocation type;
     try {
-      type = new ResourceLocation(definition.get("type").getAsString());
+      type = new ResourceLocation(JsonUtils.getString(definition, "type"));
     } catch (ResourceLocationException e) {
-      throw new IllegalStateException("Invalid quest type: " + definition.get("type").getAsString());
+      throw new IllegalStateException("Invalid quest type: " + JsonUtils.getString(definition, "type"));
     }
 
     return QuestObjectiveRegistry.create(type, definition);

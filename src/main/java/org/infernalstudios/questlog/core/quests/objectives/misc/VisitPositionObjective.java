@@ -6,6 +6,7 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraftforge.event.TickEvent;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 public class VisitPositionObjective extends Objective {
@@ -13,7 +14,7 @@ public class VisitPositionObjective extends Objective {
 
   public VisitPositionObjective(JsonObject definition) {
     super(definition);
-    this.bounds = Util.bbFromJson(definition.getAsJsonObject("bounds"));
+    this.bounds = Util.bbFromJson(JsonUtils.getObject(definition, "bounds"));
   }
 
   @Override

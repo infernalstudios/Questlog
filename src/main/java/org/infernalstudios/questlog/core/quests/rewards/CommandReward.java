@@ -3,6 +3,7 @@ package org.infernalstudios.questlog.core.quests.rewards;
 import com.google.gson.JsonObject;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 public class CommandReward extends Reward {
   private final String command;
@@ -11,12 +12,8 @@ public class CommandReward extends Reward {
   public CommandReward(JsonObject definition) {
     super(definition);
 
-    this.command = definition.get("command").getAsString();
-    if (definition.has("permission_level")) {
-      this.permissionLevel = definition.get("permission_level").getAsInt();
-    } else {
-      this.permissionLevel = 2;
-    }
+    this.command = JsonUtils.getString(definition, "command");
+    this.permissionLevel = JsonUtils.getOrDefault(definition, "permission_level", 2);
   }
 
   @Override

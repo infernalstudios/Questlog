@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
@@ -20,7 +21,7 @@ public abstract class AbstractItemObjective extends Objective {
 
   public AbstractItemObjective(JsonObject definition) {
     super(definition);
-    this.item = definition.get("item").getAsString();
+    this.item = JsonUtils.getString(definition, "item");
   }
 
   private TagKey<Item> getTag() {

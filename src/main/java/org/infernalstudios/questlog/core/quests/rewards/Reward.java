@@ -24,7 +24,7 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
       if (!definition.get("instant").isJsonPrimitive()) {
         throw new IllegalStateException("Reward instant must be a boolean");
       }
-      this.isInstant = definition.get("instant").getAsBoolean();
+      this.isInstant = JsonUtils.getBoolean(definition, "instant");
     } else {
       this.isInstant = false;
     }

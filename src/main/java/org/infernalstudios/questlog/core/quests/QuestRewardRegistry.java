@@ -8,6 +8,7 @@ import org.infernalstudios.questlog.core.quests.rewards.ExperienceReward;
 import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
 import org.infernalstudios.questlog.core.quests.rewards.LootTableReward;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,9 +31,9 @@ public class QuestRewardRegistry {
   public static Reward create(JsonObject definition) {
     ResourceLocation type;
     try {
-      type = new ResourceLocation(definition.get("type").getAsString());
+      type = new ResourceLocation(JsonUtils.getString(definition, "type"));
     } catch (ResourceLocationException e) {
-      throw new IllegalStateException("Invalid reward type: " + definition.get("type").getAsString());
+      throw new IllegalStateException("Invalid reward type: " + JsonUtils.getString(definition, "type"));
     }
 
     return QuestRewardRegistry.create(type, definition);

@@ -11,6 +11,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
@@ -23,7 +24,7 @@ public class BlockMineObjective extends AbstractBlockObjective {
 
   public BlockMineObjective(JsonObject definition) {
     super(definition);
-    this.item = definition.has("item") ? definition.get("item").getAsString() : null;
+    this.item = definition.has("item") ? JsonUtils.getString(definition, "item") : null;
   }
 
   private TagKey<Item> getItemTag() {

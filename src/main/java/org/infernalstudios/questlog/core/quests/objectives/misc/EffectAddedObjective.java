@@ -8,6 +8,7 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
@@ -18,7 +19,7 @@ public class EffectAddedObjective extends Objective {
 
   public EffectAddedObjective(JsonObject definition) {
     super(definition);
-    this.effect = new ResourceLocation(definition.get("effect").getAsString());
+    this.effect = new ResourceLocation(JsonUtils.getString(definition, "effect"));
   }
 
   private MobEffect getEffect() {

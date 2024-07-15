@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.core.quests.rewards;
 
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 public class ExperienceReward extends Reward {
   private final int experience;
@@ -10,12 +11,8 @@ public class ExperienceReward extends Reward {
   public ExperienceReward(JsonObject definition) {
     super(definition);
 
-    this.experience = definition.get("experience").getAsInt();
-    if (definition.has("levels")) {
-      this.levels = definition.get("levels").getAsBoolean();
-    } else {
-      this.levels = false;
-    }
+    this.experience = JsonUtils.getInt(definition, "experience");
+    this.levels = JsonUtils.getOrDefault(definition, "levels", false);
   }
 
   @Override

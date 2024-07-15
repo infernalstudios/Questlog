@@ -10,6 +10,7 @@ import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class LootTableReward extends Reward {
   public LootTableReward(JsonObject definition) {
     super(definition);
 
-    this.lootTable = new ResourceLocation(definition.get("loot_table").getAsString());
+    this.lootTable = new ResourceLocation(JsonUtils.getString(definition, "loot_table"));
   }
 
   @Override

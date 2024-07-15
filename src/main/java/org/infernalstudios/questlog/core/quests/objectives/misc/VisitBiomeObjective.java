@@ -6,13 +6,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.TickEvent;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 public class VisitBiomeObjective extends Objective {
   private final ResourceLocation biome;
 
   public VisitBiomeObjective(JsonObject definition) {
     super(definition);
-    this.biome = new ResourceLocation(definition.get("biome").getAsString());
+    this.biome = new ResourceLocation(JsonUtils.getString(definition, "biome"));
   }
 
   @Override

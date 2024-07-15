@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 import javax.annotation.Nullable;
@@ -19,13 +20,8 @@ public class ItemReward extends Reward {
   public ItemReward(JsonObject definition) {
     super(definition);
 
-    this.item = new ResourceLocation(definition.get("item").getAsString());
-
-    if (definition.has("count")) {
-      this.count = definition.get("count").getAsInt();
-    } else {
-      this.count = 1;
-    }
+    this.item = new ResourceLocation(JsonUtils.getString(definition, "item"));
+    this.count = JsonUtils.getOrDefault(definition, "count", 1);
   }
 
   private Item getItem() {

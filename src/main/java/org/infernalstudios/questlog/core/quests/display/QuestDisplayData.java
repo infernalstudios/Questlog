@@ -45,8 +45,8 @@ public class QuestDisplayData {
 
   public QuestDisplayData(JsonObject data) {
     boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
-    String title = data.get("title").getAsString();
-    String description = data.get("description").getAsString();
+    String title = JsonUtils.getString(data, "title");
+    String description = JsonUtils.getString(data, "description");
 
     this.title = translatable ? Component.translatable(title) : Component.literal(title);
     this.description = translatable ? Component.translatable(description) : Component.literal(description);

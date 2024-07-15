@@ -9,6 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.ItemEnchantedEvent;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -22,9 +23,9 @@ public class EnchantObjective extends Objective {
 
   public EnchantObjective(JsonObject definition) {
     super(definition);
-    this.enchantment = definition.has("enchantment") ? new ResourceLocation(definition.get("enchantment").getAsString()) : null;
-    this.level = definition.has("level") ? definition.get("level").getAsInt() : 1;
-    this.item = definition.has("item") ? new ResourceLocation(definition.get("item").getAsString()) : null;
+    this.enchantment = definition.has("enchantment") ? new ResourceLocation(JsonUtils.getString(definition, "enchantment")) : null;
+    this.level = JsonUtils.getOrDefault(definition, "level", 1);
+    this.item = definition.has("item") ? new ResourceLocation(JsonUtils.getString(definition, "item")) : null;
   }
 
   private boolean areEnchantmentsEqual(Enchantment enchantment) {

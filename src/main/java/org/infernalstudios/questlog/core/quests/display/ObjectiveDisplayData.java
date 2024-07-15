@@ -16,9 +16,14 @@ public class ObjectiveDisplayData {
   private final Component name;
 
   public ObjectiveDisplayData(JsonObject data) {
-    String name = data.get("name").getAsString();
+    String name = JsonUtils.getOrDefault(data, "name", (String) null);
 
-    this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
+    if (name == null) {
+      this.name = Component.translatable("questlog.objective.default");
+    } else {
+      this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
+    }
+
     this.icon = JsonUtils.getIcon(data, "icon");
   }
 

@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.core.quests;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +11,7 @@ import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.infernalstudios.questlog.util.Util;
 
@@ -146,24 +148,33 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   }
 
   public static Quest create(JsonObject definition, ResourceLocation id, QuestManager manager) {
-    QuestDisplayData display = new QuestDisplayData(definition.get("display").getAsJsonObject());
+    QuestDisplayData display = new QuestDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
     List<Objective> triggers = new ArrayList<>();
     List<Objective> objectives = new ArrayList<>();
     List<Reward> rewards = new ArrayList<>();
 
-    for (JsonElement triggerElement : definition.get("triggers").getAsJsonArray()) {
+    for (JsonElement triggerElement : JsonUtils.getOrDefault(definition, "triggers", new JsonArray())) {
+      if (!triggerElement.isJsonObject()) {
+        throw new IllegalStateException("Trigger must be an object");
+      }
       JsonObject trigger = triggerElement.getAsJsonObject();
       Objective triggerType = QuestObjectiveRegistry.create(trigger);
       triggers.add(triggerType);
     }
 
-    for (JsonElement objectiveElement : definition.get("objectives").getAsJsonArray()) {
+    for (JsonElement objectiveElement : JsonUtils.getOrDefault(definition, "objectives", new JsonArray())) {
+      if (!objectiveElement.isJsonObject()) {
+        throw new IllegalStateException("Objective must be an object");
+      }
       JsonObject objective = objectiveElement.getAsJsonObject();
       Objective objectiveType = QuestObjectiveRegistry.create(objective);
       objectives.add(objectiveType);
     }
 
-    for (JsonElement rewardElement : definition.get("rewards").getAsJsonArray()) {
+    for (JsonElement rewardElement : JsonUtils.getOrDefault(definition, "rewards", new JsonArray())) {
+      if (!rewardElement.isJsonObject()) {
+        throw new IllegalStateException("Reward must be an object");
+      }
       JsonObject reward = rewardElement.getAsJsonObject();
       Reward rewardType = QuestRewardRegistry.create(reward);
       rewards.add(rewardType);

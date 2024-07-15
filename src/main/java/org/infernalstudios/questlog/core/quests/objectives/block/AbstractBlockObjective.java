@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
@@ -21,7 +22,7 @@ public class AbstractBlockObjective extends Objective {
   public AbstractBlockObjective(JsonObject definition) {
     super(definition);
 
-    this.block = definition.get("block").getAsString();
+    this.block = JsonUtils.getString(definition, "block");
   }
 
   private TagKey<Block> getTag() {
