@@ -1,0 +1,22 @@
+{
+  "triggers": [
+    {
+      "type": "questlog:entity_approach",
+      "entity": "minecraft:cow",
+      "range": 5
+    }
+  ],
+  "objectives": [],
+  "rewards": [],
+  "display": {
+    "title": "Cow!!!",
+    "description": "KILL THIS COW NOW",
+    "icon": { "item": "minecraft:iron_sword" },
+    "hidden": true,
+    "notification": {
+      "toastOnTrigger": false,
+      "toastOnComplete": false,
+      "popup": true
+    }
+  }
+}

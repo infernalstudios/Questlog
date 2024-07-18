@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockMineObjective;
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockPlaceObjective;
+import org.infernalstudios.questlog.core.quests.objectives.entity.EntityApproachObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.EntityBreedObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.EntityDeathObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.EntityKillObjective;
@@ -41,6 +42,7 @@ public class QuestObjectiveRegistry {
     register(new ResourceLocation("questlog", "entity_breed"), EntityBreedObjective::new);
     register(new ResourceLocation("questlog", "entity_death"), EntityDeathObjective::new);
     register(new ResourceLocation("questlog", "entity_kill"), EntityKillObjective::new);
+    register(new ResourceLocation("questlog", "entity_approach"), EntityApproachObjective::new);
 
     // Item
     register(new ResourceLocation("questlog", "item_craft"), ItemCraftObjective::new);
