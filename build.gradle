@@ -11,6 +11,10 @@ buildscript {
   }
 }
 
+plugins {
+  id 'com.github.johnrengelman.shadow' version '7.1.2'
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
@@ -69,16 +73,26 @@ mixin {
   dumpTargetOnFailure = true
 }
 
+configurations {
+  packIntoJar {
+    // If set to false, any dependencies will not be packed into the jar.
+    transitive = false
+  }
+}
+
 repositories {
   maven { url = 'https://maven.infernalstudios.org/releases' }
 }
 
 dependencies {
   minecraft "net.minecraftforge:forge:${config.MINECRAFT_VERSION}-${config.FORGE_VERSION}"
+  implementation "org.infernalstudios:config:${config.CONFIG_LIB_VERSION}"
+  packIntoJar "org.infernalstudios:config:${config.CONFIG_LIB_VERSION}"
   annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 jar {
+  archiveClassifier = 'base'
   finalizedBy 'reobfJar'
   manifest {
     attributes([
@@ -93,12 +107,25 @@ jar {
   }
 }
 
+shadowJar {
+  archiveClassifier = ''
+  configurations = [project.configurations.packIntoJar]
+  // This is done to avoid any duplicate package issues.
+  relocate 'org.infernalstudios.config', "${config.GROUP}.${config.ARTIFACT}.config"
+}
+
+reobf {
+  shadowJar {}
+}
+
 task sourcesJar(type: Jar) {
   archiveClassifier.set('sources')
   from sourceSets.main.allJava
 }
 
 tasks.build.dependsOn sourcesJar
+tasks.build.dependsOn shadowJar
+tasks.build.dependsOn reobfShadowJar
 
 // Config parse function
 def parseConfig(File config) {
