@@ -15,6 +15,7 @@ import org.infernalstudios.questlog.client.gui.components.toasts.QuestAddedToast
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestCompletedToast;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
+import org.infernalstudios.questlog.config.QuestlogConfig.Button;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
 import org.infernalstudios.questlog.event.QuestTriggeredEvent;
@@ -26,7 +27,9 @@ public class QuestlogClientEvents {
   @SubscribeEvent
   public static void onScreenInit(ScreenEvent.Init.Post event) {
     if (event.getScreen() instanceof InventoryScreen screen) {
-      event.addListener(new QuestlogOpenButton(screen));
+      if (Button.enabled) {
+        event.addListener(new QuestlogOpenButton(screen));
+      }
     }
   }
 
