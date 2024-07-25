@@ -22,7 +22,7 @@ public class EntityDeathObjective extends AbstractEntityObjective {
         event.getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
         event.getSource().getEntity() != null &&
-        event.getSource().getEntity().getType().equals(this.getEntity())
+        this.test(event.getSource().getEntity())
     ) {
       this.setUnits(this.getUnits() + 1);
     }

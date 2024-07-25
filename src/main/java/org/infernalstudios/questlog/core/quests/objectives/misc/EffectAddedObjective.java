@@ -8,25 +8,15 @@ import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.CachedValue;
 import org.infernalstudios.questlog.util.JsonUtils;
 
-import javax.annotation.Nullable;
-
 public class EffectAddedObjective extends Objective {
-  private final ResourceLocation effect;
-  @Nullable
-  private MobEffect effectCache = null;
+  private final CachedValue<MobEffect> effect;
 
   public EffectAddedObjective(JsonObject definition) {
     super(definition);
-    this.effect = new ResourceLocation(JsonUtils.getString(definition, "effect"));
-  }
-
-  private MobEffect getEffect() {
-    if (this.effectCache == null) {
-      this.effectCache = ForgeRegistries.MOB_EFFECTS.getValue(this.effect);
-    }
-    return this.effectCache;
+    this.effect = new CachedValue<>(() -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(JsonUtils.getString(definition, "effect"))));
   }
 
   @Override
@@ -41,7 +31,7 @@ public class EffectAddedObjective extends Objective {
       event.getEntity() instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player)
     ) {
-      if (event.getEffectInstance().getEffect().equals(this.getEffect())) {
+      if (event.getEffectInstance().getEffect().equals(this.effect.get())) {
         this.setUnits(this.getUnits() + 1);
       }
     }

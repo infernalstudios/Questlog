@@ -23,7 +23,6 @@ public class ItemObtainObjective extends AbstractItemObjective {
     if (this.uniqueTagCache == null) {
       this.uniqueTagCache = "questlog_tracked_" + Objects.hash(
         this.getTotalUnits(),
-        this.item,
         this.getParent().getId(),
         this.getParent().objectives.indexOf(this),
         this.getParent().manager.player.getUUID()

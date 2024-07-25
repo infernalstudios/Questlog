@@ -21,7 +21,7 @@ public class EntityKillObjective extends AbstractEntityObjective {
     if (
         event.getSource().getEntity() instanceof ServerPlayer player &&
         this.getParent().manager.player.equals(player) &&
-        event.getEntity().getType().equals(this.getEntity())
+        this.test(event.getEntity())
     ) {
       this.setUnits(this.getUnits() + 1);
     }

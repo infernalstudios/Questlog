@@ -6,34 +6,24 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.infernalstudios.questlog.util.CachedValue;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
-import javax.annotation.Nullable;
-
 public class ItemReward extends Reward {
-  private final ResourceLocation item;
-  @Nullable
-  private Item cachedItem = null;
+  private final CachedValue<Item> item;
   private final int count;
 
   public ItemReward(JsonObject definition) {
     super(definition);
 
-    this.item = new ResourceLocation(JsonUtils.getString(definition, "item"));
+    this.item = new CachedValue<>(() -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getString(definition, "item"))));
     this.count = JsonUtils.getOrDefault(definition, "count", 1);
-  }
-
-  private Item getItem() {
-    if (this.cachedItem == null) {
-      this.cachedItem = ForgeRegistries.ITEMS.getValue(this.item);
-    }
-    return this.cachedItem;
   }
 
   @Override
   public void applyReward(ServerPlayer player) {
-    Item item = this.getItem();
+    Item item = this.item.get();
     ItemStack stack = new ItemStack(item, this.count);
 
     Util.giveToPlayer(player, stack);

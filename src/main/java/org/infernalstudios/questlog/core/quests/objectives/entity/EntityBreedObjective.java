@@ -21,7 +21,7 @@ public class EntityBreedObjective extends AbstractEntityObjective {
     if (
       event.getCausedByPlayer() instanceof ServerPlayer player &&
       this.getParent().manager.player.equals(player) &&
-      (event.getParentA().getType().equals(this.getEntity()) || event.getParentB().getType().equals(this.getEntity()))
+      (this.test(event.getParentA()) || this.test(event.getParentB()))
     ) {
       this.setUnits(this.getUnits() + 1);
     }

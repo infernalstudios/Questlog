@@ -1,48 +1,34 @@
 package org.infernalstudios.questlog.core.quests.objectives.block;
 
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.tags.ITagManager;
 import org.infernalstudios.questlog.event.GenericEventBus;
+import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 import javax.annotation.Nullable;
 
 public class BlockMineObjective extends AbstractBlockObjective {
-  private final String item;
   @Nullable
-  private Item cachedItem = null;
-  @Nullable
-  private TagKey<Item> cachedItemTag = null;
+  private final CachedRegistryPredicate<Item> item;
 
   public BlockMineObjective(JsonObject definition) {
     super(definition);
-    this.item = definition.has("item") ? JsonUtils.getString(definition, "item") : null;
-  }
-
-  private TagKey<Item> getItemTag() {
-    if (this.cachedItemTag == null) {
-      ITagManager<Item> tags = ForgeRegistries.ITEMS.tags();
-      if (tags == null) throw new IllegalStateException("Item tags are not available yet");
-      this.cachedItemTag = tags.createTagKey(new ResourceLocation(this.item.substring(1)));
+    if (definition.has("item")) {
+      this.item = new CachedRegistryPredicate<>(
+        JsonUtils.getString(definition, "item"),
+        ForgeRegistries.ITEMS,
+        Object::equals,
+        (tag, item) -> item.getDefaultInstance().is(tag)
+      );
+    } else {
+      this.item = null;
     }
-
-    return this.cachedItemTag;
-  }
-
-  private Item getItem() {
-    if (this.cachedItem == null) {
-      this.cachedItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(this.item));
-    }
-
-    return this.cachedItem;
   }
 
   private boolean testItem(ItemStack stack) {
@@ -50,11 +36,7 @@ public class BlockMineObjective extends AbstractBlockObjective {
       return true;
     }
 
-    if (this.item.startsWith("#")) {
-      return stack.is(this.getItemTag());
-    } else {
-      return stack.is(this.getItem());
-    }
+    return this.item.test(stack.getItem());
   }
 
   @Override

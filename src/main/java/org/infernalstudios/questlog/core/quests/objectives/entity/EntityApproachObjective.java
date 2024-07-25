@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.core.quests.objectives.entity;
 
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.event.TickEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
@@ -28,7 +29,7 @@ public class EntityApproachObjective extends AbstractEntityObjective {
         this.getParent().manager.player.equals(player) &&
         --ticksUntilCheck <= 0
     ) {
-      if (!event.player.level.getEntities(this.getEntity(), event.player.getBoundingBox().inflate(this.range), entity -> true).isEmpty()) {
+      if (!event.player.level.getEntities((Entity) null, event.player.getBoundingBox().inflate(this.range), this::test).isEmpty()) {
         this.setUnits(this.getUnits() + 1);
       }
       ticksUntilCheck = 20;
