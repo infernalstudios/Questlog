@@ -13,14 +13,16 @@ import java.util.List;
 public class ScrollableText implements Scrollable {
   private final Font font;
   private final FormattedText text;
+  private final int color;
 
   @Nullable
   private List<FormattedCharSequence> lines;
   private ScrollableComponent scroller;
 
-  public ScrollableText(Font font, FormattedText text) {
+  public ScrollableText(Font font, FormattedText text, int color) {
     this.font = font;
     this.text = text;
+    this.color = color;
   }
 
   private int getWidth() {
@@ -38,7 +40,7 @@ public class ScrollableText implements Scrollable {
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     for (int i = 0; i < this.getLines().size(); i++) {
-      this.font.draw(ps, this.getLines().get(i), (float) this.scroller.getXOffset(), (float) this.scroller.getYOffset() + i * this.font.lineHeight, 0x000000);
+      this.font.draw(ps, this.getLines().get(i), (float) this.scroller.getXOffset(), (float) this.scroller.getYOffset() + i * this.font.lineHeight, this.color);
     }
   }
 
