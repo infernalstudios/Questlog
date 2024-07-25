@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
@@ -17,6 +18,7 @@ import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.config.QuestlogConfig.Button;
 import org.infernalstudios.questlog.core.QuestManager;
+import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
 import org.infernalstudios.questlog.event.QuestTriggeredEvent;
 
@@ -42,6 +44,7 @@ public class QuestlogClientEvents {
     }
 
     if (QuestToastState.tickDelayForCheck == 0) {
+      QuestlogClientEvents.displayQueuedPopups();
       QuestlogClientEvents.displayQueuedToasts();
     }
 
@@ -73,6 +76,7 @@ public class QuestlogClientEvents {
     public static int tickDelayForCheck = -1;
     public static List<QuestAddedToast> addedToasts = new ArrayList<>();
     public static List<QuestCompletedToast> completedToasts = new ArrayList<>();
+    public static List<Quest> queuedPopups = new ArrayList<>();
 
     public static void resetCheckDelay() {
       QuestToastState.tickDelayForCheck = 10;
@@ -83,14 +87,9 @@ public class QuestlogClientEvents {
   public static void onQuestAdded(QuestTriggeredEvent event) {
     // Popup only if singleplayer and not opened to lan, because the QuestDetails screen is a pauseable screen
     if (event.getQuest().getDisplay().shouldPopup() && Minecraft.getInstance().hasSingleplayerServer() && !Minecraft.getInstance().getSingleplayerServer().isPublished()) {
-      Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, event.getQuest()));
-
-      SoundInstance sound = event.getQuest().getDisplay().getTriggeredSound();
-      if (sound != null) {
-        Minecraft.getInstance().getSoundManager().play(sound);
-      }
-    } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
       QuestToastState.resetCheckDelay();
+      QuestToastState.queuedPopups.add(event.getQuest());
+    } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
       QuestToastState.addedToasts.add(new QuestAddedToast(event.getQuest().getDisplay()));
     }
   }
@@ -103,7 +102,26 @@ public class QuestlogClientEvents {
     }
   }
 
+  private static void displayQueuedPopups() {
+    Quest quest = QuestToastState.queuedPopups.get(0);
+    if (Minecraft.getInstance().screen instanceof MenuAccess<?> screen && !screen.getMenu().getCarried().isEmpty()) {
+      return;
+    }
+    QuestToastState.queuedPopups.remove(quest);
+
+    Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, quest));
+
+    SoundInstance sound = quest.getDisplay().getTriggeredSound();
+    if (sound != null) {
+      Minecraft.getInstance().getSoundManager().play(sound);
+    }
+  }
+
   private static void displayQueuedToasts() {
+    if (Minecraft.getInstance().screen instanceof QuestDetails) {
+      return;
+    }
+
     ToastComponent toasts = Minecraft.getInstance().getToasts();
     if (!QuestToastState.completedToasts.isEmpty()) {
       for (QuestCompletedToast toast : QuestToastState.completedToasts) {
