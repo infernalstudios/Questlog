@@ -5,6 +5,7 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.event.TickEvent;
@@ -80,6 +81,11 @@ public class QuestlogClientEvents {
     // Popup only if singleplayer and not opened to lan, because the QuestDetails screen is a pauseable screen
     if (event.getQuest().getDisplay().shouldPopup() && Minecraft.getInstance().hasSingleplayerServer() && !Minecraft.getInstance().getSingleplayerServer().isPublished()) {
       Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, event.getQuest()));
+
+      SoundInstance sound = event.getQuest().getDisplay().getTriggeredSound();
+      if (sound != null) {
+        Minecraft.getInstance().getSoundManager().play(sound);
+      }
     } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
       QuestToastState.resetCheckDelay();
       QuestToastState.addedToasts.add(new QuestAddedToast(event.getQuest().getDisplay()));
