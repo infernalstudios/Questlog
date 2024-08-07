@@ -3,7 +3,6 @@ package org.infernalstudios.questlog.client.gui.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -39,7 +38,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
   private static final int CONTENT_X = 20;
   private static final int CONTENT_Y = 36;
-  private static final int CONTENT_WIDTH = 232;
+  private static final int CONTENT_WIDTH = 252;
   private static final int CONTENT_HEIGHT = 86;
 
   private static final int BUTTON_X = 109;
@@ -67,9 +66,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     super(quest.getDisplay().getTitle());
     this.previousScreen = previousScreen;
     this.quest = quest;
-
-    this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2;
-    this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2;
   }
 
   private QuestDisplayData getDisplay() {
@@ -92,13 +88,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       throw new IllegalStateException("Minecraft is null, UNREACHABLE");
     }
 
-    this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2;
-    this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2;
+    this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2 + 375;
+    this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2 + 174;
 
     if (this.backButton != null) this.removeWidget(this.backButton);
     this.backButton = new QuestlogButton(
-      this.x + BUTTON_X,
-      this.y + BUTTON_Y,
+      this.x + BUTTON_X + 5,
+      this.y + BUTTON_Y + 5,
       this.getPalette().textColor,
       this.getPalette().hoveredTextColor,
       this.getDisplay().getButtonText(),
@@ -148,8 +144,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.addWidget(this.info);
   }
 
-  private void drawHorizontalLine(PoseStack ps, int x, int y, int length, int color) {
-    GuiComponent.fill(ps, x, y, x + length, y + 1, color);
+  private void drawHorizontalLine(PoseStack ps, int x, int y, boolean small) {
+    (small ? this.getGuiSet().smallHR : this.getGuiSet().bigHR).blit(ps, x - (small ? 60 : 10), y - 4);
   }
 
   @Override
@@ -171,7 +167,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   @Override
   public void renderBackground(PoseStack ps) {
     super.renderBackground(ps);
-    this.getGuiSet().detailBackground.blit(ps, this.x, this.y);
+    this.getGuiSet().detailBackground.blit(ps, this.x - 375, this.y - 174);
   }
 
   private void renderTitle(PoseStack ps) {
@@ -190,7 +186,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     y += (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
     font.draw(ps, displayData.getTitle(), (int) x, (int) y, this.getPalette().titleColor);
 
-    this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, TITLE_WIDTH, this.getPalette().detailColor);
+    this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, true);
   }
 
   private int getInfoHeight() {
@@ -201,7 +197,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     if (this.info == null) throw new IllegalStateException("Info is null");
     this.info.render(ps, 0, 0, 0);
     if (this.info.height != 0) {
-      this.drawHorizontalLine(ps, this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), CONTENT_WIDTH, this.getPalette().detailColor);
+      this.drawHorizontalLine(ps,  this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), false);
     }
   }
 

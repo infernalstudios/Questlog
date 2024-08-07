@@ -38,7 +38,8 @@ public class QuestDisplayData {
   private final boolean popup;
   private final boolean hidden;
 
-  private final ResourceLocation guiTexture;
+  private final ResourceLocation bgTexture;
+  private final ResourceLocation peripheralTexture;
   private final Component buttonText;
 
   private final Palette palette;
@@ -71,14 +72,20 @@ public class QuestDisplayData {
     String backgroundLoc = style.has("background") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null) : null;
 
     if (backgroundLoc == null) {
-      backgroundLoc = Questlog.MODID + ":textures/gui/questlog.png";
+      backgroundLoc = Questlog.MODID + ":textures/gui/quest_page.png";
     }
 
-    this.guiTexture = new ResourceLocation(backgroundLoc);
+    String peripheralLoc = style.has("peripheral") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null) : null;
+
+    if (peripheralLoc == null) {
+      peripheralLoc = Questlog.MODID + ":textures/gui/quest_peripherals.png";
+    }
+
+    this.bgTexture = new ResourceLocation(backgroundLoc);
+    this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
     this.palette = new Palette(
       JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
-      JsonUtils.getOrDefault(style, "detailColor", "#987C53"),
       JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
       JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
       JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
@@ -146,7 +153,7 @@ public class QuestDisplayData {
   }
 
   public QuestlogGuiSet getGuiSet() {
-    return this.guiTexture.equals(QuestlogGuiSet.DEFAULT.location) ? QuestlogGuiSet.DEFAULT : new QuestlogGuiSet(this.guiTexture);
+    return this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc) ? QuestlogGuiSet.DEFAULT : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
   }
 
   public boolean shouldToastOnTrigger() {

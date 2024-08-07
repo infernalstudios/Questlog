@@ -18,7 +18,7 @@ import java.util.Objects;
 public class QuestlogScreen extends Screen {
   private static final Texture BACKGROUND_TEXTURE = new Texture(
       new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
-      275, 166, 0, 0, 512, 512
+      1024, 512, 0, 0, 1024, 512
   );
 
   private final Screen previousScreen;

@@ -62,11 +62,11 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   }
 
   protected int getScrollbarX() {
-    return this.left + this.width - this.scrollbar.bar().width();
+    return this.left + this.width - this.scrollbar.bar().width() - 10;
   }
 
   protected int getScrollbarY() {
-    return (int)this.getScrollAmount() * (this.bottom - this.top - this.scrollbar.bar().height()) / this.getMaxScroll() + this.top;
+    return (int)this.getScrollAmount() * (this.bottom - this.top - (this.scrollbar.bar().height() - 24)) / this.getMaxScroll() + this.top; // Scrollbar has 24px of padding
   }
 
   public int getScrollbarWidth() {
@@ -120,11 +120,12 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
       y = this.top;
     }
 
-    if (y > this.bottom - this.scrollbar.bar().height()) {
-      y = this.bottom - this.scrollbar.bar().height();
+    // Scrollbar has 12px of padding on top and bottom for a total of 24px
+    if (y > this.bottom - (this.scrollbar.bar().height() - 24)) {
+      y = this.bottom - (this.scrollbar.bar().height() - 24);
     }
 
-    this.scrollbar.bar().blit(ps, x, y);
+    this.scrollbar.bar().blit(ps, x, y - 12);
   }
 
   // Scroll handling
@@ -146,7 +147,7 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   }
 
   private void updateScrollingState(double mouseX, double mouseY, int button) {
-    this.scrolling = button == GLFW.GLFW_MOUSE_BUTTON_1 && (double) this.getScrollbarX() <= mouseX && mouseX < (double)(this.getScrollbarX() + this.scrollbar.bar().width());
+    this.scrolling = button == GLFW.GLFW_MOUSE_BUTTON_1 && (double) this.getScrollbarX() + 10 <= mouseX && mouseX < (double)(this.getScrollbarX() + this.scrollbar.bar().width() - 10);
   }
 
   // Event handlers
@@ -176,7 +177,8 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   @Override
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
     if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.scrolling) {
-      this.setScrollAmount(this.getMaxScroll() * (mouseY - (double)this.top - (double)(this.scrollbar.bar().height() / 2)) / (double)(this.bottom - this.top - this.scrollbar.bar().height()));
+      // Scrollbar has 12px of padding on top and bottom for a total of 24px
+      this.setScrollAmount(this.getMaxScroll() * (mouseY - (double)this.top - (double)((this.scrollbar.bar().height() - 24) / 2)) / (double)(this.bottom - this.top - (this.scrollbar.bar().height() - 24)));
       return true;
     }
 

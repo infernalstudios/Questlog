@@ -40,7 +40,7 @@ public abstract class AbstractToast implements Toast {
   }
 
   public Toast.Visibility render(PoseStack ps, ToastComponent toastComponent, long time) {
-    this.getBackground().blit(ps, 0, 0);
+    this.getBackground().blit(ps, -13, -9); // blit at offset (there is extra space in the texture)
     
     Font font = toastComponent.getMinecraft().font;
     

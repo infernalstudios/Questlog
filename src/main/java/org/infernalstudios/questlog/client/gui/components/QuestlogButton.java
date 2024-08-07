@@ -15,7 +15,7 @@ public class QuestlogButton extends AbstractButton {
   private final int textColorHovered;
 
   public QuestlogButton(int x, int y, int textColor, int textColorHovered, Component message, Callable onPress, QuestlogGuiSet guiSet) {
-    super(x, y, guiSet.button.width(), guiSet.button.height(), message);
+    super(x - 10, y - 10, guiSet.button.width() - 20, guiSet.button.height() - 20, message);
     this.guiSet = guiSet;
     this.onPress = onPress;
     this.textColor = textColor;
@@ -28,18 +28,20 @@ public class QuestlogButton extends AbstractButton {
 
   @Override
   protected void renderBg(PoseStack poseStack, Minecraft minecraft, int mouseX, int mouseY) {
+    int actualX = this.x - 10;
+    int actualY = this.y - 10;
     if (this.isLong()) {
-      int actualX = this.x - (34 / 2); // Hacky
-      if (this.isHovered) {
-        this.guiSet.buttonLongHovered.blit(poseStack, actualX, this.y);
+      actualX -= (34 / 2); // Hacky
+      if (this.isMouseOver(mouseX, mouseY)) {
+        this.guiSet.buttonLongHovered.blit(poseStack, actualX, actualY);
       } else {
-        this.guiSet.buttonLong.blit(poseStack, actualX, this.y);
+        this.guiSet.buttonLong.blit(poseStack, actualX, actualY);
       }
     } else {
-      if (this.isHovered) {
-        this.guiSet.buttonHovered.blit(poseStack, this.x, this.y);
+      if (this.isMouseOver(mouseX, mouseY)) {
+        this.guiSet.buttonHovered.blit(poseStack, actualX, actualY);
       } else {
-        this.guiSet.button.blit(poseStack, this.x, this.y);
+        this.guiSet.button.blit(poseStack, actualX, actualY);
       }
     }
   }
@@ -52,7 +54,12 @@ public class QuestlogButton extends AbstractButton {
     int x = this.x + (this.width - minecraft.font.width(this.getMessage())) / 2 + 1;
     int y = this.y + (this.height - 8) / 2;
 
-    minecraft.font.draw(ps, this.getMessage(), x, y, this.isHovered ? this.textColorHovered : this.textColor);
+    minecraft.font.draw(ps, this.getMessage(), x, y, this.isMouseOver(mouseX, mouseY) ? this.textColorHovered : this.textColor);
+  }
+
+  @Override
+  public boolean isMouseOver(double x, double y) {
+    return x >= this.x - 10 && x <= this.x + this.width && y >= this.y - 10 && y <= this.y + this.height;
   }
 
   @Override

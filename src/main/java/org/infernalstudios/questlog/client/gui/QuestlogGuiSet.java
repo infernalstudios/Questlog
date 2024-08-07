@@ -6,30 +6,41 @@ import org.infernalstudios.questlog.util.ScrollbarTexture;
 import org.infernalstudios.questlog.util.texture.Texture;
 
 public class QuestlogGuiSet {
-  public static final QuestlogGuiSet DEFAULT = new QuestlogGuiSet(new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"));
+  public static final QuestlogGuiSet DEFAULT = new QuestlogGuiSet(
+      new ResourceLocation(Questlog.MODID, "textures/gui/quest_page.png"),
+      new ResourceLocation(Questlog.MODID, "textures/gui/quest_peripherals.png")
+  );
 
-  public final ResourceLocation location;
+  public final ResourceLocation backgroundLoc;
+  public final ResourceLocation peripheralLoc;
   public final Texture detailBackground;
   public final Texture button;
   public final Texture buttonHovered;
   public final Texture buttonLong;
   public final Texture buttonLongHovered;
   public final Texture toast;
+  public final Texture important;
+  public final Texture smallHR;
+  public final Texture bigHR;
   public final ScrollbarTexture scrollbar;
 
-  public QuestlogGuiSet(ResourceLocation location) {
-    this.location = location;
-    this.detailBackground = new Texture(location, 275, 166, 0, 166, 512, 512);
-    this.button = new Texture(location, 54, 18, 287, 0, 512, 512);
-    this.buttonHovered = new Texture(location, 54, 18, 341, 0, 512, 512);
-    this.buttonLong = new Texture(location, 88, 18, 287, 18, 512, 512);
-    this.buttonLongHovered = new Texture(location, 88, 18, 375, 18, 512, 512);
-    this.toast = new Texture(location, 160, 32, 275, 36, 512, 512);
+  public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation peripheralLoc) {
+    this.backgroundLoc = backgroundLoc;
+    this.peripheralLoc = peripheralLoc;
+    this.detailBackground = new Texture(backgroundLoc, 1024, 512, 0, 0, 1024, 512);
+    this.button = new Texture(peripheralLoc, 74, 38, 36, 55, 256, 256);
+    this.buttonHovered = new Texture(peripheralLoc, 74, 38, 112, 55, 256, 256);
+    this.buttonLong = new Texture(peripheralLoc, 108, 38, 2, 95, 256, 256);
+    this.buttonLongHovered = new Texture(peripheralLoc, 108, 38, 112, 95, 256, 256);
+    this.toast = new Texture(peripheralLoc, 173, 51, 81, 2, 256, 256);
+    this.important = new Texture(peripheralLoc, 28, 36, 2, 2, 256, 256);
+    this.smallHR = new Texture(peripheralLoc, 252, 9, 2, 135, 256, 256);
+    this.bigHR = new Texture(peripheralLoc, 252, 9, 2, 146, 256, 256);
     this.scrollbar = new ScrollbarTexture(
-        new Texture(location, 8, 12, 277, 0, 512, 512),
-        new Texture(location, 4, 1, 279, 14, 512, 512),
-        new Texture(location, 4, 1, 279, 13, 512, 512),
-        new Texture(location, 4, 1, 279, 15, 512, 512)
+        new Texture(peripheralLoc, 28, 36, 32, 2, 256, 256),
+        new Texture(peripheralLoc, 16, 1, 62, 20, 256, 256),
+        new Texture(peripheralLoc, 16, 1, 62, 19, 256, 256),
+        new Texture(peripheralLoc, 16, 1, 62, 21, 256, 256)
     );
   }
 }

@@ -3,12 +3,12 @@ package org.infernalstudios.questlog.client.gui.components;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.lwjgl.glfw.GLFW;
@@ -223,13 +223,13 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, y, 0x4C381B);
       }
 
-      if (isHovered) {
-        fill(ps, xPosition + (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset(), xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0), yPosition + (int) this.list.scroller.getYOffset() + height, 0x80FFFFFF);
+      if (this.hasNext()) {
+        // A lot of effort went into deriving this
+        QuestlogGuiSet.DEFAULT.bigHR.blit(ps, (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset() + height - 5);
       }
 
-      if (this.hasNext()) {
-        // Draw line
-        GuiComponent.fill(ps, xPosition + (int) this.list.scroller.getXOffset() + 5, yPosition + (int) this.list.scroller.getYOffset() + height - 1, xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0) - 5, yPosition + (int) this.list.scroller.getYOffset() + height, 0xFF000000);
+      if (isHovered) {
+        fill(ps, xPosition + (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset(), xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0), yPosition + (int) this.list.scroller.getYOffset() + height, 0x80FFFFFF);
       }
     }
 
