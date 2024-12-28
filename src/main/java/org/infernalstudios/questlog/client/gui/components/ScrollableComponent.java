@@ -83,9 +83,9 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
     this.scrollable.renderBackground(ps, mouseX - this.left, (int) (mouseY - this.top + this.getScrollAmount()), partialTicks);
 
     // Clip offscreen rendering
-//    GuiComponent.enableScissor(this.left, this.top, this.left + this.width, this.top + this.height);
+    GuiComponent.enableScissor(this.left, this.top, this.left + this.width, this.top + this.height);
     this.scrollable.render(ps, mouseX - this.left, (int) (mouseY - this.top + this.getScrollAmount()), partialTicks);
-//    GuiComponent.disableScissor();
+    GuiComponent.disableScissor();
 
     if (this.canScroll()) {
       this.renderScrollbar(ps, mouseX, mouseY);
