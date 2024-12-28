@@ -1,0 +1,39 @@
+name: Auto-format
+
+concurrency: production
+
+on: [push]
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Prettier
+        run: npm install prettier prettier-plugin-java
+
+      - name: Run Prettier
+        run: npx prettier --write "**/*.java"
+
+      - name: Create commit and push
+        run: |
+          git add src --verbose
+
+          if [ ! -z "$(git diff --exit-code --staged)" ]; then
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+
+            git commit --verbose -m "
+            chore: auto-format
+
+            This is an automated commit. It was made by a GitHub workflow.
+            Action: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID
+            "
+
+            git push --verbose
+          else
+            echo "No changes to commit"
+            exit 0
+          fi
