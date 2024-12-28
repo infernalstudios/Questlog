@@ -5,12 +5,12 @@ import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class ExperienceReward extends Reward {
+
   private final int experience;
   private final boolean levels;
 
   public ExperienceReward(JsonObject definition) {
     super(definition);
-
     this.experience = JsonUtils.getInt(definition, "experience");
     this.levels = JsonUtils.getOrDefault(definition, "levels", false);
   }

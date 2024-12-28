@@ -3,6 +3,8 @@ package org.infernalstudios.questlog.core.quests;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
@@ -15,10 +17,8 @@ import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.infernalstudios.questlog.util.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
+
   private final QuestDisplayData display;
   public final List<Objective> triggers;
   public final List<Objective> objectives;
@@ -30,8 +30,14 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
   public boolean hasSentCompletion = false;
   public boolean hasSentTrigger = false;
 
-
-  public Quest(QuestDisplayData display, List<Objective> triggers, List<Objective> objectives, List<Reward> rewards, ResourceLocation id, QuestManager manager) {
+  public Quest(
+    QuestDisplayData display,
+    List<Objective> triggers,
+    List<Objective> objectives,
+    List<Reward> rewards,
+    ResourceLocation id,
+    QuestManager manager
+  ) {
     this.display = display;
     this.triggers = triggers;
     this.objectives = objectives;
@@ -94,23 +100,32 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     data.putBoolean("completed", this.hasSentCompletion);
     data.putBoolean("triggered", this.hasSentTrigger);
 
-    data.put("triggers", Util.toNbtList(this.triggers, trigger -> {
-      CompoundTag tag = new CompoundTag();
-      trigger.writeInitialData(tag);
-      return tag;
-    }));
+    data.put(
+      "triggers",
+      Util.toNbtList(this.triggers, trigger -> {
+        CompoundTag tag = new CompoundTag();
+        trigger.writeInitialData(tag);
+        return tag;
+      })
+    );
 
-    data.put("objectives", Util.toNbtList(this.objectives, objective -> {
-      CompoundTag tag = new CompoundTag();
-      objective.writeInitialData(tag);
-      return tag;
-    }));
+    data.put(
+      "objectives",
+      Util.toNbtList(this.objectives, objective -> {
+        CompoundTag tag = new CompoundTag();
+        objective.writeInitialData(tag);
+        return tag;
+      })
+    );
 
-    data.put("rewards", Util.toNbtList(this.rewards, reward -> {
-      CompoundTag tag = new CompoundTag();
-      reward.writeInitialData(tag);
-      return tag;
-    }));
+    data.put(
+      "rewards",
+      Util.toNbtList(this.rewards, reward -> {
+        CompoundTag tag = new CompoundTag();
+        reward.writeInitialData(tag);
+        return tag;
+      })
+    );
   }
 
   /** {@inheritDoc} */

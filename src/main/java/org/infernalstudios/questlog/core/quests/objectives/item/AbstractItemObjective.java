@@ -9,16 +9,13 @@ import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public abstract class AbstractItemObjective extends Objective {
+
   private final CachedRegistryPredicate<Item> item;
 
   public AbstractItemObjective(JsonObject definition) {
     super(definition);
-
-    this.item = new CachedRegistryPredicate<>(
-      JsonUtils.getString(definition, "item"),
-      ForgeRegistries.ITEMS,
-      Object::equals,
-      (tag, item) -> item.getDefaultInstance().is(tag)
+    this.item = new CachedRegistryPredicate<>(JsonUtils.getString(definition, "item"), ForgeRegistries.ITEMS, Object::equals, (tag, item) ->
+      item.getDefaultInstance().is(tag)
     );
   }
 

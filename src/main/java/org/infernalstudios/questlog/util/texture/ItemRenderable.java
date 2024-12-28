@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.util.texture;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -8,9 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.infernalstudios.questlog.Questlog;
 
-import javax.annotation.Nullable;
-
 public class ItemRenderable implements Renderable {
+
   private final ResourceLocation item;
   private ItemStack cachedStack;
 

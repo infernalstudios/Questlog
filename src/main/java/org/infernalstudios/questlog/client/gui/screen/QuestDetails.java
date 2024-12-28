@@ -1,6 +1,10 @@
 package org.infernalstudios.questlog.client.gui.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
@@ -25,12 +29,8 @@ import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.util.texture.Renderable;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
 public class QuestDetails extends Screen implements NarrationSupplier {
+
   private static final int TITLE_X = 71;
   private static final int TITLE_Y = 13;
   private static final int TITLE_WIDTH = 132;
@@ -47,6 +47,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   private static final int DESCRIPTION_INFO_PADDING = 5;
 
   private final Quest quest;
+
   @Nullable
   private final Screen previousScreen;
 
@@ -125,8 +126,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.description = new ScrollableComponent(
       this.x + CONTENT_X,
       this.y + CONTENT_Y,
-        CONTENT_WIDTH,
-        CONTENT_HEIGHT - this.getInfoHeight() - DESCRIPTION_INFO_PADDING,
+      CONTENT_WIDTH,
+      CONTENT_HEIGHT - this.getInfoHeight() - DESCRIPTION_INFO_PADDING,
       new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor)
     );
     // We render this ourselves, don't use addRenderableWidget.
@@ -136,7 +137,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.info = new ScrollableComponent(
       this.x + CONTENT_X,
       this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight() + DESCRIPTION_INFO_PADDING,
-        CONTENT_WIDTH,
+      CONTENT_WIDTH,
       this.getInfoHeight(),
       new InfoScrollable()
     );
@@ -190,14 +191,20 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   }
 
   private int getInfoHeight() {
-    return Math.min(2, this.quest.isCompleted() ? this.getDisplay().getRewardDisplayData().size() : this.getDisplay().getObjectiveDisplayData().size()) * InfoEntry.INFO_ENTRY_HEIGHT;
+    return (
+      Math.min(
+        2,
+        this.quest.isCompleted() ? this.getDisplay().getRewardDisplayData().size() : this.getDisplay().getObjectiveDisplayData().size()
+      ) *
+      InfoEntry.INFO_ENTRY_HEIGHT
+    );
   }
 
   private void renderInfo(PoseStack ps) {
     if (this.info == null) throw new IllegalStateException("Info is null");
     this.info.render(ps, 0, 0, 0);
     if (this.info.height != 0) {
-      this.drawHorizontalLine(ps,  this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), false);
+      this.drawHorizontalLine(ps, this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), false);
     }
   }
 
@@ -217,6 +224,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   }
 
   private class InfoScrollable implements Scrollable {
+
     private List<InfoEntry> rewards;
     private List<InfoEntry> objectives;
 
@@ -274,10 +282,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   }
 
   private class InfoEntry implements Widget, GuiEventListener {
+
     private static final int INFO_ENTRY_HEIGHT = 18;
 
     @CheckForNull
     private final RewardDisplayData rewardDisplayData;
+
     @CheckForNull
     private final ObjectiveDisplayData objectiveDisplayData;
 
@@ -348,8 +358,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
       font.draw(ps, "- ", x, y, QuestDetails.this.getPalette().progressTextColor);
       font.draw(
-          ps, progress, x + font.width("- "), y,
-          this.objectiveDisplayData.isCompleted() ? QuestDetails.this.getPalette().completedTextColor : QuestDetails.this.getPalette().progressTextColor
+        ps,
+        progress,
+        x + font.width("- "),
+        y,
+        this.objectiveDisplayData.isCompleted()
+          ? QuestDetails.this.getPalette().completedTextColor
+          : QuestDetails.this.getPalette().progressTextColor
       );
     }
 
@@ -361,15 +376,19 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         throw new IllegalCallerException("Collected can only be drawn for rewards");
       }
 
-      Component collected = this.rewardDisplayData.hasRewarded() ?
-        Component.translatable("questlog.reward.collected") :
-        Component.translatable("questlog.reward.uncollected");
-
+      Component collected = this.rewardDisplayData.hasRewarded()
+        ? Component.translatable("questlog.reward.collected")
+        : Component.translatable("questlog.reward.uncollected");
 
       font.draw(ps, "- ", x, y, QuestDetails.this.getPalette().progressTextColor);
       font.draw(
-          ps, collected, x + font.width("- "), y,
-          this.rewardDisplayData.hasRewarded() ? QuestDetails.this.getPalette().completedTextColor : QuestDetails.this.getPalette().progressTextColor
+        ps,
+        collected,
+        x + font.width("- "),
+        y,
+        this.rewardDisplayData.hasRewarded()
+          ? QuestDetails.this.getPalette().completedTextColor
+          : QuestDetails.this.getPalette().progressTextColor
       );
     }
 

@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
 import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,11 +15,8 @@ import org.infernalstudios.questlog.event.StatAwardEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 public class StatisticObjective extends Objective {
+
   private final ResourceLocation stat;
   private int statAtStart = 0;
   private boolean trackSinceStart = true;
@@ -90,6 +90,7 @@ public class StatisticObjective extends Objective {
   // This is a hacky workaround to fix the issue.
 
   private static final Map<ResourceLocation, ResourceLocation> STAT_MAP = new HashMap<>();
+
   static {
     STAT_MAP.put(new ResourceLocation("leave_game"), Stats.LEAVE_GAME);
     STAT_MAP.put(new ResourceLocation("play_time"), Stats.PLAY_TIME);

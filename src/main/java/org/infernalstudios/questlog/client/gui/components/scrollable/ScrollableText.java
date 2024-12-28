@@ -1,22 +1,23 @@
 package org.infernalstudios.questlog.client.gui.components.scrollable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.List;
+import javax.annotation.Nullable;
 import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
 
-import javax.annotation.Nullable;
-import java.util.List;
-
 public class ScrollableText implements Scrollable {
+
   private final Font font;
   private final FormattedText text;
   private final int color;
 
   @Nullable
   private List<FormattedCharSequence> lines;
+
   private ScrollableComponent scroller;
 
   public ScrollableText(Font font, FormattedText text, int color) {
@@ -40,7 +41,13 @@ public class ScrollableText implements Scrollable {
   @Override
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     for (int i = 0; i < this.getLines().size(); i++) {
-      this.font.draw(ps, this.getLines().get(i), (float) this.scroller.getXOffset(), (float) this.scroller.getYOffset() + i * this.font.lineHeight, this.color);
+      this.font.draw(
+          ps,
+          this.getLines().get(i),
+          (float) this.scroller.getXOffset(),
+          (float) this.scroller.getYOffset() + i * this.font.lineHeight,
+          this.color
+        );
     }
   }
 

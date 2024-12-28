@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.network.packet;
 
+import java.util.function.Supplier;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -8,9 +9,8 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 
-import java.util.function.Supplier;
-
 public class QuestDataPacket {
+
   private final ResourceLocation id;
   private final CompoundTag data;
 

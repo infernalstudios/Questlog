@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.core.quests;
 
 import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.rewards.CommandReward;
@@ -10,11 +13,8 @@ import org.infernalstudios.questlog.core.quests.rewards.LootTableReward;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.JsonUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 public class QuestRewardRegistry {
+
   private static final Map<ResourceLocation, Function<JsonObject, Reward>> REGISTRY = new HashMap<>();
 
   static {

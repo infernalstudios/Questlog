@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class EntityDeathObjective extends AbstractEntityObjective {
+
   public EntityDeathObjective(JsonObject definition) {
     super(definition);
   }
@@ -19,10 +20,10 @@ public class EntityDeathObjective extends AbstractEntityObjective {
   private void onEntityDeath(LivingDeathEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
     if (
-        event.getEntity() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        event.getSource().getEntity() != null &&
-        this.test(event.getSource().getEntity())
+      event.getEntity() instanceof ServerPlayer player &&
+      this.getParent().manager.player.equals(player) &&
+      event.getSource().getEntity() != null &&
+      this.test(event.getSource().getEntity())
     ) {
       this.setUnits(this.getUnits() + 1);
     }

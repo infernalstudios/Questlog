@@ -1,5 +1,10 @@
 package org.infernalstudios.questlog.event;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 import net.jodah.typetools.TypeResolver;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -8,15 +13,10 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.infernalstudios.questlog.Questlog;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 // This class is a generic event bus that allows for the registration of dynamic listeners that are resolved at runtime.
 // This is used because Forge's event bus sometimes does not work as expected with Objective::registerEventListeners.
 public class GenericEventBus {
+
   private final Marker GENERIC_EVENTBUS = MarkerManager.getMarker("GENERIC_EVENTBUS");
 
   private final Map<Class<? extends Event>, List<Consumer<Event>>> listeners = new HashMap<>();

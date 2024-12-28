@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemUseObjective extends AbstractItemObjective {
+
   public ItemUseObjective(JsonObject definition) {
     super(definition);
   }
@@ -18,11 +19,7 @@ public class ItemUseObjective extends AbstractItemObjective {
 
   private void onItemUse(LivingEntityUseItemEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-        event.getEntity() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        this.test(event.getItem())
-    ) {
+    if (event.getEntity() instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.getItem())) {
       this.setUnits(this.getUnits() + 1);
     }
   }

@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.core.quests;
 
 import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
@@ -26,11 +29,8 @@ import org.infernalstudios.questlog.core.quests.objectives.misc.VisitDimensionOb
 import org.infernalstudios.questlog.core.quests.objectives.misc.VisitPositionObjective;
 import org.infernalstudios.questlog.util.JsonUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
-
 public class QuestObjectiveRegistry {
+
   private static final Map<ResourceLocation, Function<JsonObject, Objective>> REGISTRY = new HashMap<>();
 
   static {

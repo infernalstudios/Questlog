@@ -3,6 +3,7 @@ package org.infernalstudios.questlog.util;
 import java.util.function.Supplier;
 
 public class CachedValue<T> implements Supplier<T> {
+
   private final Supplier<T> supplier;
   private T value;
 

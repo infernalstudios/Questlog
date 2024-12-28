@@ -1,14 +1,14 @@
 package org.infernalstudios.questlog.network.packet;
 
+import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.QuestManager;
 
-import java.util.function.Supplier;
-
 public class QuestRemovePacket {
+
   private final ResourceLocation id;
 
   public QuestRemovePacket(ResourceLocation id) {

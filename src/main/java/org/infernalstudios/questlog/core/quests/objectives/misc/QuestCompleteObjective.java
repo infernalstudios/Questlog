@@ -9,6 +9,7 @@ import org.infernalstudios.questlog.event.QuestCompletedEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class QuestCompleteObjective extends Objective {
+
   private final ResourceLocation quest;
 
   public QuestCompleteObjective(JsonObject definition) {
@@ -19,7 +20,7 @@ public class QuestCompleteObjective extends Objective {
   @Override
   protected void registerEventListeners(GenericEventBus bus) {
     super.registerEventListeners(bus);
-     bus.addListener(this::onQuestCompleted);
+    bus.addListener(this::onQuestCompleted);
   }
 
   private void onQuestCompleted(QuestCompletedEvent event) {

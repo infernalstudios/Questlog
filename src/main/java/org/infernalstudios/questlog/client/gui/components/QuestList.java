@@ -1,6 +1,11 @@
 package org.infernalstudios.questlog.client.gui.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
@@ -13,19 +18,16 @@ import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Sc
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-
 public class QuestList extends AbstractContainerEventHandler implements Scrollable {
+
   protected final Minecraft minecraft;
   protected final int itemHeight;
   private final Consumer<Quest> onSelect;
   private final List<QuestListEntry> children = new ArrayList<>();
+
   @Nullable
   private QuestListEntry hovered;
+
   @Nullable
   private ScrollableComponent scroller;
 
@@ -40,20 +42,20 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
     // Uncompleted first, then uncollected rewards first
     this.children.sort((a, b) -> {
-      Quest qa = a.quest;
-      Quest qb = b.quest;
-      if (qa.isCompleted() && !qb.isCompleted()) {
-        return 1;
-      } else if (!qa.isCompleted() && qb.isCompleted()) {
-        return -1;
-      } else if (!qa.isRewarded() && qb.isRewarded()) {
-        return -1;
-      } else if (qa.isRewarded() && !qb.isRewarded()) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+        Quest qa = a.quest;
+        Quest qb = b.quest;
+        if (qa.isCompleted() && !qb.isCompleted()) {
+          return 1;
+        } else if (!qa.isCompleted() && qb.isCompleted()) {
+          return -1;
+        } else if (!qa.isRewarded() && qb.isRewarded()) {
+          return -1;
+        } else if (qa.isRewarded() && !qb.isRewarded()) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
   }
 
   public int getWidth() {
@@ -119,7 +121,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     for (int i = 0; i < this.children.size(); i++) {
       int top = this.getRowTop(i);
       int bottom = this.getRowBottom(i);
-      if (y >= (double)top && y <= (double)bottom) {
+      if (y >= (double) top && y <= (double) bottom) {
         return this.children.get(i);
       }
     }
@@ -147,9 +149,30 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     }
   }
 
-  protected void renderItem(PoseStack ps, int mouseX, int mouseY, float partialTicks, int itemIndex, int rowLeft, int rowTop, int rowWidth, int itemHeightAdjusted) {
+  protected void renderItem(
+    PoseStack ps,
+    int mouseX,
+    int mouseY,
+    float partialTicks,
+    int itemIndex,
+    int rowLeft,
+    int rowTop,
+    int rowWidth,
+    int itemHeightAdjusted
+  ) {
     QuestListEntry entry = this.getEntry(itemIndex);
-    entry.render(ps, itemIndex, rowTop, rowLeft, rowWidth, itemHeightAdjusted, mouseX, mouseY, Objects.equals(this.hovered, entry), partialTicks);
+    entry.render(
+      ps,
+      itemIndex,
+      rowTop,
+      rowLeft,
+      rowWidth,
+      itemHeightAdjusted,
+      mouseX,
+      mouseY,
+      Objects.equals(this.hovered, entry),
+      partialTicks
+    );
   }
 
   public boolean isMouseOver(double x, double y) {
@@ -180,6 +203,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
   @OnlyIn(Dist.CLIENT)
   public static class QuestListEntry implements GuiEventListener {
+
     private final QuestList list;
     private final Quest quest;
 
@@ -188,22 +212,53 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
       this.quest = quest;
     }
 
-    public void render(PoseStack ps, int color, int yPosition, int xPosition, int width, int height, int mouseX, int mouseY, boolean isHovered, float partialTicks) {
+    public void render(
+      PoseStack ps,
+      int color,
+      int yPosition,
+      int xPosition,
+      int width,
+      int height,
+      int mouseX,
+      int mouseY,
+      boolean isHovered,
+      float partialTicks
+    ) {
       Font font = Minecraft.getInstance().font;
       int dx = 5;
       if (this.quest.getDisplay().getIcon() != null) {
-        this.quest.getDisplay().getIcon().blit(ps, xPosition + dx + (int) this.list.scroller.getXOffset(), yPosition + 5 + (int) this.list.scroller.getYOffset());
+        this.quest.getDisplay()
+          .getIcon()
+          .blit(ps, xPosition + dx + (int) this.list.scroller.getXOffset(), yPosition + 5 + (int) this.list.scroller.getYOffset());
         dx += 20;
       }
       if (this.quest.isCompleted()) {
         int linesHeight = font.lineHeight * 2;
         int dy = (height - linesHeight) / 2;
 
-        font.draw(ps, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + dy + (int) this.list.scroller.getYOffset() , 0x4C381B);
+        font.draw(
+          ps,
+          this.quest.getDisplay().getTitle(),
+          xPosition + (int) this.list.scroller.getXOffset() + dx,
+          yPosition + dy + (int) this.list.scroller.getYOffset(),
+          0x4C381B
+        );
         if (!this.quest.isRewarded()) {
-          font.draw(ps, Component.translatable("questlog.quest.uncollected"), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight, 0x9e6632);
+          font.draw(
+            ps,
+            Component.translatable("questlog.quest.uncollected"),
+            xPosition + (int) this.list.scroller.getXOffset() + dx,
+            yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
+            0x9e6632
+          );
         } else {
-          font.draw(ps, Component.translatable("questlog.quest.completed"), xPosition + (int) this.list.scroller.getXOffset() + dx, yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight, 0x529E52);
+          font.draw(
+            ps,
+            Component.translatable("questlog.quest.completed"),
+            xPosition + (int) this.list.scroller.getXOffset() + dx,
+            yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
+            0x529E52
+          );
         }
       } else {
         int y = yPosition + (int) this.list.scroller.getYOffset() + (height - font.lineHeight) / 2;
@@ -212,11 +267,25 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
       if (this.hasNext()) {
         // A lot of effort went into deriving this
-        QuestlogGuiSet.DEFAULT.bigHR.blit(ps, (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset() + height - 5);
+        QuestlogGuiSet.DEFAULT.bigHR.blit(
+          ps,
+          (int) this.list.scroller.getXOffset() - 2,
+          yPosition + (int) this.list.scroller.getYOffset() + height - 5
+        );
       }
 
       if (isHovered) {
-        fill(ps, xPosition + (int) this.list.scroller.getXOffset() - 2, yPosition + (int) this.list.scroller.getYOffset(), xPosition + (int) this.list.scroller.getXOffset() + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0), yPosition + (int) this.list.scroller.getYOffset() + height, 0x80FFFFFF);
+        fill(
+          ps,
+          xPosition + (int) this.list.scroller.getXOffset() - 2,
+          yPosition + (int) this.list.scroller.getYOffset(),
+          xPosition +
+          (int) this.list.scroller.getXOffset() +
+          width -
+          (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0),
+          yPosition + (int) this.list.scroller.getYOffset() + height,
+          0x80FFFFFF
+        );
       }
     }
 

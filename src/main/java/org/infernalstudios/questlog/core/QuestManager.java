@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.core;
 
 import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
@@ -16,11 +19,8 @@ import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestDataPacket;
 import org.infernalstudios.questlog.network.packet.QuestRemovePacket;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class QuestManager {
+
   private static QuestManager INSTANCE;
 
   public final Player player;

@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 public class Palette {
+
   public final int textColor;
   public final int completedTextColor;
   public final int hoveredTextColor;

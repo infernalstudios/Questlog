@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.network.packet;
 
+import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,10 +11,9 @@ import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 
-import java.util.function.Supplier;
-
 // Indicates to the server that the client has collected a reward in the GUI.
 public class QuestRewardCollectPacket {
+
   private final ResourceLocation id;
   private final int rewardIndex;
 

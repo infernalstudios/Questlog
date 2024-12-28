@@ -11,12 +11,12 @@ import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 public class ItemReward extends Reward {
+
   private final CachedValue<Item> item;
   private final int count;
 
   public ItemReward(JsonObject definition) {
     super(definition);
-
     this.item = new CachedValue<>(() -> ForgeRegistries.ITEMS.getValue(new ResourceLocation(JsonUtils.getString(definition, "item"))));
     this.count = JsonUtils.getOrDefault(definition, "count", 1);
   }

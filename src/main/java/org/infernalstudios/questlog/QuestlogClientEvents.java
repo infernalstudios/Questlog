@@ -1,5 +1,7 @@
 package org.infernalstudios.questlog;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
@@ -22,10 +24,8 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
 import org.infernalstudios.questlog.event.QuestTriggeredEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class QuestlogClientEvents {
+
   @SubscribeEvent
   public static void onScreenInit(ScreenEvent.Init.Post event) {
     if (event.getScreen() instanceof InventoryScreen screen) {
@@ -68,8 +68,8 @@ public class QuestlogClientEvents {
     QuestManager.destroyLocal();
   }
 
-
   private static class QuestToastState {
+
     // This allows for all network packets to be received before displaying toasts
     // This is necessary because the server may send an added quest before a completed quest,
     // and we want to display the completed quest first.
@@ -86,7 +86,11 @@ public class QuestlogClientEvents {
   // Called by QuestlogEvents.onQuestAdded
   public static void onQuestAdded(QuestTriggeredEvent event) {
     // Popup only if singleplayer and not opened to lan, because the QuestDetails screen is a pauseable screen
-    if (event.getQuest().getDisplay().shouldPopup() && Minecraft.getInstance().hasSingleplayerServer() && !Minecraft.getInstance().getSingleplayerServer().isPublished()) {
+    if (
+      event.getQuest().getDisplay().shouldPopup() &&
+      Minecraft.getInstance().hasSingleplayerServer() &&
+      !Minecraft.getInstance().getSingleplayerServer().isPublished()
+    ) {
       QuestToastState.resetCheckDelay();
       QuestToastState.queuedPopups.add(event.getQuest());
     } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
@@ -95,7 +99,7 @@ public class QuestlogClientEvents {
 
     SoundInstance triggeredSound = event.getQuest().getDisplay().getTriggeredSound();
     if (triggeredSound != null) {
-        Minecraft.getInstance().getSoundManager().play(triggeredSound);
+      Minecraft.getInstance().getSoundManager().play(triggeredSound);
     }
   }
 

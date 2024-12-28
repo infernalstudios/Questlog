@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 public final class Texture implements Renderable {
+
   private final ResourceLocation path;
   private final int width;
   private final int height;

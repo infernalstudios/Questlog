@@ -1,5 +1,10 @@
 package org.infernalstudios.questlog.core;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.MinecraftServer;
@@ -10,19 +15,13 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.NetworkHandler;
 import org.infernalstudios.questlog.network.packet.QuestDefinitionPacket;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 public class ServerPlayerManager {
+
   public static ServerPlayerManager INSTANCE = null;
 
   private final Map<UUID, QuestManager> questManagers = new HashMap<>();
   private final MinecraftServer server;
 
-  
   public ServerPlayerManager(MinecraftServer server) {
     this.server = server;
     for (Player player : this.server.getPlayerList().getPlayers()) {
@@ -125,8 +124,15 @@ public class ServerPlayerManager {
       } else {
         shouldSave = true;
       }
-      Questlog.LOGGER.trace("Loaded quest {} for {}, sending definition packet", quest.getId(), questManager.player.getGameProfile().getName());
-      NetworkHandler.sendToPlayer(new QuestDefinitionPacket(quest.getId(), DefinitionUtil.getCached(quest.getId())), (ServerPlayer) questManager.player);
+      Questlog.LOGGER.trace(
+        "Loaded quest {} for {}, sending definition packet",
+        quest.getId(),
+        questManager.player.getGameProfile().getName()
+      );
+      NetworkHandler.sendToPlayer(
+        new QuestDefinitionPacket(quest.getId(), DefinitionUtil.getCached(quest.getId())),
+        (ServerPlayer) questManager.player
+      );
       // This is handled when client responds with QuestDefinitionHandledPacket with questManager.sync()
       // NetworkHandler.sendToPlayer(new QuestDataPacket(quest.getId(), quest.serialize()), (ServerPlayer) event.getEntity());
     }

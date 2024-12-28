@@ -1,6 +1,8 @@
 package org.infernalstudios.questlog.core.quests.objectives;
 
 import com.google.gson.JsonObject;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -10,14 +12,13 @@ import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
+
   private final ObjectiveDisplayData display;
 
   @CheckForNull
   private Quest parent;
+
   private final int totalUnits;
   private int units;
 
@@ -32,8 +33,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
   }
 
   // This is required due to EVENT_BUS.register(this) does not work for superclasses
-  protected void registerEventListeners(GenericEventBus bus) {
-  }
+  protected void registerEventListeners(GenericEventBus bus) {}
 
   public final void setParent(Quest parent) {
     this.parent = parent;

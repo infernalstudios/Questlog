@@ -8,14 +8,15 @@ import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class ItemEquipObjective extends AbstractItemObjective {
-  private final EquipmentSlot slot;
-//  "mainhand"
-//  "offhand"
-//  "feet"
-//  "legs"
-//  "chest"
-//  "head"
 
+  private final EquipmentSlot slot;
+
+  //  "mainhand"
+  //  "offhand"
+  //  "feet"
+  //  "legs"
+  //  "chest"
+  //  "head"
 
   public ItemEquipObjective(JsonObject definition) {
     super(definition);
@@ -30,6 +31,7 @@ public class ItemEquipObjective extends AbstractItemObjective {
 
   // Checks every second for performance
   private int ticksUntilCheck = 0;
+
   private void onPlayerTick(TickEvent.PlayerTickEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
     if (

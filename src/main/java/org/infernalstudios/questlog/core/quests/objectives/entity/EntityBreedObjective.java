@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class EntityBreedObjective extends AbstractEntityObjective {
+
   public EntityBreedObjective(JsonObject definition) {
     super(definition);
   }

@@ -15,8 +15,9 @@ import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.network.packet.QuestTriggeredPacket;
 
 public class NetworkHandler {
+
   private static final String PROTOCOL_VERSION = "1";
-  
+
   public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
     new ResourceLocation(Questlog.MODID, "main"),
     () -> PROTOCOL_VERSION,

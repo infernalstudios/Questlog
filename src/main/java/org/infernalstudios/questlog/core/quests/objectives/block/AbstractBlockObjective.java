@@ -9,11 +9,11 @@ import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class AbstractBlockObjective extends Objective {
+
   private final CachedRegistryPredicate<Block> block;
 
   public AbstractBlockObjective(JsonObject definition) {
     super(definition);
-
     this.block = new CachedRegistryPredicate<>(
       JsonUtils.getString(definition, "block"),
       ForgeRegistries.BLOCKS,

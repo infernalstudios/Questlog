@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.network.packet;
 
+import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
@@ -7,12 +8,11 @@ import net.minecraftforge.network.NetworkEvent;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.QuestCompletedEvent;
 
-import java.util.function.Supplier;
-
 // Indicates to the client that a quest has been freshly completed
 // and a notification may be sent.
 // Sent only to notify the client to post a QuestCompletedEvent.
 public class QuestCompletedPacket {
+
   private final ResourceLocation id;
 
   public QuestCompletedPacket(ResourceLocation id) {

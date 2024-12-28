@@ -12,9 +12,15 @@ import org.infernalstudios.questlog.config.QuestlogConfig.Button;
 import org.infernalstudios.questlog.util.texture.Texture;
 
 public class QuestlogOpenButton implements Widget, GuiEventListener {
+
   public static final Texture TEXTURE = new Texture(
     new ResourceLocation(Questlog.MODID, "textures/gui/questlog_button.png"),
-    64, 64, 96, 96, 256, 256
+    64,
+    64,
+    96,
+    96,
+    256,
+    256
   );
 
   private final InventoryScreen parent;
@@ -57,6 +63,11 @@ public class QuestlogOpenButton implements Widget, GuiEventListener {
   public boolean isMouseOver(double mouseX, double mouseY) {
     if (!Button.enabled) return false;
 
-    return mouseX >= this.getX() + 18 && mouseX < this.getX() + TEXTURE.width() - 18 && mouseY > this.getY() + 19 && mouseY <= this.getY() + TEXTURE.height() - 20;
+    return (
+      mouseX >= this.getX() + 18 &&
+      mouseX < this.getX() + TEXTURE.width() - 18 &&
+      mouseY > this.getY() + 19 &&
+      mouseY <= this.getY() + TEXTURE.height() - 20
+    );
   }
 }

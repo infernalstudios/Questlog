@@ -5,6 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 public class StatAwardEvent extends PlayerEvent {
+
   private final Stat<?> stat;
   private final int amount;
 

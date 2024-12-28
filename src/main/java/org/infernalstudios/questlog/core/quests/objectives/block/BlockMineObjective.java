@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.core.quests.objectives.block;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
@@ -11,9 +12,8 @@ import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 
-import javax.annotation.Nullable;
-
 public class BlockMineObjective extends AbstractBlockObjective {
+
   @Nullable
   private final CachedRegistryPredicate<Item> item;
 
@@ -48,10 +48,10 @@ public class BlockMineObjective extends AbstractBlockObjective {
   private void onBlockDestroy(BlockEvent.BreakEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
     if (
-        event.getPlayer() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        this.test(event.getState()) &&
-        this.testItem(event.getPlayer().getItemInHand(InteractionHand.MAIN_HAND))
+      event.getPlayer() instanceof ServerPlayer player &&
+      this.getParent().manager.player.equals(player) &&
+      this.test(event.getState()) &&
+      this.testItem(event.getPlayer().getItemInHand(InteractionHand.MAIN_HAND))
     ) {
       this.setUnits(this.getUnits() + 1);
     }

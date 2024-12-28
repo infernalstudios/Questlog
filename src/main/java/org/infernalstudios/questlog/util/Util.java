@@ -5,6 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.MalformedJsonException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import javax.annotation.CheckForNull;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -20,16 +26,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-import javax.annotation.CheckForNull;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 public final class Util {
-  private Util() {}  // Uninstantiable
-  
+
+  private Util() {} // Uninstantiable
+
   @CheckForNull // No stats counter ONLY for other players, when calling from the client
   public static StatsCounter getStats(Player player) {
     if (player instanceof LocalPlayer localPlayer) {
@@ -37,7 +37,7 @@ public final class Util {
     } else if (player instanceof ServerPlayer serverPlayer) {
       return serverPlayer.getStats();
     }
-    
+
     return null;
   }
 
@@ -122,7 +122,16 @@ public final class Util {
         itemEntity.makeFakeItem();
       }
 
-      player.level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+      player.level.playSound(
+        null,
+        player.getX(),
+        player.getY(),
+        player.getZ(),
+        SoundEvents.ITEM_PICKUP,
+        SoundSource.PLAYERS,
+        0.2F,
+        ((player.getRandom().nextFloat() - player.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F
+      );
       player.containerMenu.broadcastChanges();
     } else {
       ItemEntity itemEntity = player.drop(item, false);

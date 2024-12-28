@@ -12,10 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EnchantedItemTrigger.class)
 public class EnchantedItemTriggerMixin {
-  @Inject(
-      method = "trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V",
-      at = @At("HEAD")
-  )
+
+  @Inject(method = "trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/item/ItemStack;I)V", at = @At("HEAD"))
   public void onEnchanted(ServerPlayer player, ItemStack stack, int enchantSlot, CallbackInfo ci) {
     MinecraftForge.EVENT_BUS.post(new ItemEnchantedEvent(player, stack, enchantSlot));
   }

@@ -3,6 +3,9 @@ package org.infernalstudios.questlog.network.packet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.function.Supplier;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkEvent;
@@ -11,11 +14,8 @@ import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.NetworkHandler;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.function.Supplier;
-
 public class QuestDefinitionPacket {
+
   private static final Gson GSON = new GsonBuilder().create();
 
   private final ResourceLocation id;
@@ -53,7 +53,7 @@ public class QuestDefinitionPacket {
 
     try {
       QuestManager manager = QuestManager.getLocal();
-  
+
       Quest quest = Quest.create(Objects.requireNonNull(packet.definition), packet.id, manager);
       manager.addQuest(quest);
 

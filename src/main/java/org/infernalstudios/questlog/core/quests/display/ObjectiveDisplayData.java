@@ -1,18 +1,20 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
 
-import javax.annotation.Nullable;
-
 public class ObjectiveDisplayData {
+
   @Nullable
   private Objective objective;
+
   @Nullable
   private final Renderable icon;
+
   private final Component name;
 
   public ObjectiveDisplayData(JsonObject data) {
@@ -48,11 +50,11 @@ public class ObjectiveDisplayData {
       throw new IllegalStateException("ObjectiveDisplayData has not been assigned a quest type");
     }
 
-    return this.isCompleted() ?
-      Component.translatable("questlog.objective.completed") :
-      this.objective.getTotalUnits() > 1 ?
-        Component.translatable("questlog.objective.in_progress", this.objective.getUnits(), this.objective.getTotalUnits()) :
-        Component.translatable("questlog.objective.in_progress_singular");
+    return this.isCompleted()
+      ? Component.translatable("questlog.objective.completed")
+      : this.objective.getTotalUnits() > 1
+        ? Component.translatable("questlog.objective.in_progress", this.objective.getUnits(), this.objective.getTotalUnits())
+        : Component.translatable("questlog.objective.in_progress_singular");
   }
 
   @Nullable

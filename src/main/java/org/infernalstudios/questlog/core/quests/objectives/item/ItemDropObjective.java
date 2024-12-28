@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.item.ItemTossEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemDropObjective extends AbstractItemObjective {
+
   public ItemDropObjective(JsonObject definition) {
     super(definition);
   }
@@ -19,9 +20,9 @@ public class ItemDropObjective extends AbstractItemObjective {
   private void onItemDrop(ItemTossEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
     if (
-        event.getPlayer() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        this.test(event.getEntity().getItem())
+      event.getPlayer() instanceof ServerPlayer player &&
+      this.getParent().manager.player.equals(player) &&
+      this.test(event.getEntity().getItem())
     ) {
       this.setUnits(this.getUnits() + event.getEntity().getItem().getCount());
     }

@@ -1,14 +1,14 @@
 package org.infernalstudios.questlog.client.gui.components.toasts;
 
+import javax.annotation.Nullable;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.util.texture.Renderable;
 import org.infernalstudios.questlog.util.texture.Texture;
 
-import javax.annotation.Nullable;
-
 public class QuestAddedToast extends QuestlogToast {
+
   private final QuestDisplayData displayData;
 
   public QuestAddedToast(QuestDisplayData displayData) {

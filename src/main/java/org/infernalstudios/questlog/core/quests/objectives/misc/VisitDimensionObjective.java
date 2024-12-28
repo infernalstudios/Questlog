@@ -9,6 +9,7 @@ import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class VisitDimensionObjective extends Objective {
+
   private final ResourceLocation dimension;
 
   public VisitDimensionObjective(JsonObject definition) {
@@ -24,13 +25,10 @@ public class VisitDimensionObjective extends Objective {
 
   // Checks every second for performance
   private int ticksUntilCheck = 0;
+
   private void onPlayerMove(TickEvent.PlayerTickEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-      event.player instanceof ServerPlayer player &&
-      this.getParent().manager.player.equals(player) &&
-      --ticksUntilCheck <= 0
-    ) {
+    if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
       if (player.level.dimensionTypeId().location().equals(this.dimension)) {
         this.setUnits(this.getUnits() + 1);
       }

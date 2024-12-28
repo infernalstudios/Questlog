@@ -12,11 +12,14 @@ import org.infernalstudios.questlog.util.CachedValue;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class EffectAddedObjective extends Objective {
+
   private final CachedValue<MobEffect> effect;
 
   public EffectAddedObjective(JsonObject definition) {
     super(definition);
-    this.effect = new CachedValue<>(() -> ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(JsonUtils.getString(definition, "effect"))));
+    this.effect = new CachedValue<>(() ->
+      ForgeRegistries.MOB_EFFECTS.getValue(new ResourceLocation(JsonUtils.getString(definition, "effect")))
+    );
   }
 
   @Override
@@ -27,10 +30,7 @@ public class EffectAddedObjective extends Objective {
 
   private void onEffectAdded(MobEffectEvent.Added event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-      event.getEntity() instanceof ServerPlayer player &&
-      this.getParent().manager.player.equals(player)
-    ) {
+    if (event.getEntity() instanceof ServerPlayer player && this.getParent().manager.player.equals(player)) {
       if (event.getEffectInstance().getEffect().equals(this.effect.get())) {
         this.setUnits(this.getUnits() + 1);
       }

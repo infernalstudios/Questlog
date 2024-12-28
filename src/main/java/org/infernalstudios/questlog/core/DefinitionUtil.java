@@ -4,18 +4,18 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.MalformedJsonException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.Util;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 public class DefinitionUtil {
+
   private static final Map<ResourceLocation, JsonObject> QUEST_DEFINITION_CACHE = new Object2ObjectOpenHashMap<>();
 
   public static void getAndCacheAllQuests(ResourceManager manager) throws IOException {
@@ -25,9 +25,9 @@ public class DefinitionUtil {
       Questlog.LOGGER.error("No quest definition file found!");
       Questlog.LOGGER.error("Not crashing simply because it can happen.");
     }
-    
+
     List<ResourceLocation> quests = new ArrayList<>();
-    
+
     for (Resource res : allQuestFiles) {
       JsonObject json;
 

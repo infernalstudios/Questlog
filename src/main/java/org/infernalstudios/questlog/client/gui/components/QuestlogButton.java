@@ -9,6 +9,7 @@ import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.util.Callable;
 
 public class QuestlogButton extends AbstractButton {
+
   private final QuestlogGuiSet guiSet;
   private final Callable onPress;
   private final int textColor;

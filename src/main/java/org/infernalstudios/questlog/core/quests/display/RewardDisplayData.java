@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
@@ -11,14 +12,16 @@ import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
 
-import javax.annotation.Nullable;
-
 public class RewardDisplayData {
+
   @Nullable
   private Reward reward;
+
   private final Component name;
+
   @Nullable
   private final Renderable icon;
+
   @Nullable
   private final ResourceLocation claimSound;
 
@@ -31,10 +34,7 @@ public class RewardDisplayData {
       this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
     }
     this.icon = JsonUtils.getIcon(data, "icon");
-    String sound = JsonUtils.getOrDefault(
-      JsonUtils.getOrDefault(data, "sound", new JsonObject()),
-      "claimed", (String) null
-    );
+    String sound = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "claimed", (String) null);
 
     this.claimSound = sound == null ? null : new ResourceLocation(sound);
   }

@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.core.quests.rewards;
 
 import com.google.gson.JsonObject;
+import java.util.List;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -13,14 +14,12 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
-import java.util.List;
-
 public class LootTableReward extends Reward {
+
   private final ResourceLocation lootTable;
 
   public LootTableReward(JsonObject definition) {
     super(definition);
-
     this.lootTable = new ResourceLocation(JsonUtils.getString(definition, "loot_table"));
   }
 

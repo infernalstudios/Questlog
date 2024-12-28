@@ -7,6 +7,7 @@ import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class TrampleObjective extends Objective {
+
   public TrampleObjective(JsonObject definition) {
     super(definition);
   }
@@ -19,10 +20,7 @@ public class TrampleObjective extends Objective {
 
   private void onBlockTrample(BlockEvent.FarmlandTrampleEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-        event.getEntity() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player)
-    ) {
+    if (event.getEntity() instanceof ServerPlayer player && this.getParent().manager.player.equals(player)) {
       this.setUnits(this.getUnits() + 1);
     }
   }

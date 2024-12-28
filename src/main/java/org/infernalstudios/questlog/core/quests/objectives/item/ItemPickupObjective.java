@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class ItemPickupObjective extends AbstractItemObjective {
+
   public ItemPickupObjective(JsonObject definition) {
     super(definition);
   }
@@ -18,11 +19,7 @@ public class ItemPickupObjective extends AbstractItemObjective {
 
   private void onItemPickup(PlayerEvent.ItemPickupEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-        event.getEntity() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        this.test(event.getStack())
-    ) {
+    if (event.getEntity() instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.getStack())) {
       this.setUnits(this.getUnits() + event.getStack().getCount());
     }
   }

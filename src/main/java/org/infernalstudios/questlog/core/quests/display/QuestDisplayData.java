@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
+import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nullable;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
@@ -13,23 +16,23 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Renderable;
 
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Objects;
-
 public class QuestDisplayData {
+
   @Nullable
   private List<ObjectiveDisplayData> objectiveDisplay = null;
+
   @Nullable
   private List<RewardDisplayData> rewardDisplay = null;
 
   private final Component title;
   private final Component description;
+
   @Nullable
   private final Renderable icon;
 
   @Nullable
   private final ResourceLocation completedSound;
+
   @Nullable
   private final ResourceLocation triggeredSound;
 
@@ -53,29 +56,27 @@ public class QuestDisplayData {
     this.description = translatable ? Component.translatable(description) : Component.literal(description);
     this.icon = JsonUtils.getIcon(data, "icon");
 
-    String completedSoundLoc = JsonUtils.getOrDefault(
-        JsonUtils.getOrDefault(data, "sound", new JsonObject()),
-        "completed", (String) null
-    );
+    String completedSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "completed", (String) null);
 
     this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
 
-    String triggeredSoundLoc = JsonUtils.getOrDefault(
-        JsonUtils.getOrDefault(data, "sound", new JsonObject()),
-        "triggered", (String) null
-    );
+    String triggeredSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "triggered", (String) null);
 
     this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
     JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
 
-    String backgroundLoc = style.has("background") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null) : null;
+    String backgroundLoc = style.has("background")
+      ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null)
+      : null;
 
     if (backgroundLoc == null) {
       backgroundLoc = Questlog.MODID + ":textures/gui/quest_page.png";
     }
 
-    String peripheralLoc = style.has("peripheral") ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null) : null;
+    String peripheralLoc = style.has("peripheral")
+      ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null)
+      : null;
 
     if (peripheralLoc == null) {
       peripheralLoc = Questlog.MODID + ":textures/gui/quest_peripherals.png";
@@ -153,7 +154,11 @@ public class QuestDisplayData {
   }
 
   public QuestlogGuiSet getGuiSet() {
-    return this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc) ? QuestlogGuiSet.DEFAULT : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
+    return (
+        this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc)
+      )
+      ? QuestlogGuiSet.DEFAULT
+      : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
   }
 
   public boolean shouldToastOnTrigger() {

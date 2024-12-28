@@ -5,6 +5,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import org.infernalstudios.questlog.core.quests.Quest;
 
 public class QuestTriggeredEvent extends PlayerEvent {
+
   private final Quest quest;
   private final boolean isClient;
 

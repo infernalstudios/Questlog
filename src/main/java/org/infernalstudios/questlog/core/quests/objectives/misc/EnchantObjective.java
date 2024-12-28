@@ -1,6 +1,8 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
 import com.google.gson.JsonObject;
+import java.util.Map;
+import javax.annotation.Nullable;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
@@ -11,14 +13,14 @@ import org.infernalstudios.questlog.event.GenericEventBus;
 import org.infernalstudios.questlog.event.ItemEnchantedEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 
-import javax.annotation.Nullable;
-import java.util.Map;
-
 public class EnchantObjective extends Objective {
+
   @Nullable
   private final ResourceLocation enchantment;
+
   @Nullable
   private final ResourceLocation item;
+
   private final int level;
 
   public EnchantObjective(JsonObject definition) {

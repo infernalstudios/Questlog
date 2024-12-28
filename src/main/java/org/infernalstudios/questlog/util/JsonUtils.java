@@ -2,14 +2,14 @@ package org.infernalstudios.questlog.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import javax.annotation.Nullable;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Renderable;
 import org.infernalstudios.questlog.util.texture.Texture;
 
-import javax.annotation.Nullable;
-
 public class JsonUtils {
+
   public static String getOrDefault(JsonObject obj, String key, String defaultValue) {
     if (obj.has(key)) {
       if (!obj.get(key).isJsonPrimitive()) {

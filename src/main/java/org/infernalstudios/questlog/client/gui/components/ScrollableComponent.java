@@ -24,6 +24,7 @@ import org.lwjgl.glfw.GLFW;
  * The scrollbar is rendered on the right side of the component and is draggable.<p>
  */
 public class ScrollableComponent implements Widget, NarratableEntry, GuiEventListener {
+
   private final Scrollable scrollable;
   public final int width;
   public final int height;
@@ -66,7 +67,9 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   }
 
   protected int getScrollbarY() {
-    return (int)this.getScrollAmount() * (this.bottom - this.top - (this.scrollbar.bar().height() - 24)) / this.getMaxScroll() + this.top; // Scrollbar has 24px of padding
+    return (
+      ((int) this.getScrollAmount() * (this.bottom - this.top - (this.scrollbar.bar().height() - 24))) / this.getMaxScroll() + this.top
+    ); // Scrollbar has 24px of padding
   }
 
   public int getScrollbarWidth() {
@@ -96,19 +99,22 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
     int bgHeight = this.scrollbar.backgroundTopCap().height() + this.scrollbar.backgroundBottomCap().height();
 
     // We do a little bit of simple math
-    bgHeight += (int) (Math.floor(this.height - (double) bgHeight / this.scrollbar.background().height()) * this.scrollbar.background().height());
-
+    bgHeight += (int) (Math.floor(this.height - (double) bgHeight / this.scrollbar.background().height()) *
+      this.scrollbar.background().height());
 
     int bgY = this.top;
-    this.scrollbar.backgroundTopCap().blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.backgroundTopCap().width()) / 2, bgY);
+    this.scrollbar.backgroundTopCap()
+      .blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.backgroundTopCap().width()) / 2, bgY);
     bgY += this.scrollbar.backgroundTopCap().height();
 
     while (bgY < bgHeight + this.top - this.scrollbar.backgroundBottomCap().height()) {
-      this.scrollbar.background().blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.background().width()) / 2, bgY);
+      this.scrollbar.background()
+        .blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.background().width()) / 2, bgY);
       bgY += this.scrollbar.background().height();
     }
 
-    this.scrollbar.backgroundBottomCap().blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.backgroundBottomCap().width()) / 2, bgY);
+    this.scrollbar.backgroundBottomCap()
+      .blit(ps, this.getScrollbarX() + (this.scrollbar.bar().width() - this.scrollbar.backgroundBottomCap().width()) / 2, bgY);
   }
 
   private void renderScrollbar(PoseStack ps, int mouseX, int mouseY) {
@@ -147,13 +153,16 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   }
 
   private void updateScrollingState(double mouseX, double mouseY, int button) {
-    this.scrolling = button == GLFW.GLFW_MOUSE_BUTTON_1 && (double) this.getScrollbarX() + 10 <= mouseX && mouseX < (double)(this.getScrollbarX() + this.scrollbar.bar().width() - 10);
+    this.scrolling =
+      button == GLFW.GLFW_MOUSE_BUTTON_1 &&
+      (double) this.getScrollbarX() + 10 <= mouseX &&
+      mouseX < (double) (this.getScrollbarX() + this.scrollbar.bar().width() - 10);
   }
 
   // Event handlers
   @Override
   public boolean isMouseOver(double x, double y) {
-    return y >= (double)this.top && y <= (double)this.bottom && x >= (double)this.left && x <= (double)this.right;
+    return y >= (double) this.top && y <= (double) this.bottom && x >= (double) this.left && x <= (double) this.right;
   }
 
   @Override
@@ -178,7 +187,10 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
   public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
     if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.scrolling) {
       // Scrollbar has 12px of padding on top and bottom for a total of 24px
-      this.setScrollAmount(this.getMaxScroll() * (mouseY - (double)this.top - (double)((this.scrollbar.bar().height() - 24) / 2)) / (double)(this.bottom - this.top - (this.scrollbar.bar().height() - 24)));
+      this.setScrollAmount(
+          (this.getMaxScroll() * (mouseY - (double) this.top - (double) ((this.scrollbar.bar().height() - 24) / 2))) /
+          (double) (this.bottom - this.top - (this.scrollbar.bar().height() - 24))
+        );
       return true;
     }
 
@@ -280,7 +292,9 @@ public class ScrollableComponent implements Widget, NarratableEntry, GuiEventLis
 
   public interface Scrollable extends Widget {
     int getHeight();
+
     default void setScrollableComponent(ScrollableComponent component) {}
+
     default void renderBackground(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {}
   }
 }

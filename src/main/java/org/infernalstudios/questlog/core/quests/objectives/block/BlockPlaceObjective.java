@@ -6,6 +6,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import org.infernalstudios.questlog.event.GenericEventBus;
 
 public class BlockPlaceObjective extends AbstractBlockObjective {
+
   public BlockPlaceObjective(JsonObject definition) {
     super(definition);
   }
@@ -18,11 +19,7 @@ public class BlockPlaceObjective extends AbstractBlockObjective {
 
   private void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
     if (this.isCompleted() || this.getParent() == null) return;
-    if (
-        event.getEntity() instanceof ServerPlayer player &&
-        this.getParent().manager.player.equals(player) &&
-        this.test(event.getState())
-    ) {
+    if (event.getEntity() instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.getState())) {
       this.setUnits(this.getUnits() + 1);
     }
   }
