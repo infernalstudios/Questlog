@@ -155,7 +155,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       if (this.quest.isCompleted() && !this.quest.isRewarded()) {
         this.backButton.setMessage(Component.translatable("questlog.reward.collect"));
       } else {
-        this.backButton.setMessage(Component.translatable("gui.back"));
+        this.backButton.setMessage(this.getDisplay().getButtonText());
       }
     }
     super.render(ps, mouseX, mouseY, partialTicks);
