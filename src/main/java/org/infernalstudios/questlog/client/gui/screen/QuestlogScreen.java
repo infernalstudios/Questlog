@@ -88,17 +88,12 @@ public class QuestlogScreen extends Screen {
     if (this.questList != null) {
       this.questList.render(ps, mouseX, mouseY, delta);
     } else {
-      int width = 245;
-      int height = 137;
-      int x = (this.width - width) / 2;
-      int y = (this.height - height) / 2;
-
       Font font = this.minecraft.font;
       float scale = 2.0F;
       ps.pushPose();
       ps.scale(scale, scale, scale);
       Component text = Component.translatable("questlog.no_quests");
-      font.draw(ps, text, (x + ((width - (font.width(text) * scale)) / 2)) / scale, (y + ((height - (font.lineHeight * scale)) / 2)) / scale, 0x4C381B);
+      font.draw(ps, text, ((this.width - (font.width(text) * scale)) / 2) / scale, ((this.height - (font.lineHeight * scale)) / 2) / scale, 0x4C381B);
       ps.popPose();
     }
     super.render(ps, mouseX, mouseY, delta);
