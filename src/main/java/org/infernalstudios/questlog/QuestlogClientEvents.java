@@ -92,6 +92,11 @@ public class QuestlogClientEvents {
     } else if (event.getQuest().getDisplay().shouldToastOnTrigger()) {
       QuestToastState.addedToasts.add(new QuestAddedToast(event.getQuest().getDisplay()));
     }
+
+    SoundInstance triggeredSound = event.getQuest().getDisplay().getTriggeredSound();
+    if (triggeredSound != null) {
+        Minecraft.getInstance().getSoundManager().play(triggeredSound);
+    }
   }
 
   // Called by QuestlogEvents.onQuestCompleted
@@ -100,13 +105,31 @@ public class QuestlogClientEvents {
       QuestToastState.resetCheckDelay();
       QuestToastState.completedToasts.add(new QuestCompletedToast(event.getQuest().getDisplay()));
     }
+
+    SoundInstance completedSound = event.getQuest().getDisplay().getCompletedSound();
+    if (completedSound != null) {
+      Minecraft.getInstance().getSoundManager().play(completedSound);
+    }
   }
 
   private static void displayQueuedPopups() {
-    Quest quest = QuestToastState.queuedPopups.get(0);
+    if (QuestToastState.queuedPopups.isEmpty()) {
+      return;
+    }
+
+    // Don't display popups if the player is viewing the QuestDetails screen
+    // Make sure to reset the check delay so that the popup is displayed after the screen is closed
+    if (Minecraft.getInstance().screen instanceof QuestDetails) {
+      QuestToastState.resetCheckDelay();
+      return;
+    }
+
+    // Don't display popups if the player is holding an item in their cursor
     if (Minecraft.getInstance().screen instanceof MenuAccess<?> screen && !screen.getMenu().getCarried().isEmpty()) {
       return;
     }
+
+    Quest quest = QuestToastState.queuedPopups.get(0);
     QuestToastState.queuedPopups.remove(quest);
 
     Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, quest));
@@ -115,6 +138,8 @@ public class QuestlogClientEvents {
     if (sound != null) {
       Minecraft.getInstance().getSoundManager().play(sound);
     }
+
+    QuestToastState.resetCheckDelay(); // Reset the check delay to ensure any following popups are displayed
   }
 
   private static void displayQueuedToasts() {
@@ -132,12 +157,14 @@ public class QuestlogClientEvents {
 
     if (toasts.getToast(QuestCompletedToast.class, Toast.NO_TOKEN) != null) {
       QuestToastState.resetCheckDelay();
-      return;
+      return; // Return early so all completion toasts display before addition toasts
     }
 
-    for (QuestAddedToast toast : QuestToastState.addedToasts) {
-      toasts.addToast(toast);
+    if (!QuestToastState.addedToasts.isEmpty()) {
+      for (QuestAddedToast toast : QuestToastState.addedToasts) {
+        toasts.addToast(toast);
+      }
+      QuestToastState.addedToasts.clear();
     }
-    QuestToastState.addedToasts.clear();
   }
 }

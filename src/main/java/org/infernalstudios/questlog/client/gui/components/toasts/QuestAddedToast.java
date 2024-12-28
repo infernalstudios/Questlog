@@ -34,7 +34,7 @@ public class QuestAddedToast extends QuestlogToast {
   @Override
   @Nullable
   protected SoundInstance getSound() {
-    return this.displayData.getTriggeredSound();
+    return null; // Sound logic is moved to QuestlogClientEvents
   }
 
   @Override
