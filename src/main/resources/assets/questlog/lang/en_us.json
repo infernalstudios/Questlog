@@ -13,5 +13,6 @@
     "questlog.reward.uncollected": "Uncollected",
     "questlog.gui.open": "Open Quest Log",
     "questlog.objective.default": "Unnamed Objective",
-    "questlog.reward.default": "Unnamed Reward"
+    "questlog.reward.default": "Unnamed Reward",
+    "questlog.no_quests": "No Quests Available"
 }

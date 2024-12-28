@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.client.gui.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -9,10 +10,12 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.components.QuestList;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.core.QuestManager;
+import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.texture.Texture;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
 
 public class QuestlogScreen extends Screen {
@@ -40,19 +43,26 @@ public class QuestlogScreen extends Screen {
     }
 
     this.questList = this.getList();
-
-    this.addRenderableWidget(this.questList);
+    if (this.questList != null) {
+      this.addRenderableWidget(this.questList);
+    }
   }
 
+  @Nullable
   private ScrollableComponent getList() {
     int width = 245;
     int height = 137;
     int x = (this.width - width) / 2;
     int y = (this.height - height) / 2;
+    List<Quest> quests = this.manager.getAllQuests().stream().filter(quest -> !quest.getDisplay().isHidden() && quest.isTriggered()).toList();
+
+    if (quests.isEmpty()) {
+      return null;
+    }
 
     return new ScrollableComponent(x, y, width, height, new QuestList(
       Minecraft.getInstance(),
-      this.manager.getAllQuests().stream().filter(quest -> !quest.getDisplay().isHidden()).toList(),
+      quests,
       displayData -> {
         if (this.minecraft != null) {
           this.minecraft.setScreen(new QuestDetails(this, displayData));
@@ -77,6 +87,19 @@ public class QuestlogScreen extends Screen {
 
     if (this.questList != null) {
       this.questList.render(ps, mouseX, mouseY, delta);
+    } else {
+      int width = 245;
+      int height = 137;
+      int x = (this.width - width) / 2;
+      int y = (this.height - height) / 2;
+
+      Font font = this.minecraft.font;
+      float scale = 2.0F;
+      ps.pushPose();
+      ps.scale(scale, scale, scale);
+      Component text = Component.translatable("questlog.no_quests");
+      font.draw(ps, text, (x + ((width - (font.width(text) * scale)) / 2)) / scale, (y + ((height - (font.lineHeight * scale)) / 2)) / scale, 0x4C381B);
+      ps.popPose();
     }
     super.render(ps, mouseX, mouseY, delta);
   }

@@ -35,9 +35,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     this.onSelect = onSelect;
 
     for (Quest quest : quests) {
-      if (quest.isTriggered()) {
-        this.children.add(new QuestListEntry(this, quest));
-      }
+      this.children.add(new QuestListEntry(this, quest));
     }
 
     // Uncompleted first, then uncollected rewards first
@@ -137,18 +135,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
   public void render(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
     this.hovered = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
-
-    if (this.children.isEmpty()) {
-      Font font = this.minecraft.font;
-      float scale = 2.0F;
-      ps.pushPose();
-      ps.scale(scale, scale, scale);
-      String text = "No quests available";
-      font.draw(ps, text, (float) this.scroller.getXOffset() + (int) (scale + ((float) this.getWidth() / 2) - (font.width(text) * scale / 2)) / scale, (float) this.scroller.getYOffset() + (int) (5 + font.lineHeight * 5) / scale, 0x4C381B);
-      ps.popPose();
-    } else {
-      this.renderList(ps, mouseX, mouseY, partialTicks);
-    }
+    this.renderList(ps, mouseX, mouseY, partialTicks);
   }
 
   protected void renderList(PoseStack ps, int mouseX, int mouseY, float partialTicks) {
