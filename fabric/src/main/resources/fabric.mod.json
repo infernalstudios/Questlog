@@ -1,0 +1,34 @@
+{
+    "schemaVersion": 1,
+    "id": "${mod_id}",
+    "version": "${version}",
+    "name": "${mod_name}",
+    "description": "${description}",
+    "authors": ["${mod_author}"],
+    "contact": {
+        "homepage": "https://infernalstudios.org/",
+        "sources": "..."
+    },
+    "license": "Apache-2.0",
+    "icon": "questlog.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "org.infernalstudios.questlog.QuestlogFabric"
+        ],
+        "client": [
+            "org.infernalstudios.questlog.QuestlogFabric"
+        ]
+    },
+    "mixins": [
+        "questlog.mixins.json",
+        "questlog.fabric.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.14",
+        "fabric": "*",
+        "minecraft": "1.20.1",
+        "java": ">=17"
+    }
+}
+  
