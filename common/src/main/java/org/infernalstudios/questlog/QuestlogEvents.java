@@ -17,13 +17,6 @@ public class QuestlogEvents {
 
   // These initialize the ServerPlayerManager instance
   public static void onServerStart(MinecraftServer server) {
-    try {
-      // Ensure that the quest definitions are loaded before calling ServerPlayerManager.load()
-      DefinitionUtil.getAndCacheAllQuests(server.getResourceManager());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
     ServerPlayerManager.INSTANCE = new ServerPlayerManager(server);
     ServerPlayerManager.INSTANCE.load();
   }
@@ -59,14 +52,6 @@ public class QuestlogEvents {
       Services.PLATFORM.sendPacketToClient((ServerPlayer) event.player, new QuestCompletedPacket(event.quest.getId()));
     } else {
       QuestlogClientEvents.onQuestCompleted(event);
-    }
-  }
-
-  public static void onDataPackReload(ResourceManager resourceManager) {
-    try {
-      DefinitionUtil.getAndCacheAllQuests(resourceManager);
-    } catch (IOException e) {
-      Questlog.LOGGER.error("Failed to load quest definitions", e);
     }
   }
 }

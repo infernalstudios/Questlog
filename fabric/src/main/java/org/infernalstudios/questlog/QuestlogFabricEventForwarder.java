@@ -8,14 +8,14 @@ import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 
@@ -44,22 +44,19 @@ public class QuestlogFabricEventForwarder {
       return InteractionResultHolder.pass(ItemStack.EMPTY);
     });
 
-    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new SimpleSynchronousResourceReloadListener() {
-      @Override
-      public ResourceLocation getFabricId() {
-        return new ResourceLocation(Questlog.MODID, "questlog_data");
-      }
-
-      @Override
-      public void onResourceManagerReload(ResourceManager resourceManager) {
-        QuestlogEvents.onDataPackReload(resourceManager);
-      }
-    });
+    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new FabricQuestDefinitionReloadListener());
   }
 
   public static void initClient() {
     ClientTickEvents.START_CLIENT_TICK.register(minecraft -> QuestlogClientEvents.onClientTick());
     ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> QuestlogClientEvents.onClientPlayerLogin());
     ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> QuestlogClientEvents.onClientPlayerLogout());
+  }
+
+  public static class FabricQuestDefinitionReloadListener extends DefinitionUtil.QuestDefinitionReloadListener implements IdentifiableResourceReloadListener {
+    @Override
+    public ResourceLocation getFabricId() {
+      return new ResourceLocation(Questlog.MODID, "quest_data");
+    }
   }
 }

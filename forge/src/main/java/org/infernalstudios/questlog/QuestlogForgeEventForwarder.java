@@ -1,6 +1,14 @@
 package org.infernalstudios.questlog;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -23,7 +31,9 @@ import org.infernalstudios.questlog.event.events.QLEntityEvent;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public class QuestlogForgeEventForwarder {
   @SubscribeEvent
@@ -48,10 +58,7 @@ public class QuestlogForgeEventForwarder {
 
   @SubscribeEvent
   public static void addReloadListener(AddReloadListenerEvent event) {
-    event.addListener(
-        (preparationBarrier, resourceManager, profilerFiller, profilerFiller1, executor, executor1) ->
-            CompletableFuture.runAsync(() -> QuestlogEvents.onDataPackReload(resourceManager), executor1)
-    );
+    event.addListener(new DefinitionUtil.QuestDefinitionReloadListener());
   }
 
   @SubscribeEvent
