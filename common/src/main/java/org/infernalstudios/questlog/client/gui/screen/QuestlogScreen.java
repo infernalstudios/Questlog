@@ -59,9 +59,9 @@ public class QuestlogScreen extends Screen {
   @Nullable
   private ScrollableComponent getList() {
     int width = 245;
-    int height = 137;
-    int x = (this.width - width) / 2;
-    int y = (this.height - height) / 2;
+    int height = 136;
+    int x = (this.width - width) / 2 + 1;
+    int y = (this.height - height) / 2 + 1;
     List<Quest> quests =
       this.manager.getAllQuests().stream().filter(quest -> !quest.getDisplay().isHidden() && quest.isTriggered()).toList();
 

@@ -62,7 +62,7 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
   }
 
   protected int getScrollbarX() {
-    return this.left + this.width - this.scrollbar.bar().width() - 10;
+    return this.left + this.width - 16;
   }
 
   protected int getScrollbarY() {
@@ -72,7 +72,7 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
   }
 
   public int getScrollbarWidth() {
-    return this.scrollbar.bar().width();
+    return 5;
   }
 
   public boolean canScroll() {
