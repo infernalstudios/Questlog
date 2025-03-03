@@ -14,6 +14,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
@@ -59,6 +60,11 @@ public class QuestlogForgeEventForwarder {
   @SubscribeEvent
   public static void addReloadListener(AddReloadListenerEvent event) {
     event.addListener(new DefinitionUtil.QuestDefinitionReloadListener());
+  }
+
+  @SubscribeEvent
+  public static void registerCommands(RegisterCommandsEvent event) {
+    QuestlogEvents.registerCommands(event.getDispatcher());
   }
 
   @SubscribeEvent

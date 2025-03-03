@@ -2,9 +2,12 @@ package org.infernalstudios.questlog;
 
 import java.io.IOException;
 
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
+import org.infernalstudios.questlog.commands.QuestlogCommands;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
@@ -53,5 +56,9 @@ public class QuestlogEvents {
     } else {
       QuestlogClientEvents.onQuestCompleted(event);
     }
+  }
+
+  public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
+    QuestlogCommands.register(dispatcher);
   }
 }

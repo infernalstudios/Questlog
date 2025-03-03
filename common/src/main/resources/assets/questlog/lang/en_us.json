@@ -14,5 +14,25 @@
     "questlog.gui.open": "Open Questlog",
     "questlog.objective.default": "Unnamed Objective",
     "questlog.reward.default": "Unnamed Reward",
-    "questlog.no_quests": "No Quests Available"
+    "questlog.no_quests": "No Quests Available",
+
+    "command.questlog.argument.quest.unknown": "Unknown quest",
+    "command.questlog.argument.quest.invalid": "Invalid quest ID",
+    "command.questlog.argument.trigger.invalid": "Invalid trigger index",
+    "command.questlog.argument.objective.invalid": "Invalid objective index",
+    "command.questlog.argument.reward.invalid": "Invalid reward index",
+    "command.questlog.reset.success": "Reset quest %s",
+    "command.questlog.objective.reset_all": "Reset all objectives",
+    "command.questlog.objective.set_all": "Completed all objectives",
+    "command.questlog.objective.reset": "Reset objective %s",
+    "command.questlog.objective.set": "Set objective %s to %s",
+    "command.questlog.trigger.reset_all": "Reset all triggers",
+    "command.questlog.trigger.set_all": "Completed all triggers",
+    "command.questlog.trigger.reset": "Reset trigger %s",
+    "command.questlog.trigger.set": "Set trigger %s to %s",
+    "command.questlog.reward.uncollect_all": "Uncollected all rewards",
+    "command.questlog.reward.collect_all": "Collected all rewards",
+    "command.questlog.reward.uncollect": "Uncollected reward %s",
+    "command.questlog.reward.success": "Collected reward %s",
+    "command.questlog.reward.already_collected": "Reward %s is already collected"
 }

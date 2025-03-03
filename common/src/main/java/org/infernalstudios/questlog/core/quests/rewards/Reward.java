@@ -61,6 +61,13 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
     }
   }
 
+  public void revokeReward() {
+    this.rewarded = false;
+    if (this.getParent() != null) {
+      this.getParent().markForUpdate();
+    }
+  }
+
   public boolean hasRewarded() {
     return this.rewarded;
   }
