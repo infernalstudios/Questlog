@@ -1,11 +1,14 @@
 modLoader = "javafml" #mandatory
 loaderVersion = "${forge_loader_version_range}" #mandatory This is typically bumped every Minecraft version by Forge. See https://files.minecraftforge.net/ for a list of versions.
 license = "${license}"
+issueTrackerURL = "${github}/issues"
 
 [[mods]] #mandatory
 modId = "${mod_id}"
 version = "${version}"
 displayName = "${mod_name}"
+displayURL = "${github}"
+logoFile = "questlog.png"
 
 authors = "${mod_author}" #optional
 description = '''${description}''' #mandatory (Supports multiline text)

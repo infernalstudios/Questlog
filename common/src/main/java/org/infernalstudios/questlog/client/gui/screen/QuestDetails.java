@@ -43,7 +43,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   private static final int CONTENT_WIDTH = 252;
   private static final int CONTENT_HEIGHT = 86;
 
-  private static final int BUTTON_X = 109;
+  private static final int BUTTON_X = 121;
   private static final int BUTTON_Y = 134;
 
   private static final int DESCRIPTION_INFO_PADDING = 5;
@@ -96,8 +96,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     if (this.backButton != null) this.removeWidget(this.backButton);
     this.backButton = new QuestlogButton(
-      this.x + BUTTON_X + 5,
-      this.y + BUTTON_Y + 5,
+      this.x + BUTTON_X,
+      this.y + BUTTON_Y,
       this.getPalette().textColor,
       this.getPalette().hoveredTextColor,
       this.getDisplay().getButtonText(),
