@@ -13,14 +13,15 @@ A clear and concise description of what the bug is. Include as much information 
 **Versions:**
 Minecraft version:
 Questlog version:
-Forge/Fabric (& Fabric API) version:
+Loader (Forge or Fabric):
+Loader version (and Fabric API version, if applicable):
 
 **Other mods:**
 List all mods that you're using (If applicable):
 
 **Logs:**
 *Even if the game does not crash, they may be instrumental!*
-Please provide the following logs:
+Please provide the following logs (preferrably upload them to [mclo.gs](https://mclo.gs)):
 From .minecraft/logs:  
 - "latest.log"
 - "debug.log" (if it exists.) 
