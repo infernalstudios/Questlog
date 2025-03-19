@@ -16,6 +16,7 @@ import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.packet.QuestDefinitionPacket;
 
@@ -93,6 +94,18 @@ public class QuestlogClientEvents {
     SoundEvent completedSound = event.quest.getDisplay().getCompletedSound();
     if (completedSound != null) {
       Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(completedSound, 1, 1));
+    }
+
+    for (Reward reward : event.quest.rewards) {
+      if (reward.rewardsInstantly()) {
+        // Reward claiming is handled by the server for instant rewards
+
+        // Play sound
+        SoundEvent sound = reward.getDisplay().getClaimSound();
+        if (sound != null) {
+          Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, 1, 1));
+        }
+      }
     }
   }
 

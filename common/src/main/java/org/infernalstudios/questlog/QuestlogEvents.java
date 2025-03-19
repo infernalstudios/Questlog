@@ -11,6 +11,7 @@ import org.infernalstudios.questlog.commands.QuestlogCommands;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.packet.QuestCompletedPacket;
 import org.infernalstudios.questlog.network.packet.QuestTriggeredPacket;
@@ -53,6 +54,15 @@ public class QuestlogEvents {
   public static void onQuestCompleted(QuestEvent.Completed event) {
     if (event.isServer) {
       Services.PLATFORM.sendPacketToClient((ServerPlayer) event.player, new QuestCompletedPacket(event.quest.getId()));
+
+      for (Reward reward : event.quest.rewards) {
+        if (reward.rewardsInstantly()) {
+          // Reward claiming is handled by the server for instant rewards
+          if (!reward.hasRewarded()) {
+            reward.applyReward((ServerPlayer) event.player);
+          }
+        }
+      }
     } else {
       QuestlogClientEvents.onQuestCompleted(event);
     }
