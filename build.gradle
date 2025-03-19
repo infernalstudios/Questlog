@@ -46,6 +46,10 @@ subprojects {
       name = 'BlameJared Maven (JEI / CraftTweaker / Bookshelf)'
       url = 'https://maven.blamejared.com'
     }
+    maven {
+      name = 'Infernal Studios Maven'
+      url = 'https://maven.infernalstudios.org/releases'
+    }
   }
 
   tasks.withType(JavaCompile).configureEach {

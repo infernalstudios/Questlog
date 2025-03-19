@@ -17,6 +17,11 @@ dependencies {
     // Fabric doesn't include this
     implementation 'net.jodah:typetools:0.6.3'
     include 'net.jodah:typetools:0.6.3'
+    implementation 'org.infernalstudios:config:4.0.3'
+    include 'org.infernalstudios:config:4.0.3'
+    // Fabric "include" isn't transitive, so we need to include the dependencies for Blazing Config ourselves
+    include 'com.electronwill.night-config:core:3.6.4'
+    include 'com.electronwill.night-config:toml:3.6.4'
 }
 
 loom {

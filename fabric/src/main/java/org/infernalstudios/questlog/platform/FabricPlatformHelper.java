@@ -3,12 +3,14 @@ package org.infernalstudios.questlog.platform;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.QuestlogPackets;
 import org.infernalstudios.questlog.platform.services.IPlatformHelper;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +45,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
       ClientPlayNetworking.send(registeredPacket.id(), buf);
     }
 
-    @SuppressWarnings("unchecked")
+  @SuppressWarnings("unchecked")
     private static <T> QuestlogPackets.RegisteredPacket<T> getRegisteredPacketByClass(Class<T> packetClass) {
         return (QuestlogPackets.RegisteredPacket<T>) classToIdCache.computeIfAbsent(packetClass, clazz ->
             QuestlogPackets.PACKETS.stream()
@@ -51,5 +53,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("No packet registered for class " + clazz))
         );
+    }
+
+    @Override
+    public Path getConfigDirectory() {
+        return FabricLoader.getInstance().getConfigDir();
     }
 }

@@ -19,6 +19,7 @@ public class QuestlogFabric implements ModInitializer, ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        Questlog.initClient();
         KeyBindingHelper.registerKeyBinding(QuestlogClient.OPEN_SCREEN_KEY);
         QuestlogFabricEventForwarder.initClient();
     }

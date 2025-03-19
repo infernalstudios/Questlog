@@ -74,6 +74,8 @@ minecraft {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+jarJar.enable()
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":common")
@@ -83,9 +85,10 @@ dependencies {
 //    compileOnly group: 'net.jodah', name: 'typetools', version: '0.6.3'
 
 //    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
-//    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
-//        jarJar.ranged(it, "[0.4.1,)")
-//    }
+    implementation("org.infernalstudios:config:4.0.3")
+    jarJar("org.infernalstudios:config:4.0.3") {
+        jarJar.ranged(it, "[4.0.3,5)")
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {

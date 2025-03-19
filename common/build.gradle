@@ -34,6 +34,7 @@ dependencies {
     compileOnly group: 'net.jodah', name: 'typetools', version: '0.6.3' // Forge depends on this, Fabric subproject compiles it within itself
     compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
 //    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation "org.infernalstudios:config:4.0.3"
 }
 
 publishing {
