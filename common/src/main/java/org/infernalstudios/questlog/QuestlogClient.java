@@ -29,7 +29,7 @@ public class QuestlogClient {
       QUEST_MANAGER_INSTANCE = null;
     }
 
-    if (QUEST_MANAGER_INSTANCE == null || QUEST_MANAGER_INSTANCE.player != Minecraft.getInstance().player) {
+    if (QUEST_MANAGER_INSTANCE == null || !QUEST_MANAGER_INSTANCE.player.getUUID().equals(Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getUUID() : null)) {
       LocalPlayer player = Minecraft.getInstance().player;
       if (player == null) {
         throw new NullPointerException("QuestManager cannot be initialized, player is null\n");
