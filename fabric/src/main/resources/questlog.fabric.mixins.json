@@ -10,9 +10,11 @@
         "LivingEntityMixin",
         "MixinItemStack",
         "PlayerDataStorageMixin",
-        "ServerPlayerMixin"
+        "ServerPlayerMixin",
+        "ServerGamePacketListenerImplAccessor"
     ],
     "client": [
+      "client.ClientPacketListenerAccessor"
     ],
     "server": [
     ],
