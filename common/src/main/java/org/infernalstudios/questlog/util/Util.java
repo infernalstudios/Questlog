@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import javax.annotation.CheckForNull;
+
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -32,13 +33,14 @@ public final class Util {
 
   @CheckForNull // No stats counter ONLY for other players, when calling from the client
   public static StatsCounter getStats(Player player) {
-    if (player instanceof LocalPlayer localPlayer) {
-      return localPlayer.getStats();
-    } else if (player instanceof ServerPlayer serverPlayer) {
+    // Important: check for ServerPlayer first, otherwise servers will crash
+    if (player instanceof ServerPlayer serverPlayer) {
       return serverPlayer.getStats();
+    } else if (player instanceof LocalPlayer localPlayer) {
+      return localPlayer.getStats();
     }
 
-    return null;
+      return null;
   }
 
   public static <T> List<T> invertList(List<T> list) {
