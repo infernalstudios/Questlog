@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.MalformedJsonException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -61,7 +62,7 @@ public final class Util {
 
   public static JsonObject getJsonResource(Resource resource) throws IOException {
     try (InputStream stream = resource.open()) {
-      return GSON.fromJson(new String(stream.readAllBytes()), JsonObject.class);
+      return GSON.fromJson(new String(stream.readAllBytes(), StandardCharsets.UTF_8), JsonObject.class);
     } catch (MalformedJsonException e) {
       throw new MalformedJsonException("Malformed JSON in resource " + resource, e);
     }
