@@ -53,6 +53,7 @@ public class QuestlogEvents {
 
   public static void onQuestCompleted(QuestEvent.Completed event) {
     if (event.isServer) {
+      Questlog.EVENTS.post(event);
       Services.PLATFORM.sendPacketToClient((ServerPlayer) event.player, new QuestCompletedPacket(event.quest.getId()));
 
       for (Reward reward : event.quest.rewards) {
