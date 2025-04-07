@@ -37,13 +37,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
   private static final int TITLE_WIDTH = 132;
   private static final int TITLE_HEIGHT = 16;
 
-  private static final int CONTENT_X = 20;
+  private static final int CONTENT_X = 18;
   private static final int CONTENT_Y = 36;
-  private static final int CONTENT_WIDTH = 252;
+  private static final int CONTENT_WIDTH = 237;
   private static final int CONTENT_HEIGHT = 86;
 
   private static final int BUTTON_X = 121;
-  private static final int BUTTON_Y = 134;
+  private static final int BUTTON_Y = 138;
 
   private static final int DESCRIPTION_INFO_PADDING = 5;
 
@@ -140,7 +140,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight() + DESCRIPTION_INFO_PADDING,
       CONTENT_WIDTH,
       this.getInfoHeight(),
-      new InfoScrollable()
+      new InfoScrollable(this.getDisplay())
     );
     // We render this ourselves, don't use addRenderableWidget.
     this.addWidget(this.info);
@@ -232,6 +232,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Nullable
     private ScrollableComponent parent = null;
 
+    private QuestDisplayData display;
+
+    public InfoScrollable(QuestDisplayData display) {
+      this.display = display;
+    }
+
     private List<InfoEntry> getInfoEntries() {
       if (QuestDetails.this.quest.isCompleted()) {
         if (this.rewards == null) {
@@ -239,7 +245,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
           List<RewardDisplayData> rewardDisplayData = QuestDetails.this.getDisplay().getRewardDisplayData();
           for (int i = 0; i < rewardDisplayData.size(); i++) {
             RewardDisplayData reward = rewardDisplayData.get(i);
-            this.rewards.add(new InfoEntry(reward, 0, i * InfoEntry.INFO_ENTRY_HEIGHT));
+            this.rewards.add(new InfoEntry(reward, 0, i * InfoEntry.INFO_ENTRY_HEIGHT, display));
           }
         }
 
@@ -295,12 +301,17 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     protected int x;
     protected int y;
 
-    public InfoEntry(RewardDisplayData rewardDisplayData, int x, int y) {
+    @Nullable
+    private QuestDisplayData display;
+
+    public InfoEntry(RewardDisplayData rewardDisplayData, int x, int y, @Nullable QuestDisplayData display) {
       this.rewardDisplayData = rewardDisplayData;
       this.objectiveDisplayData = null;
 
       this.x = x;
       this.y = y;
+
+      this.display = display;
     }
 
     public InfoEntry(ObjectiveDisplayData objectiveDisplayData, int x, int y) {
@@ -378,8 +389,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       }
 
       Component collected = this.rewardDisplayData.hasRewarded()
-        ? Component.translatable("questlog.reward.collected")
-        : Component.translatable("questlog.reward.uncollected");
+              ? Component.translatable("questlog.reward.collected")
+              : Component.translatable("questlog.reward.uncollected");
+
+      if (this.display != null) {
+        collected = this.rewardDisplayData.hasRewarded()
+                ? display.getCollectedText()
+                : display.getUncollectedText();
+      }
 
       ps.drawString(
         font,

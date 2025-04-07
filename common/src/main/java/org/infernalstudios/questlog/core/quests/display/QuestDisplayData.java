@@ -41,8 +41,12 @@ public class QuestDisplayData {
 
   private final ResourceLocation bgTexture;
   private final ResourceLocation peripheralTexture;
+
   private final Component backButtonText;
   private final Component collectButtonText;
+
+  private final Component collectedText;
+  private final Component uncollectedText;
 
   private final Palette palette;
 
@@ -104,6 +108,20 @@ public class QuestDisplayData {
       this.collectButtonText = Component.translatable("questlog.reward.collect");
     } else {
       this.collectButtonText = translatable ? Component.translatable(backButtonTextRaw) : Component.literal(backButtonTextRaw);
+    }
+
+    String uncollectedTextRaw = JsonUtils.getOrDefault(style, "uncollectedText", (String) null);
+    if (buttonTextRaw == null) {
+      this.uncollectedText = Component.translatable("questlog.reward.uncollected");
+    } else {
+      this.uncollectedText = translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw);
+    }
+
+    String collectedTextRaw = JsonUtils.getOrDefault(style, "collectedText", (String) null);
+    if (buttonTextRaw == null) {
+      this.collectedText = Component.translatable("questlog.reward.collected");
+    } else {
+      this.collectedText = translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw);
     }
 
     JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
@@ -191,5 +209,13 @@ public class QuestDisplayData {
 
   public Component getCollectButtonText() {
     return this.collectButtonText;
+  }
+
+  public Component getCollectedText() {
+    return this.collectedText;
+  }
+
+  public Component getUncollectedText() {
+    return this.uncollectedText;
   }
 }
