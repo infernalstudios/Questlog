@@ -13,7 +13,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
@@ -100,7 +99,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
       this.y + BUTTON_Y,
       this.getPalette().textColor,
       this.getPalette().hoveredTextColor,
-      this.getDisplay().getButtonText(),
+      this.getDisplay().getBackButtonText(),
       () -> {
         if (this.quest.isCompleted() && !this.quest.isRewarded()) {
           for (int i = 0; i < this.quest.rewards.size(); i++) {
@@ -156,9 +155,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     this.renderBackground(ps);
     if (this.backButton != null) {
       if (this.quest.isCompleted() && !this.quest.isRewarded()) {
-        this.backButton.setMessage(Component.translatable("questlog.reward.collect"));
+        this.backButton.setMessage(this.getDisplay().getCollectButtonText());
       } else {
-        this.backButton.setMessage(this.getDisplay().getButtonText());
+        this.backButton.setMessage(this.getDisplay().getBackButtonText());
       }
     }
     super.render(ps, mouseX, mouseY, partialTicks);
@@ -358,11 +357,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
       Component progress = this.objectiveDisplayData.getProgress();
 
-      ps.drawString(font, "- ", x, y, QuestDetails.this.getPalette().progressTextColor, false);
       ps.drawString(
         font,
         progress,
-        x + font.width("- "),
+        x,
         y,
         this.objectiveDisplayData.isCompleted()
           ? QuestDetails.this.getPalette().completedTextColor
@@ -383,11 +381,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         ? Component.translatable("questlog.reward.collected")
         : Component.translatable("questlog.reward.uncollected");
 
-      ps.drawString(font, "- ", x, y, QuestDetails.this.getPalette().progressTextColor, false);
       ps.drawString(
         font,
         collected,
-        x + font.width("- "),
+        x,
         y,
         this.rewardDisplayData.hasRewarded()
           ? QuestDetails.this.getPalette().completedTextColor

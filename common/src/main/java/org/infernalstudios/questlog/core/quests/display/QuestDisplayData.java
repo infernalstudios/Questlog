@@ -41,7 +41,8 @@ public class QuestDisplayData {
 
   private final ResourceLocation bgTexture;
   private final ResourceLocation peripheralTexture;
-  private final Component buttonText;
+  private final Component backButtonText;
+  private final Component collectButtonText;
 
   private final Palette palette;
 
@@ -91,11 +92,18 @@ public class QuestDisplayData {
       JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
     );
 
-    String buttonTextRaw = JsonUtils.getOrDefault(style, "buttonText", (String) null);
+    String buttonTextRaw = JsonUtils.getOrDefault(style, "backButtonText", (String) null);
     if (buttonTextRaw == null) {
-      this.buttonText = Component.translatable("gui.back");
+      this.backButtonText = Component.translatable("gui.back");
     } else {
-      this.buttonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
+      this.backButtonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
+    }
+
+    String backButtonTextRaw = JsonUtils.getOrDefault(style, "collectButtonText", (String) null);
+    if (buttonTextRaw == null) {
+      this.collectButtonText = Component.translatable("questlog.reward.collect");
+    } else {
+      this.collectButtonText = translatable ? Component.translatable(backButtonTextRaw) : Component.literal(backButtonTextRaw);
     }
 
     JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
@@ -177,7 +185,11 @@ public class QuestDisplayData {
     return this.palette;
   }
 
-  public Component getButtonText() {
-    return this.buttonText;
+  public Component getBackButtonText() {
+    return this.backButtonText;
+  }
+
+  public Component getCollectButtonText() {
+    return this.collectButtonText;
   }
 }
