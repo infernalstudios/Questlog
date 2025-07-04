@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.event.events;
 
 import net.minecraft.stats.Stat;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 

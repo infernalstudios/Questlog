@@ -3,8 +3,11 @@ package org.infernalstudios.questlog.event.events;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+
+import javax.annotation.Nullable;
 
 public class QLEntityEvent extends QLEvent {
   public final LivingEntity entity;
@@ -74,6 +77,15 @@ public class QLEntityEvent extends QLEvent {
       super(entity);
 
       this.effect = effect;
+    }
+  }
+
+  public static class TameAnimal extends QLEntityEvent {
+    @Nullable
+    public final Player causedByPlayer;
+    public TameAnimal(Player player, Animal animal) {
+      super(animal);
+      this.causedByPlayer = player;
     }
   }
 }
