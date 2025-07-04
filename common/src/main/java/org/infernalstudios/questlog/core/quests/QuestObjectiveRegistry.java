@@ -19,14 +19,7 @@ import org.infernalstudios.questlog.core.quests.objectives.item.ItemEquipObjecti
 import org.infernalstudios.questlog.core.quests.objectives.item.ItemObtainObjective;
 import org.infernalstudios.questlog.core.quests.objectives.item.ItemPickupObjective;
 import org.infernalstudios.questlog.core.quests.objectives.item.ItemUseObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.EffectAddedObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.EnchantObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.QuestCompleteObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.StatisticObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.TrampleObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.VisitBiomeObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.VisitDimensionObjective;
-import org.infernalstudios.questlog.core.quests.objectives.misc.VisitPositionObjective;
+import org.infernalstudios.questlog.core.quests.objectives.misc.*;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class QuestObjectiveRegistry {
@@ -60,6 +53,7 @@ public class QuestObjectiveRegistry {
     register(new ResourceLocation("questlog", "visit_biome"), VisitBiomeObjective::new);
     register(new ResourceLocation("questlog", "visit_dimension"), VisitDimensionObjective::new);
     register(new ResourceLocation("questlog", "visit_position"), VisitPositionObjective::new);
+    register(new ResourceLocation("questlog", "visit_structure"), VisitStructureObjective::new);
     register(new ResourceLocation("questlog", "quest_complete"), QuestCompleteObjective::new);
   }
 
