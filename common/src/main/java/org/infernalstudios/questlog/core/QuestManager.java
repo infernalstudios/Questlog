@@ -1,9 +1,9 @@
 package org.infernalstudios.questlog.core;
 
 import com.google.gson.JsonObject;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +20,7 @@ import org.infernalstudios.questlog.platform.Services;
 
 public class QuestManager {
   public final Player player;
-  private final Map<ResourceLocation, Quest> quests = new HashMap<>();
+  private final Map<ResourceLocation, Quest> quests = new LinkedHashMap<>();
 
   public QuestManager(Player player) {
     this.player = player;
@@ -53,8 +53,11 @@ public class QuestManager {
     return this.player.isLocalPlayer();
   }
 
+  /**
+   * Returns all quests in insertion order (definition order).
+   */
   public List<Quest> getAllQuests() {
-    return this.quests.values().stream().toList();
+    return new ArrayList<>(this.quests.values());
   }
 
   /**
