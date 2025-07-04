@@ -26,6 +26,7 @@ public class QuestlogCommands {
   public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
     LiteralCommandNode<CommandSourceStack> root = dispatcher.register(
       Commands.literal("questlog")
+        .requires(stack -> stack.hasPermission(2))
         .then(Commands.argument("quest", ResourceLocationArgument.id())
           .suggests((ctx, builder) -> {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSource().getPlayerOrException());
@@ -92,7 +93,7 @@ public class QuestlogCommands {
         )
     );
 
-    dispatcher.register(Commands.literal("ql").redirect(root));
+    dispatcher.register(Commands.literal("ql").requires(stack -> stack.hasPermission(2)).redirect(root));
   }
 
   private static int resetQuest(CommandContext<CommandSourceStack> ctx, Quest quest) throws CommandSyntaxException {
