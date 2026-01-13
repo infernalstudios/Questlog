@@ -13,7 +13,7 @@ A clear and concise description of what the bug is. Include as much information 
 **Versions:**
 Minecraft version:
 Questlog version:
-Loader (Forge or Fabric):
+Loader (NeoForge or Fabric):
 Loader version (and Fabric API version, if applicable):
 
 **Other mods:**

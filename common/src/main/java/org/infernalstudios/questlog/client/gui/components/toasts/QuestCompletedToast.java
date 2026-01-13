@@ -1,6 +1,6 @@
 package org.infernalstudios.questlog.client.gui.components.toasts;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;

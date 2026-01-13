@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Simple event bus for Questlog events.
  * <p>
- * This class is basically a stripped down reimplementation of Forge's event bus.
+ * This class is basically a stripped down reimplementation of NeoForge's event bus.
  */
 public class QuestlogEventBus {
     private final Map<Class<?>, List<Consumer<? extends QLEvent>>> listeners = new HashMap<>();

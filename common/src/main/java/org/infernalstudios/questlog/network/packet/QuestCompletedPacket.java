@@ -1,35 +1,42 @@
 package org.infernalstudios.questlog.network.packet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogEvents;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.IPacketContext;
+import org.jetbrains.annotations.NotNull;
 
-// Indicates to the client that a quest has been freshly completed
-// and a notification may be sent.
-// Sent only to notify the client to post a QuestCompletedEvent.
-public class QuestCompletedPacket {
-  public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
+public class QuestCompletedPacket implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<QuestCompletedPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "completed"));
 
-  private final ResourceLocation id;
+    public static final StreamCodec<RegistryFriendlyByteBuf, QuestCompletedPacket> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC, QuestCompletedPacket::id,
+            QuestCompletedPacket::new
+    );
 
-  public QuestCompletedPacket(ResourceLocation id) {
-    this.id = id;
-  }
+    private final ResourceLocation id;
 
-  public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(this.id);
-  }
+    public QuestCompletedPacket(ResourceLocation id) {
+        this.id = id;
+    }
 
-  public static QuestCompletedPacket decode(FriendlyByteBuf buf) {
-    return new QuestCompletedPacket(buf.readResourceLocation());
-  }
+    public static void handle(QuestCompletedPacket packet, IPacketContext ctx) {
+        QuestManager manager = QuestlogClient.getLocal();
+        QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(manager.player, manager.getQuest(packet.id), false));
+    }
 
-  public static void handle(QuestCompletedPacket packet, IPacketContext ctx) {
-    QuestManager manager = QuestlogClient.getLocal();
-    QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(manager.player, manager.getQuest(packet.id), false));
-  }
+    public ResourceLocation id() {
+        return id;
+    }
+
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

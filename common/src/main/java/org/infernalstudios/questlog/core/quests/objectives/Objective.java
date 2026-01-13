@@ -1,23 +1,19 @@
 package org.infernalstudios.questlog.core.quests.objectives;
 
 import com.google.gson.JsonObject;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
-import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
 
   private final ObjectiveDisplayData display;
 
-  @CheckForNull
   private Quest parent;
 
   private final int totalUnits;
@@ -33,7 +29,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
 
   public void registerEventListeners(QuestlogEventBus bus) {}
 
-  public final void setParent(Quest parent) {
+  public final void setParent(@Nullable Quest parent) {
     this.parent = parent;
   }
 

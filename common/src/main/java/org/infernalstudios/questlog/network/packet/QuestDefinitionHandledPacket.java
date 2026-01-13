@@ -1,33 +1,42 @@
 package org.infernalstudios.questlog.network.packet;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.network.IPacketContext;
+import org.jetbrains.annotations.NotNull;
 
-public class QuestDefinitionHandledPacket {
-  public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.CLIENT_TO_SERVER;
-  private final ResourceLocation id;
+public class QuestDefinitionHandledPacket implements CustomPacketPayload {
+    public static final CustomPacketPayload.Type<QuestDefinitionHandledPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "definition_handled"));
 
-  public QuestDefinitionHandledPacket(ResourceLocation id) {
-    this.id = id;
-  }
+    public static final StreamCodec<RegistryFriendlyByteBuf, QuestDefinitionHandledPacket> STREAM_CODEC = StreamCodec.composite(
+            ResourceLocation.STREAM_CODEC, QuestDefinitionHandledPacket::id,
+            QuestDefinitionHandledPacket::new
+    );
 
-  public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(this.id);
-  }
+    private final ResourceLocation id;
 
-  public static QuestDefinitionHandledPacket decode(FriendlyByteBuf buf) {
-    ResourceLocation id = buf.readResourceLocation();
-    return new QuestDefinitionHandledPacket(id);
-  }
+    public QuestDefinitionHandledPacket(ResourceLocation id) {
+        this.id = id;
+    }
 
-  public static void handle(QuestDefinitionHandledPacket packet, IPacketContext ctx) {
-    Questlog.LOGGER.trace("Client handled definition for quest {}", packet.id.toString());
+    public static void handle(QuestDefinitionHandledPacket packet, IPacketContext ctx) {
+        Questlog.LOGGER.trace("Client handled definition for quest {}", packet.id.toString());
 
-    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSender());
-    manager.sync(packet.id);
-  }
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSender());
+        manager.sync(packet.id);
+    }
+
+    public ResourceLocation id() {
+        return id;
+    }
+
+    @Override
+    public @NotNull Type<? extends CustomPacketPayload> type() {
+        return TYPE;
+    }
 }

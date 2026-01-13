@@ -1,8 +1,7 @@
 package org.infernalstudios.questlog.network;
 
 import net.minecraft.world.entity.player.Player;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface IPacketContext {
   // Null if the packet is sent from the server

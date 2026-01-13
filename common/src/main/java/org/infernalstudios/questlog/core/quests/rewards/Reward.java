@@ -1,8 +1,7 @@
 package org.infernalstudios.questlog.core.quests.rewards;
 
 import com.google.gson.JsonObject;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -13,7 +12,6 @@ import org.infernalstudios.questlog.util.NbtSaveable;
 
 public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDisplayData> {
 
-  @CheckForNull
   private Quest parent;
 
   private final RewardDisplayData display;
