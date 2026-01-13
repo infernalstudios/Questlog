@@ -37,7 +37,7 @@ public class ServerPlayerManager {
   }
 
   public QuestManager getManagerByPlayer(Player player) {
-    if (!this.questManagers.containsKey(player.getUUID())) {
+    if (!this.questManagers.containsKey(player.getUUID()) || this.questManagers.get(player.getUUID()).player != player) {
       this.addPlayer(player);
     }
 
@@ -127,13 +127,13 @@ public class ServerPlayerManager {
         shouldSave = true;
       }
       Questlog.LOGGER.trace(
-        "Loaded quest {} for {}, sending definition packet",
-        quest.getId(),
-        questManager.player.getGameProfile().getName()
+              "Loaded quest {} for {}, sending definition packet",
+              quest.getId(),
+              questManager.player.getGameProfile().getName()
       );
       Services.PLATFORM.sendPacketToClient(
-        (ServerPlayer) questManager.player,
-        new QuestDefinitionPacket(quest.getId(), DefinitionUtil.getCached(quest.getId()))
+              (ServerPlayer) questManager.player,
+              new QuestDefinitionPacket(quest.getId(), DefinitionUtil.getCached(quest.getId()))
       );
       // This is handled when client responds with QuestDefinitionHandledPacket with questManager.sync()
       // NetworkHandler.sendToPlayer(new QuestDataPacket(quest.getId(), quest.serialize()), (ServerPlayer) event.getEntity());
@@ -146,8 +146,8 @@ public class ServerPlayerManager {
 
   private File getPlayerDataFile(Player player) {
     return new File(
-      ((PlayerDataStorageAccessor)((MinecraftServerAccessor) this.server).getPlayerDataStorage()).getPlayerDir(),
-      player.getUUID() + ".questlog.dat"
+            ((PlayerDataStorageAccessor)((MinecraftServerAccessor) this.server).getPlayerDataStorage()).getPlayerDir(),
+            player.getUUID() + ".questlog.dat"
     );
   }
 }
