@@ -1,27 +1,27 @@
 plugins {
-    id 'java'
-    id 'idea'
-    id 'maven-publish'
+    id 'multiloader-loader'
     id 'fabric-loom'
+    id "me.modmuss50.mod-publish-plugin" version "1.1.0"
 }
-base {
-    archivesName = "${mod_name}-fabric-${minecraft_version}"
-}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft}:${parchment_version}@zip")
+    }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    implementation 'com.google.code.findbugs:jsr305:3.0.2'
-    implementation project(":common")
-    // Fabric doesn't include this
-    implementation 'net.jodah:typetools:0.6.3'
-    include 'net.jodah:typetools:0.6.3'
+
     implementation 'org.infernalstudios:config:4.0.3'
     include 'org.infernalstudios:config:4.0.3'
-    // Fabric "include" isn't transitive, so we need to include the dependencies for Blazing Config ourselves
+    implementation 'net.jodah:typetools:0.6.3'
+    include 'net.jodah:typetools:0.6.3'
     include 'com.electronwill.night-config:core:3.6.4'
     include 'com.electronwill.night-config:toml:3.6.4'
+
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    implementation project(":common")
 }
 
 loom {
@@ -47,30 +47,22 @@ loom {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    source(project(":common").sourceSets.main.allSource)
-}
-tasks.withType(Javadoc).configureEach {
-    source(project(":common").sourceSets.main.allJava)
-}
-tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
-}
+publishMods {
+    file = tasks.named("remapJar").flatMap { it.archiveFile }
+    changelog = rootProject.file("CHANGELOG.md").text
+    type = STABLE
+    displayName = "${mod_name} Fabric ${minecraft_version} - ${project.version}"
+    modLoaders.add("fabric")
 
-processResources {
-    from project(":common").sourceSets.main.resources
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId base.archivesName.get()
-            from components.java
-        }
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+        projectId = "1202066"
+        minecraftVersions.add("1.20.1")
     }
-    repositories {
-        maven {
-            url "file://" + System.getenv("local_maven")
-        }
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        projectId = "ufQYCY6N"
+        minecraftVersions.add("1.20.1")
     }
 }

@@ -4,14 +4,16 @@
     "version": "${version}",
     "name": "${mod_name}",
     "description": "${description}",
-    "authors": ["${mod_author}"],
+    "authors": [
+        "${mod_author}"
+    ],
     "contact": {
-        "homepage": "${github}",
-        "sources": "${github}",
-        "issues": "${github}/issues"
+        "homepage": "https://infernalstudios.org/",
+        "sources": "https://github.com/infernalstudios/Questlog",
+        "issues": "https://github.com/infernalstudios/Questlog/issues"
     },
-    "license": "Apache-2.0",
-    "icon": "questlog.png",
+    "license": "${license}",
+    "icon": "${mod_id}.png",
     "environment": "*",
     "entrypoints": {
         "main": [
@@ -22,13 +24,13 @@
         ]
     },
     "mixins": [
-        "questlog.mixins.json",
-        "questlog.fabric.mixins.json"
+        "${mod_id}.mixins.json",
+        "${mod_id}.fabric.mixins.json"
     ],
     "depends": {
         "fabricloader": ">=0.14",
         "fabric": "*",
-        "minecraft": "1.20.1",
+        "minecraft": "${minecraft_version}",
         "java": ">=17"
     }
 }

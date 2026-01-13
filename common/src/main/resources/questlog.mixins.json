@@ -2,8 +2,8 @@
   "required": true,
   "minVersion": "0.8",
   "package": "org.infernalstudios.questlog.mixin",
-  "compatibilityLevel": "JAVA_8",
-  "refmap": "questlog.refmap.json",
+  "refmap": "${mod_id}.refmap.json",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "EnchantedItemTriggerMixin",
     "MinecraftServerAccessor",
