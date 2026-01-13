@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(PlayerDataStorage.class)
 public class PlayerDataStorageMixin {
-  @Inject(method = "save", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;safeReplaceFile(Ljava/io/File;Ljava/io/File;Ljava/io/File;)V"))
+  @Inject(method = "save", at = @At("RETURN"))
   private void savePlayerData(Player player, CallbackInfo info) {
     if (player instanceof ServerPlayer serverPlayer) {
       QuestlogEvents.onPlayerSave(serverPlayer);

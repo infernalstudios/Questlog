@@ -11,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {
-  @Inject(method = "awardStat", at = @At("HEAD"))
-  private void onAwardStat(Stat<?> stat, int amount, CallbackInfo ci) {
-    Questlog.EVENTS.post(new QLPlayerEvent.StatAward((ServerPlayer) (Object) this, stat, amount));
-  }
+    @Inject(method = "awardStat", at = @At("HEAD"))
+    private void onAwardStat(Stat<?> stat, int amount, CallbackInfo ci) {
+        Questlog.EVENTS.post(new QLPlayerEvent.StatAward((ServerPlayer) (Object) this, stat, amount));
+    }
 }

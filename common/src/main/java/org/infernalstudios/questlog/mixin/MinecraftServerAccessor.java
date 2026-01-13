@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(MinecraftServer.class)
 public interface MinecraftServerAccessor {
-  @Accessor("playerDataStorage")
-  PlayerDataStorage getPlayerDataStorage();
+    @Accessor("playerDataStorage")
+    PlayerDataStorage getPlayerDataStorage();
 }
