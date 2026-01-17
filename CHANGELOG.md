@@ -1,1 +1,1 @@
-* Fix quests not working in multiplayer.
+* Fix crash related to collecting rewards.

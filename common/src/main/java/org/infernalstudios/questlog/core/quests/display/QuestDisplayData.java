@@ -111,14 +111,14 @@ public class QuestDisplayData {
     }
 
     String uncollectedTextRaw = JsonUtils.getOrDefault(style, "uncollectedText", (String) null);
-    if (buttonTextRaw == null) {
+    if (uncollectedTextRaw == null) {
       this.uncollectedText = Component.translatable("questlog.reward.uncollected");
     } else {
       this.uncollectedText = translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw);
     }
 
     String collectedTextRaw = JsonUtils.getOrDefault(style, "collectedText", (String) null);
-    if (buttonTextRaw == null) {
+    if (collectedTextRaw == null) {
       this.collectedText = Component.translatable("questlog.reward.collected");
     } else {
       this.collectedText = translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw);
