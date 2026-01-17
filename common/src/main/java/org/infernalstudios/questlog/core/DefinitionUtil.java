@@ -13,6 +13,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.Util;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class DefinitionUtil {
 
     public static class QuestDefinitionReloadListener extends SimplePreparableReloadListener<Map<ResourceLocation, JsonElement>> {
         @Override
-        protected Map<ResourceLocation, JsonElement> prepare(ResourceManager manager, ProfilerFiller profiler) {
+        protected @NotNull Map<ResourceLocation, JsonElement> prepare(ResourceManager manager, @NotNull ProfilerFiller profiler) {
             Map<ResourceLocation, JsonElement> prepared = new HashMap<>();
 
             List<Resource> allQuestFiles = manager.getResourceStack(ResourceLocation.fromNamespaceAndPath("questlog", "quests.json"));
@@ -94,7 +95,7 @@ public class DefinitionUtil {
         }
 
         @Override
-        protected void apply(Map<ResourceLocation, JsonElement> questDefinitions, ResourceManager manager, ProfilerFiller profiler) {
+        protected void apply(Map<ResourceLocation, JsonElement> questDefinitions, @NotNull ResourceManager manager, @NotNull ProfilerFiller profiler) {
             QUEST_DEFINITION_CACHE.clear();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : questDefinitions.entrySet()) {

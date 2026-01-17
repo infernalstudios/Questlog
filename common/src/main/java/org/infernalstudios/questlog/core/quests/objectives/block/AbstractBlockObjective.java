@@ -10,23 +10,23 @@ import org.infernalstudios.questlog.util.JsonUtils;
 
 public class AbstractBlockObjective extends Objective {
 
-  private final CachedRegistryPredicate<Block> block;
+    private final CachedRegistryPredicate<Block> block;
 
-  public AbstractBlockObjective(JsonObject definition) {
-    super(definition);
-    this.block = new CachedRegistryPredicate<>(
-      JsonUtils.getString(definition, "block"),
-      BuiltInRegistries.BLOCK,
-      Object::equals,
-      (tag, block) -> block.defaultBlockState().is(tag)
-    );
-  }
+    public AbstractBlockObjective(JsonObject definition) {
+        super(definition);
+        this.block = new CachedRegistryPredicate<>(
+                JsonUtils.getString(definition, "block"),
+                BuiltInRegistries.BLOCK,
+                Object::equals,
+                (tag, block) -> block.defaultBlockState().is(tag)
+        );
+    }
 
-  protected boolean test(Block block) {
-    return this.block.test(block);
-  }
+    protected boolean test(Block block) {
+        return this.block.test(block);
+    }
 
-  protected boolean test(BlockState block) {
-    return this.test(block.getBlock());
-  }
+    protected boolean test(BlockState block) {
+        return this.test(block.getBlock());
+    }
 }

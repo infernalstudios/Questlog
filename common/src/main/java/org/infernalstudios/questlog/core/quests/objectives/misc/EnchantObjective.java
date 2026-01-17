@@ -12,7 +12,6 @@ import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
-
 import org.jetbrains.annotations.Nullable;
 
 public class EnchantObjective extends Objective {

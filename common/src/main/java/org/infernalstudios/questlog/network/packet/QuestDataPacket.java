@@ -13,22 +13,14 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.jetbrains.annotations.NotNull;
 
-public class QuestDataPacket implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<QuestDataPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "data"));
+public record QuestDataPacket(ResourceLocation id, CompoundTag data) implements CustomPacketPayload {
+    public static final Type<QuestDataPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "data"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestDataPacket> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC, QuestDataPacket::id,
             ByteBufCodecs.COMPOUND_TAG, QuestDataPacket::data,
             QuestDataPacket::new
     );
-
-    private final ResourceLocation id;
-    private final CompoundTag data;
-
-    public QuestDataPacket(ResourceLocation id, CompoundTag data) {
-        this.id = id;
-        this.data = data;
-    }
 
     public static void handle(QuestDataPacket packet, IPacketContext ctx) {
         try {
@@ -43,14 +35,6 @@ public class QuestDataPacket implements CustomPacketPayload {
         } catch (Throwable e) {
             Questlog.LOGGER.error("Failed to handle QuestDataPacket", e);
         }
-    }
-
-    public ResourceLocation id() {
-        return id;
-    }
-
-    public CompoundTag data() {
-        return data;
     }
 
     @Override

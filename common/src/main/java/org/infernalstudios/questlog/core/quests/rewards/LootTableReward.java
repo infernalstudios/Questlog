@@ -15,6 +15,7 @@ import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LootTableReward extends Reward {
 
@@ -27,7 +28,7 @@ public class LootTableReward extends Reward {
 
     @Override
     public void applyReward(ServerPlayer player) {
-        LootTable table = player.getServer().reloadableRegistries()
+        LootTable table = Objects.requireNonNull(player.getServer()).reloadableRegistries()
                 .getLootTable(ResourceKey.create(Registries.LOOT_TABLE, this.lootTable));
 
         if (table == LootTable.EMPTY) {

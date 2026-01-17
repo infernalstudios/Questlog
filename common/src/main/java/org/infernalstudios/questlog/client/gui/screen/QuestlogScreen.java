@@ -116,6 +116,7 @@ public class QuestlogScreen extends Screen {
             }
         }
     }
+
     @Override
     public boolean isPauseScreen() {
         return true;

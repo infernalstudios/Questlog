@@ -7,45 +7,45 @@ import org.infernalstudios.questlog.core.QuestManager;
 import org.lwjgl.glfw.GLFW;
 
 public class QuestlogClient {
-  public static final KeyMapping OPEN_SCREEN_KEY = new KeyMapping(
-      "key.questlog.open",
-      GLFW.GLFW_KEY_GRAVE_ACCENT,
-      KeyMapping.CATEGORY_MISC
-  );
+    public static final KeyMapping OPEN_SCREEN_KEY = new KeyMapping(
+            "key.questlog.open",
+            GLFW.GLFW_KEY_GRAVE_ACCENT,
+            KeyMapping.CATEGORY_MISC
+    );
 
 
-  private static QuestManager QUEST_MANAGER_INSTANCE;
+    private static QuestManager QUEST_MANAGER_INSTANCE;
 
-  /**
-   * This method is used to get the local instance of the QuestManager.
-   * If the instance is null or the player is not the current Minecraft player, a new QuestManager instance is created.
-   * If the instance is not local, an IllegalCallerException is thrown.
-   *
-   * @return Returns the local instance of the QuestManager.
-   */
-  public static QuestManager getLocal() {
-    if (QUEST_MANAGER_INSTANCE != null && QUEST_MANAGER_INSTANCE.player == null) {
-      // Destroy the QuestManager instance if the player is null
-      QUEST_MANAGER_INSTANCE = null;
+    /**
+     * This method is used to get the local instance of the QuestManager.
+     * If the instance is null or the player is not the current Minecraft player, a new QuestManager instance is created.
+     * If the instance is not local, an IllegalCallerException is thrown.
+     *
+     * @return Returns the local instance of the QuestManager.
+     */
+    public static QuestManager getLocal() {
+        if (QUEST_MANAGER_INSTANCE != null && QUEST_MANAGER_INSTANCE.player == null) {
+            // Destroy the QuestManager instance if the player is null
+            QUEST_MANAGER_INSTANCE = null;
+        }
+
+        if (QUEST_MANAGER_INSTANCE == null || !QUEST_MANAGER_INSTANCE.player.getUUID().equals(Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getUUID() : null)) {
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player == null) {
+                throw new NullPointerException("QuestManager cannot be initialized, player is null\n");
+            }
+
+            QUEST_MANAGER_INSTANCE = new QuestManager(player);
+        }
+
+        if (!QUEST_MANAGER_INSTANCE.isClient()) {
+            throw new IllegalCallerException("QuestManager is not local");
+        }
+
+        return QUEST_MANAGER_INSTANCE;
     }
 
-    if (QUEST_MANAGER_INSTANCE == null || !QUEST_MANAGER_INSTANCE.player.getUUID().equals(Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getUUID() : null)) {
-      LocalPlayer player = Minecraft.getInstance().player;
-      if (player == null) {
-        throw new NullPointerException("QuestManager cannot be initialized, player is null\n");
-      }
-
-      QUEST_MANAGER_INSTANCE = new QuestManager(player);
+    public static void destroyLocal() {
+        QUEST_MANAGER_INSTANCE = null;
     }
-
-    if (!QUEST_MANAGER_INSTANCE.isClient()) {
-      throw new IllegalCallerException("QuestManager is not local");
-    }
-
-    return QUEST_MANAGER_INSTANCE;
-  }
-
-  public static void destroyLocal() {
-    QUEST_MANAGER_INSTANCE = null;
-  }
 }

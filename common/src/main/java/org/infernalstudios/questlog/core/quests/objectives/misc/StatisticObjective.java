@@ -18,6 +18,7 @@ import java.util.Objects;
 
 public class StatisticObjective extends Objective {
 
+    // TODO
     // This fixes a weird bug:
     //  Stat.CUSTOM.get(ResourceLocation.parse("stat")) // -> NullPointerException
     //  Stat.CUSTOM.get(Stat.STAT) // -> Stat<ResourceLocation>

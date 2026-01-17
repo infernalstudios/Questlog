@@ -7,6 +7,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ServerCommonPacketListenerImpl.class)
 public interface ServerGamePacketListenerImplAccessor {
-  @Accessor("server")
-  MinecraftServer getServer();
+    @Accessor("server")
+    MinecraftServer getServer();
 }

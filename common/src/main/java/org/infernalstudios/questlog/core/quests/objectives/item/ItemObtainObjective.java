@@ -8,8 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

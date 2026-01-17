@@ -6,86 +6,86 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-
 import org.jetbrains.annotations.Nullable;
 
 public class QLEntityEvent extends QLEvent {
-  public final LivingEntity entity;
+    public final LivingEntity entity;
 
-  public QLEntityEvent(LivingEntity entity) {
-    this.entity = entity;
-  }
-
-  public static class Breed extends QLEntityEvent {
-    public final LivingEntity parentA;
-    public final LivingEntity parentB;
-    public final Player causedByPlayer;
-
-    public Breed(LivingEntity entity, LivingEntity parentA, LivingEntity parentB, Player causedByPlayer) {
-      super(entity);
-
-      this.parentA = parentA;
-      this.parentB = parentB;
-      this.causedByPlayer = causedByPlayer;
+    public QLEntityEvent(LivingEntity entity) {
+        this.entity = entity;
     }
-  }
 
-  public static class Death extends QLEntityEvent {
-    public final DamageSource damageSource;
+    public static class Breed extends QLEntityEvent {
+        public final LivingEntity parentA;
+        public final LivingEntity parentB;
+        public final Player causedByPlayer;
 
-    public Death(LivingEntity entity, DamageSource source) {
-      super(entity);
+        public Breed(LivingEntity entity, LivingEntity parentA, LivingEntity parentB, Player causedByPlayer) {
+            super(entity);
 
-      this.damageSource = source;
+            this.parentA = parentA;
+            this.parentB = parentB;
+            this.causedByPlayer = causedByPlayer;
+        }
     }
-  }
 
-  public static class UseItem extends QLEntityEvent {
-    public final ItemStack item;
+    public static class Death extends QLEntityEvent {
+        public final DamageSource damageSource;
 
-    public UseItem(LivingEntity entity, ItemStack item) {
-      super(entity);
+        public Death(LivingEntity entity, DamageSource source) {
+            super(entity);
 
-      this.item = item;
+            this.damageSource = source;
+        }
     }
-  }
 
-  public static class TossItem extends QLEntityEvent {
-    public final ItemStack item;
+    public static class UseItem extends QLEntityEvent {
+        public final ItemStack item;
 
-    public TossItem(LivingEntity entity, ItemStack item) {
-      super(entity);
+        public UseItem(LivingEntity entity, ItemStack item) {
+            super(entity);
 
-      this.item = item;
+            this.item = item;
+        }
     }
-  }
 
-  public static class PickupItem extends QLEntityEvent {
-    public final ItemStack item;
+    public static class TossItem extends QLEntityEvent {
+        public final ItemStack item;
 
-    public PickupItem(LivingEntity entity, ItemStack item) {
-      super(entity);
+        public TossItem(LivingEntity entity, ItemStack item) {
+            super(entity);
 
-      this.item = item;
+            this.item = item;
+        }
     }
-  }
 
-  public static class EffectAdded extends QLEntityEvent {
-    public final MobEffectInstance effect;
+    public static class PickupItem extends QLEntityEvent {
+        public final ItemStack item;
 
-    public EffectAdded(LivingEntity entity, MobEffectInstance effect) {
-      super(entity);
+        public PickupItem(LivingEntity entity, ItemStack item) {
+            super(entity);
 
-      this.effect = effect;
+            this.item = item;
+        }
     }
-  }
 
-  public static class TameAnimal extends QLEntityEvent {
-    @Nullable
-    public final Player causedByPlayer;
-    public TameAnimal(Player player, Animal animal) {
-      super(animal);
-      this.causedByPlayer = player;
+    public static class EffectAdded extends QLEntityEvent {
+        public final MobEffectInstance effect;
+
+        public EffectAdded(LivingEntity entity, MobEffectInstance effect) {
+            super(entity);
+
+            this.effect = effect;
+        }
     }
-  }
+
+    public static class TameAnimal extends QLEntityEvent {
+        @Nullable
+        public final Player causedByPlayer;
+
+        public TameAnimal(@Nullable Player player, Animal animal) {
+            super(animal);
+            this.causedByPlayer = player;
+        }
+    }
 }

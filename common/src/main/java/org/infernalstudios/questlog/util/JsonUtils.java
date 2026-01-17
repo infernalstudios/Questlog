@@ -6,7 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Texture;
-
 import org.jetbrains.annotations.Nullable;
 
 public class JsonUtils {
@@ -74,19 +73,20 @@ public class JsonUtils {
 
     @Nullable
     public static Blittable getIcon(@Nullable JsonObject icon) {
-        if (icon.has("texture")) {
-            if (!icon.get("texture").isJsonPrimitive()) {
-                throw new IllegalArgumentException("Field icon.texture must be a string");
+        if (icon != null) {
+            if (icon.has("texture")) {
+                if (!icon.get("texture").isJsonPrimitive()) {
+                    throw new IllegalArgumentException("Field icon.texture must be a string");
+                }
+                return new Texture(ResourceLocation.parse(JsonUtils.getString(icon, "texture")), 16, 16, 0, 0, 16, 16);
+            } else if (icon.has("item")) {
+                if (!icon.get("item").isJsonPrimitive()) {
+                    throw new IllegalArgumentException("Field icon.item must be a string");
+                }
+                return new ItemRenderable(ResourceLocation.parse(JsonUtils.getString(icon, "item")));
             }
-            return new Texture(ResourceLocation.parse(JsonUtils.getString(icon, "texture")), 16, 16, 0, 0, 16, 16);
-        } else if (icon.has("item")) {
-            if (!icon.get("item").isJsonPrimitive()) {
-                throw new IllegalArgumentException("Field icon.item must be a string");
-            }
-            return new ItemRenderable(ResourceLocation.parse(JsonUtils.getString(icon, "item")));
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static String getString(JsonObject obj, String name) {

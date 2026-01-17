@@ -9,39 +9,37 @@ import org.infernalstudios.questlog.util.JsonUtils;
 
 public class ItemEquipObjective extends AbstractItemObjective {
 
-  private final EquipmentSlot slot;
+    private final EquipmentSlot slot;
 
-  //  "mainhand"
-  //  "offhand"
-  //  "feet"
-  //  "legs"
-  //  "chest"
-  //  "head"
+    //  "mainhand"
+    //  "offhand"
+    //  "feet"
+    //  "legs"
+    //  "chest"
+    //  "head"
+    private int ticksUntilCheck = 0;
 
-  public ItemEquipObjective(JsonObject definition) {
-    super(definition);
-    this.slot = EquipmentSlot.byName(JsonUtils.getString(definition, "slot"));
-  }
-
-  @Override
-  public void registerEventListeners(QuestlogEventBus bus) {
-    super.registerEventListeners(bus);
-    bus.addListener(this::onPlayerTick);
-  }
-
-  // Checks every second for performance
-  private int ticksUntilCheck = 0;
-
-  private void onPlayerTick(QLPlayerEvent.Tick event) {
-    if (this.isCompleted() || this.getParent() == null) return;
-    if (
-      event.player instanceof ServerPlayer player &&
-      this.getParent().manager.player.equals(player) &&
-      --ticksUntilCheck <= 0 &&
-      this.test(player.getItemBySlot(this.slot))
-    ) {
-      this.setUnits(this.getUnits() + 1);
-      ticksUntilCheck = 20;
+    public ItemEquipObjective(JsonObject definition) {
+        super(definition);
+        this.slot = EquipmentSlot.byName(JsonUtils.getString(definition, "slot"));
     }
-  }
+
+    @Override
+    public void registerEventListeners(QuestlogEventBus bus) {
+        super.registerEventListeners(bus);
+        bus.addListener(this::onPlayerTick);
+    }
+
+    private void onPlayerTick(QLPlayerEvent.Tick event) {
+        if (this.isCompleted() || this.getParent() == null) return;
+        if (
+                event.player instanceof ServerPlayer player &&
+                        this.getParent().manager.player.equals(player) &&
+                        --ticksUntilCheck <= 0 &&
+                        this.test(player.getItemBySlot(this.slot))
+        ) {
+            this.setUnits(this.getUnits() + 1);
+            ticksUntilCheck = 20;
+        }
+    }
 }

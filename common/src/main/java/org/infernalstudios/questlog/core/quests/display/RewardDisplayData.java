@@ -8,7 +8,6 @@ import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
-
 import org.jetbrains.annotations.Nullable;
 
 public class RewardDisplayData {

@@ -14,16 +14,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ServerPlayer.class)
 public class ServerPlayerMixin {
-  @Inject(
-      method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
-      at = @At(value = "RETURN", ordinal = 1)
-  )
-  private void onDrop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
-     Questlog.EVENTS.post(new QLEntityEvent.TossItem((ServerPlayer) (Object) this, itemStack));
-  }
+    @Inject(
+            method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At(value = "RETURN", ordinal = 1)
+    )
+    private void onDrop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
+        Questlog.EVENTS.post(new QLEntityEvent.TossItem((ServerPlayer) (Object) this, itemStack));
+    }
 
-  @Inject(method = "tick", at = @At("TAIL"))
-  private void onTick(CallbackInfo ci) {
-    Questlog.EVENTS.post(new QLPlayerEvent.Tick((ServerPlayer) (Object) this));
-  }
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void onTick(CallbackInfo ci) {
+        Questlog.EVENTS.post(new QLPlayerEvent.Tick((ServerPlayer) (Object) this));
+    }
 }

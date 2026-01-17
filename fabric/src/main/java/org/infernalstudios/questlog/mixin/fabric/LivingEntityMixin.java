@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
-  @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z", at = @At("RETURN"))
-  private void onAddEffect(MobEffectInstance mobEffectInstance, CallbackInfoReturnable<Boolean> cir) {
-    if (cir.getReturnValueZ()) {
-      Questlog.EVENTS.post(new QLEntityEvent.EffectAdded((LivingEntity) (Object) this, mobEffectInstance));
+    @Inject(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;)Z", at = @At("RETURN"))
+    private void onAddEffect(MobEffectInstance mobEffectInstance, CallbackInfoReturnable<Boolean> cir) {
+        if (cir.getReturnValueZ()) {
+            Questlog.EVENTS.post(new QLEntityEvent.EffectAdded((LivingEntity) (Object) this, mobEffectInstance));
+        }
     }
-  }
 }

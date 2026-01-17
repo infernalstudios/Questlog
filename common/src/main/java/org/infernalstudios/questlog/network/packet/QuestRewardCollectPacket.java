@@ -14,8 +14,10 @@ import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.jetbrains.annotations.NotNull;
 
-public class QuestRewardCollectPacket implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<QuestRewardCollectPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "reward_collect"));
+import java.util.Objects;
+
+public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) implements CustomPacketPayload {
+    public static final Type<QuestRewardCollectPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "reward_collect"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestRewardCollectPacket> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC, QuestRewardCollectPacket::id,
@@ -23,16 +25,8 @@ public class QuestRewardCollectPacket implements CustomPacketPayload {
             QuestRewardCollectPacket::new
     );
 
-    private final ResourceLocation id;
-    private final int rewardIndex;
-
-    public QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) {
-        this.id = id;
-        this.rewardIndex = rewardIndex;
-    }
-
     public static void handle(QuestRewardCollectPacket packet, IPacketContext ctx) {
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSender());
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(Objects.requireNonNull(ctx.getSender()));
         Quest quest = manager.getQuest(packet.id);
         if (quest == null) {
             Questlog.LOGGER.warn("Quest {} not found", packet.id);
@@ -46,14 +40,6 @@ public class QuestRewardCollectPacket implements CustomPacketPayload {
         if (!reward.hasRewarded()) {
             reward.applyReward((ServerPlayer) manager.player);
         }
-    }
-
-    public ResourceLocation id() {
-        return id;
-    }
-
-    public int rewardIndex() {
-        return rewardIndex;
     }
 
     @Override

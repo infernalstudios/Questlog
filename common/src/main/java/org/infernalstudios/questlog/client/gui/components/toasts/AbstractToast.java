@@ -12,8 +12,8 @@ import net.minecraft.util.Mth;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public abstract class AbstractToast implements Toast {

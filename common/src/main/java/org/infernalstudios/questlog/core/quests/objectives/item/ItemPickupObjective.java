@@ -7,20 +7,20 @@ import org.infernalstudios.questlog.event.events.QLEntityEvent;
 
 public class ItemPickupObjective extends AbstractItemObjective {
 
-  public ItemPickupObjective(JsonObject definition) {
-    super(definition);
-  }
-
-  @Override
-  public void registerEventListeners(QuestlogEventBus bus) {
-    super.registerEventListeners(bus);
-    bus.addListener(this::onItemPickup);
-  }
-
-  private void onItemPickup(QLEntityEvent.PickupItem event) {
-    if (this.isCompleted() || this.getParent() == null) return;
-    if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.item)) {
-      this.setUnits(this.getUnits() + event.item.getCount());
+    public ItemPickupObjective(JsonObject definition) {
+        super(definition);
     }
-  }
+
+    @Override
+    public void registerEventListeners(QuestlogEventBus bus) {
+        super.registerEventListeners(bus);
+        bus.addListener(this::onItemPickup);
+    }
+
+    private void onItemPickup(QLEntityEvent.PickupItem event) {
+        if (this.isCompleted() || this.getParent() == null) return;
+        if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.item)) {
+            this.setUnits(this.getUnits() + event.item.getCount());
+        }
+    }
 }

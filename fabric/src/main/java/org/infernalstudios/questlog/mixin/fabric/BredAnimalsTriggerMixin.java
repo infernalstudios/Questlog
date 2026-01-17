@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BredAnimalsTrigger.class)
 public class BredAnimalsTriggerMixin {
-  @Inject(method = "trigger", at = @At("HEAD"))
-  private void onBredAnimalsTrigger(ServerPlayer serverPlayer, Animal parentA, Animal parentB, AgeableMob child, CallbackInfo ci) {
-    Questlog.EVENTS.post(new QLEntityEvent.Breed(child, parentA, parentB, serverPlayer));
-  }
+    @Inject(method = "trigger", at = @At("HEAD"))
+    private void onBredAnimalsTrigger(ServerPlayer serverPlayer, Animal parentA, Animal parentB, AgeableMob child, CallbackInfo ci) {
+        Questlog.EVENTS.post(new QLEntityEvent.Breed(child, parentA, parentB, serverPlayer));
+    }
 }

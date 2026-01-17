@@ -12,27 +12,17 @@ import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.jetbrains.annotations.NotNull;
 
-public class QuestCompletedPacket implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<QuestCompletedPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "completed"));
+public record QuestCompletedPacket(ResourceLocation id) implements CustomPacketPayload {
+    public static final Type<QuestCompletedPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "completed"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestCompletedPacket> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC, QuestCompletedPacket::id,
             QuestCompletedPacket::new
     );
 
-    private final ResourceLocation id;
-
-    public QuestCompletedPacket(ResourceLocation id) {
-        this.id = id;
-    }
-
     public static void handle(QuestCompletedPacket packet, IPacketContext ctx) {
         QuestManager manager = QuestlogClient.getLocal();
         QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(manager.player, manager.getQuest(packet.id), false));
-    }
-
-    public ResourceLocation id() {
-        return id;
     }
 
     @Override

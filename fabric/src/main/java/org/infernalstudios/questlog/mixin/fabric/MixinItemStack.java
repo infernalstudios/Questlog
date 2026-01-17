@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemStack.class)
 public class MixinItemStack {
-  @Inject(method = "onCraftedBy", at = @At("TAIL"))
-  private void onCraftedBy(Level level, Player player, int i, CallbackInfo ci) {
-    Questlog.EVENTS.post(new QLPlayerEvent.Craft(player, (ItemStack) (Object) this));
-  }
+    @Inject(method = "onCraftedBy", at = @At("TAIL"))
+    private void onCraftedBy(Level level, Player player, int i, CallbackInfo ci) {
+        Questlog.EVENTS.post(new QLPlayerEvent.Craft(player, (ItemStack) (Object) this));
+    }
 }
