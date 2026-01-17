@@ -1,1 +1,1 @@
-* Fixed mixin crash on Fabric.
+* Fix crash related to collecting rewards.
