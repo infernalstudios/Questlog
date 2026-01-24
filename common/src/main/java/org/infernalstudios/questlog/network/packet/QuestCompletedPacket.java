@@ -12,24 +12,24 @@ import org.infernalstudios.questlog.network.IPacketContext;
 // and a notification may be sent.
 // Sent only to notify the client to post a QuestCompletedEvent.
 public class QuestCompletedPacket {
-  public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
+    public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
 
-  private final ResourceLocation id;
+    private final ResourceLocation id;
 
-  public QuestCompletedPacket(ResourceLocation id) {
-    this.id = id;
-  }
+    public QuestCompletedPacket(ResourceLocation id) {
+        this.id = id;
+    }
 
-  public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(this.id);
-  }
+    public static QuestCompletedPacket decode(FriendlyByteBuf buf) {
+        return new QuestCompletedPacket(buf.readResourceLocation());
+    }
 
-  public static QuestCompletedPacket decode(FriendlyByteBuf buf) {
-    return new QuestCompletedPacket(buf.readResourceLocation());
-  }
+    public static void handle(QuestCompletedPacket packet, IPacketContext ctx) {
+        QuestManager manager = QuestlogClient.getLocal();
+        QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(manager.player, manager.getQuest(packet.id), false));
+    }
 
-  public static void handle(QuestCompletedPacket packet, IPacketContext ctx) {
-    QuestManager manager = QuestlogClient.getLocal();
-    QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(manager.player, manager.getQuest(packet.id), false));
-  }
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(this.id);
+    }
 }

@@ -8,6 +8,6 @@ import java.io.File;
 
 @Mixin(PlayerDataStorage.class)
 public interface PlayerDataStorageAccessor {
-  @Accessor("playerDir")
-  File getPlayerDir();
+    @Accessor("playerDir")
+    File getPlayerDir();
 }

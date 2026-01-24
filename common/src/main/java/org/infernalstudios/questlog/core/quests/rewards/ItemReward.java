@@ -12,22 +12,22 @@ import org.infernalstudios.questlog.util.Util;
 
 public class ItemReward extends Reward {
 
-  private final CachedValue<Item> item;
-  private final int count;
+    private final CachedValue<Item> item;
+    private final int count;
 
-  public ItemReward(JsonObject definition) {
-    super(definition);
-    this.item = new CachedValue<>(() -> BuiltInRegistries.ITEM.get(new ResourceLocation(JsonUtils.getString(definition, "item"))));
-    this.count = JsonUtils.getOrDefault(definition, "count", 1);
-  }
+    public ItemReward(JsonObject definition) {
+        super(definition);
+        this.item = new CachedValue<>(() -> BuiltInRegistries.ITEM.get(new ResourceLocation(JsonUtils.getString(definition, "item"))));
+        this.count = JsonUtils.getOrDefault(definition, "count", 1);
+    }
 
-  @Override
-  public void applyReward(ServerPlayer player) {
-    Item item = this.item.get();
-    ItemStack stack = new ItemStack(item, this.count);
+    @Override
+    public void applyReward(ServerPlayer player) {
+        Item item = this.item.get();
+        ItemStack stack = new ItemStack(item, this.count);
 
-    Util.giveToPlayer(player, stack);
+        Util.giveToPlayer(player, stack);
 
-    super.applyReward(player);
-  }
+        super.applyReward(player);
+    }
 }

@@ -23,17 +23,17 @@ public class QuestlogPacketsFabric {
         ClientPlayNetworking.registerGlobalReceiver(registered.id(), (client, handler, buf, responseSender) -> {
             T packet = registered.decoder().apply(buf);
             ((ClientPacketListenerAccessor) handler).getMinecraft().execute(() ->
-                registered.handler().accept(packet, new IPacketContext() {
-                    @Override
-                    public Player getSender() {
-                        return null;
-                    }
+                    registered.handler().accept(packet, new IPacketContext() {
+                        @Override
+                        public Player getSender() {
+                            return null;
+                        }
 
-                    @Override
-                    public Direction getDirection() {
-                        return Direction.SERVER_TO_CLIENT;
-                    }
-                })
+                        @Override
+                        public Direction getDirection() {
+                            return Direction.SERVER_TO_CLIENT;
+                        }
+                    })
             );
         });
     }
@@ -42,17 +42,17 @@ public class QuestlogPacketsFabric {
         ServerPlayNetworking.registerGlobalReceiver(registered.id(), (server, player, handler, buf, responseSender) -> {
             T packet = registered.decoder().apply(buf);
             ((ServerGamePacketListenerImplAccessor) handler).getServer().execute(() ->
-                registered.handler().accept(packet, new IPacketContext() {
-                    @Override
-                    public Player getSender() {
-                        return player;
-                    }
+                    registered.handler().accept(packet, new IPacketContext() {
+                        @Override
+                        public Player getSender() {
+                            return player;
+                        }
 
-                    @Override
-                    public Direction getDirection() {
-                        return Direction.CLIENT_TO_SERVER;
-                    }
-                })
+                        @Override
+                        public Direction getDirection() {
+                            return Direction.CLIENT_TO_SERVER;
+                        }
+                    })
             );
         });
     }

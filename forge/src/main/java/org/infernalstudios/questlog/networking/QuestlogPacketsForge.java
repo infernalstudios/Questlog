@@ -11,8 +11,6 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.QuestlogPackets;
 
-import java.util.Optional;
-
 public class QuestlogPacketsForge {
     public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(Questlog.MODID, "messages"))
@@ -30,39 +28,39 @@ public class QuestlogPacketsForge {
 
     private static synchronized <T> void registerPacket(int index, QuestlogPackets.RegisteredPacket<T> registered) {
         CHANNEL.messageBuilder(registered.clazz(), index, registered.direction() == IPacketContext.Direction.CLIENT_TO_SERVER ? NetworkDirection.PLAY_TO_SERVER : NetworkDirection.PLAY_TO_CLIENT)
-            .encoder(registered.encoder())
-            .decoder(registered.decoder())
-            .consumerMainThread((packet, contextSupplier) -> {
-                NetworkEvent.Context context = contextSupplier.get();
-                if (registered.direction() == IPacketContext.Direction.CLIENT_TO_SERVER) {
-                    if (!context.getDirection().getReceptionSide().isServer()) {
-                        throw new IllegalStateException("Received a client to server packet on the wrong side " + context.getDirection() + ": " + registered.id());
+                .encoder(registered.encoder())
+                .decoder(registered.decoder())
+                .consumerMainThread((packet, contextSupplier) -> {
+                    NetworkEvent.Context context = contextSupplier.get();
+                    if (registered.direction() == IPacketContext.Direction.CLIENT_TO_SERVER) {
+                        if (!context.getDirection().getReceptionSide().isServer()) {
+                            throw new IllegalStateException("Received a client to server packet on the wrong side " + context.getDirection() + ": " + registered.id());
+                        }
+
+                        if (contextSupplier.get().getSender() == null) {
+                            throw new IllegalStateException("Received a client to server packet with a null sender: " + registered.id());
+                        }
                     }
 
-                    if (contextSupplier.get().getSender() == null) {
-                        throw new IllegalStateException("Received a client to server packet with a null sender: " + registered.id());
-                    }
-                }
-
-                if (registered.direction() == IPacketContext.Direction.SERVER_TO_CLIENT) {
-                    if (!context.getDirection().getReceptionSide().isClient()) {
-                        throw new IllegalStateException("Received a server to client packet on the wrong side " + context.getDirection() + ": " + registered.id());
-                    }
-                }
-
-                registered.handler().accept(packet, new IPacketContext() {
-                    @Override
-                    public ServerPlayer getSender() {
-                        return contextSupplier.get().getSender();
+                    if (registered.direction() == IPacketContext.Direction.SERVER_TO_CLIENT) {
+                        if (!context.getDirection().getReceptionSide().isClient()) {
+                            throw new IllegalStateException("Received a server to client packet on the wrong side " + context.getDirection() + ": " + registered.id());
+                        }
                     }
 
-                    @Override
-                    public IPacketContext.Direction getDirection() {
-                        return registered.direction();
-                    }
-                });
-            })
-            .add();
+                    registered.handler().accept(packet, new IPacketContext() {
+                        @Override
+                        public ServerPlayer getSender() {
+                            return contextSupplier.get().getSender();
+                        }
+
+                        @Override
+                        public IPacketContext.Direction getDirection() {
+                            return registered.direction();
+                        }
+                    });
+                })
+                .add();
     }
 
     public static <M> void sendToPlayer(M message, ServerPlayer player) {

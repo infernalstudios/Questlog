@@ -1,9 +1,6 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonObject;
-import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nullable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -14,208 +11,202 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
 
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
+
 public class QuestDisplayData {
 
-  @Nullable
-  private List<ObjectiveDisplayData> objectiveDisplay = null;
+    private final Component title;
+    private final Component description;
+    @Nullable
+    private final Blittable icon;
+    @Nullable
+    private final ResourceLocation completedSound;
+    @Nullable
+    private final ResourceLocation triggeredSound;
+    private final boolean toastOnTrigger;
+    private final boolean toastOnComplete;
+    private final boolean popup;
+    private final boolean hidden;
+    private final ResourceLocation bgTexture;
+    private final ResourceLocation peripheralTexture;
+    private final Component backButtonText;
+    private final Component collectButtonText;
+    private final Component collectedText;
+    private final Component uncollectedText;
+    private final Palette palette;
+    @Nullable
+    private List<ObjectiveDisplayData> objectiveDisplay = null;
+    @Nullable
+    private List<RewardDisplayData> rewardDisplay = null;
 
-  @Nullable
-  private List<RewardDisplayData> rewardDisplay = null;
+    public QuestDisplayData(JsonObject data) {
+        boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
+        String title = JsonUtils.getString(data, "title");
+        String description = JsonUtils.getString(data, "description");
 
-  private final Component title;
-  private final Component description;
+        this.title = translatable ? Component.translatable(title) : Component.literal(title);
+        this.description = translatable ? Component.translatable(description) : Component.literal(description);
+        this.icon = JsonUtils.getIcon(data, "icon");
 
-  @Nullable
-  private final Blittable icon;
+        String completedSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "completed", (String) null);
 
-  @Nullable
-  private final ResourceLocation completedSound;
+        this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
 
-  @Nullable
-  private final ResourceLocation triggeredSound;
+        String triggeredSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "triggered", (String) null);
 
-  private final boolean toastOnTrigger;
-  private final boolean toastOnComplete;
-  private final boolean popup;
-  private final boolean hidden;
+        this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
-  private final ResourceLocation bgTexture;
-  private final ResourceLocation peripheralTexture;
+        JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
 
-  private final Component backButtonText;
-  private final Component collectButtonText;
+        String backgroundLoc = style.has("background")
+                ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null)
+                : null;
 
-  private final Component collectedText;
-  private final Component uncollectedText;
+        if (backgroundLoc == null) {
+            backgroundLoc = Questlog.MODID + ":textures/gui/quest_page.png";
+        }
 
-  private final Palette palette;
+        String peripheralLoc = style.has("peripheral")
+                ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null)
+                : null;
 
-  public QuestDisplayData(JsonObject data) {
-    boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
-    String title = JsonUtils.getString(data, "title");
-    String description = JsonUtils.getString(data, "description");
+        if (peripheralLoc == null) {
+            peripheralLoc = Questlog.MODID + ":textures/gui/quest_peripherals.png";
+        }
 
-    this.title = translatable ? Component.translatable(title) : Component.literal(title);
-    this.description = translatable ? Component.translatable(description) : Component.literal(description);
-    this.icon = JsonUtils.getIcon(data, "icon");
+        this.bgTexture = new ResourceLocation(backgroundLoc);
+        this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
-    String completedSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "completed", (String) null);
+        this.palette = new Palette(
+                JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
+                JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
+                JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
+                JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
+                JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
+        );
 
-    this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
+        String buttonTextRaw = JsonUtils.getOrDefault(style, "backButtonText", (String) null);
+        if (buttonTextRaw == null) {
+            this.backButtonText = Component.translatable("gui.back");
+        } else {
+            this.backButtonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
+        }
 
-    String triggeredSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "triggered", (String) null);
+        String backButtonTextRaw = JsonUtils.getOrDefault(style, "collectButtonText", (String) null);
+        if (buttonTextRaw == null) {
+            this.collectButtonText = Component.translatable("questlog.reward.collect");
+        } else {
+            this.collectButtonText = translatable ? Component.translatable(backButtonTextRaw) : Component.literal(backButtonTextRaw);
+        }
 
-    this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
+        String uncollectedTextRaw = JsonUtils.getOrDefault(style, "uncollectedText", (String) null);
+        if (uncollectedTextRaw == null) {
+            this.uncollectedText = Component.translatable("questlog.reward.uncollected");
+        } else {
+            this.uncollectedText = translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw);
+        }
 
-    JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
+        String collectedTextRaw = JsonUtils.getOrDefault(style, "collectedText", (String) null);
+        if (collectedTextRaw == null) {
+            this.collectedText = Component.translatable("questlog.reward.collected");
+        } else {
+            this.collectedText = translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw);
+        }
 
-    String backgroundLoc = style.has("background")
-      ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null)
-      : null;
+        JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
 
-    if (backgroundLoc == null) {
-      backgroundLoc = Questlog.MODID + ":textures/gui/quest_page.png";
+        this.toastOnTrigger = JsonUtils.getOrDefault(notification, "toastOnTrigger", true);
+        this.toastOnComplete = JsonUtils.getOrDefault(notification, "toastOnComplete", true);
+        this.popup = JsonUtils.getOrDefault(notification, "popup", false);
+
+        this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
     }
 
-    String peripheralLoc = style.has("peripheral")
-      ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null)
-      : null;
-
-    if (peripheralLoc == null) {
-      peripheralLoc = Questlog.MODID + ":textures/gui/quest_peripherals.png";
+    public void setQuest(Quest quest) {
+        this.objectiveDisplay = quest.objectives.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
+        this.rewardDisplay = quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
     }
 
-    this.bgTexture = new ResourceLocation(backgroundLoc);
-    this.peripheralTexture = new ResourceLocation(peripheralLoc);
-
-    this.palette = new Palette(
-      JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
-      JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
-      JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
-      JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
-      JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
-    );
-
-    String buttonTextRaw = JsonUtils.getOrDefault(style, "backButtonText", (String) null);
-    if (buttonTextRaw == null) {
-      this.backButtonText = Component.translatable("gui.back");
-    } else {
-      this.backButtonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
+    public Component getTitle() {
+        return this.title;
     }
 
-    String backButtonTextRaw = JsonUtils.getOrDefault(style, "collectButtonText", (String) null);
-    if (buttonTextRaw == null) {
-      this.collectButtonText = Component.translatable("questlog.reward.collect");
-    } else {
-      this.collectButtonText = translatable ? Component.translatable(backButtonTextRaw) : Component.literal(backButtonTextRaw);
+    public Component getDescription() {
+        return this.description;
     }
 
-    String uncollectedTextRaw = JsonUtils.getOrDefault(style, "uncollectedText", (String) null);
-    if (uncollectedTextRaw == null) {
-      this.uncollectedText = Component.translatable("questlog.reward.uncollected");
-    } else {
-      this.uncollectedText = translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw);
+    public List<ObjectiveDisplayData> getObjectiveDisplayData() {
+        if (this.objectiveDisplay == null) {
+            throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
+        }
+        return this.objectiveDisplay;
     }
 
-    String collectedTextRaw = JsonUtils.getOrDefault(style, "collectedText", (String) null);
-    if (collectedTextRaw == null) {
-      this.collectedText = Component.translatable("questlog.reward.collected");
-    } else {
-      this.collectedText = translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw);
+    public List<RewardDisplayData> getRewardDisplayData() {
+        if (this.rewardDisplay == null) {
+            throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
+        }
+        return this.rewardDisplay;
     }
 
-    JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
-
-    this.toastOnTrigger = JsonUtils.getOrDefault(notification, "toastOnTrigger", true);
-    this.toastOnComplete = JsonUtils.getOrDefault(notification, "toastOnComplete", true);
-    this.popup = JsonUtils.getOrDefault(notification, "popup", false);
-
-    this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
-  }
-
-  public void setQuest(Quest quest) {
-    this.objectiveDisplay = quest.objectives.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
-    this.rewardDisplay = quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
-  }
-
-  public Component getTitle() {
-    return this.title;
-  }
-
-  public Component getDescription() {
-    return this.description;
-  }
-
-  public List<ObjectiveDisplayData> getObjectiveDisplayData() {
-    if (this.objectiveDisplay == null) {
-      throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
+    @Nullable
+    public Blittable getIcon() {
+        return this.icon;
     }
-    return this.objectiveDisplay;
-  }
 
-  public List<RewardDisplayData> getRewardDisplayData() {
-    if (this.rewardDisplay == null) {
-      throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
+    @Nullable
+    public SoundEvent getCompletedSound() {
+        return BuiltInRegistries.SOUND_EVENT.get(this.completedSound);
     }
-    return this.rewardDisplay;
-  }
 
-  @Nullable
-  public Blittable getIcon() {
-    return this.icon;
-  }
+    @Nullable
+    public SoundEvent getTriggeredSound() {
+        return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
+    }
 
-  @Nullable
-  public SoundEvent getCompletedSound() {
-    return BuiltInRegistries.SOUND_EVENT.get(this.completedSound);
-  }
+    public QuestlogGuiSet getGuiSet() {
+        return (
+                this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc)
+        )
+                ? QuestlogGuiSet.DEFAULT
+                : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
+    }
 
-  @Nullable
-  public SoundEvent getTriggeredSound() {
-    return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
-  }
+    public boolean shouldToastOnTrigger() {
+        return this.toastOnTrigger;
+    }
 
-  public QuestlogGuiSet getGuiSet() {
-    return (
-        this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc)
-      )
-      ? QuestlogGuiSet.DEFAULT
-      : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
-  }
+    public boolean shouldToastOnComplete() {
+        return this.toastOnComplete;
+    }
 
-  public boolean shouldToastOnTrigger() {
-    return this.toastOnTrigger;
-  }
+    public boolean shouldPopup() {
+        return this.popup;
+    }
 
-  public boolean shouldToastOnComplete() {
-    return this.toastOnComplete;
-  }
+    public boolean isHidden() {
+        return this.hidden;
+    }
 
-  public boolean shouldPopup() {
-    return this.popup;
-  }
+    public Palette getPalette() {
+        return this.palette;
+    }
 
-  public boolean isHidden() {
-    return this.hidden;
-  }
+    public Component getBackButtonText() {
+        return this.backButtonText;
+    }
 
-  public Palette getPalette() {
-    return this.palette;
-  }
+    public Component getCollectButtonText() {
+        return this.collectButtonText;
+    }
 
-  public Component getBackButtonText() {
-    return this.backButtonText;
-  }
+    public Component getCollectedText() {
+        return this.collectedText;
+    }
 
-  public Component getCollectButtonText() {
-    return this.collectButtonText;
-  }
-
-  public Component getCollectedText() {
-    return this.collectedText;
-  }
-
-  public Component getUncollectedText() {
-    return this.uncollectedText;
-  }
+    public Component getUncollectedText() {
+        return this.uncollectedText;
+    }
 }

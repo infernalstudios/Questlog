@@ -15,17 +15,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FarmBlock.class)
 public class FarmBlockMixin {
-  @Inject(
-      method = "fallOn",
-      at = @At(
-          value = "INVOKE",
-          target = "Lnet/minecraft/world/level/block/FarmBlock;turnToDirt(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V",
-          shift = At.Shift.AFTER
-      )
-  )
-  private void onFallOn(Level level, BlockState blockState, BlockPos blockPos, Entity entity, float f, CallbackInfo ci) {
-    if (entity instanceof LivingEntity livingEntity) {
-      Questlog.EVENTS.post(new QLBlockEvent.FarmlandTrample(blockState, blockPos, livingEntity));
+    @Inject(
+            method = "fallOn",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/block/FarmBlock;turnToDirt(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    private void onFallOn(Level level, BlockState blockState, BlockPos blockPos, Entity entity, float f, CallbackInfo ci) {
+        if (entity instanceof LivingEntity livingEntity) {
+            Questlog.EVENTS.post(new QLBlockEvent.FarmlandTrample(blockState, blockPos, livingEntity));
+        }
     }
-  }
 }

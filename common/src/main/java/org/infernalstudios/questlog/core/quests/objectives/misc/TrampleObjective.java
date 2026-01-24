@@ -8,20 +8,20 @@ import org.infernalstudios.questlog.event.events.QLBlockEvent;
 
 public class TrampleObjective extends Objective {
 
-  public TrampleObjective(JsonObject definition) {
-    super(definition);
-  }
-
-  @Override
-  public void registerEventListeners(QuestlogEventBus bus) {
-    super.registerEventListeners(bus);
-    bus.addListener(this::onBlockTrample);
-  }
-
-  private void onBlockTrample(QLBlockEvent.FarmlandTrample event) {
-    if (this.isCompleted() || this.getParent() == null) return;
-    if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player)) {
-      this.setUnits(this.getUnits() + 1);
+    public TrampleObjective(JsonObject definition) {
+        super(definition);
     }
-  }
+
+    @Override
+    public void registerEventListeners(QuestlogEventBus bus) {
+        super.registerEventListeners(bus);
+        bus.addListener(this::onBlockTrample);
+    }
+
+    private void onBlockTrample(QLBlockEvent.FarmlandTrample event) {
+        if (this.isCompleted() || this.getParent() == null) return;
+        if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player)) {
+            this.setUnits(this.getUnits() + 1);
+        }
+    }
 }

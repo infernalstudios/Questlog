@@ -14,16 +14,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(InventoryScreen.class)
 public abstract class InventoryScreenMixin extends EffectRenderingInventoryScreen<InventoryMenu> {
-  public InventoryScreenMixin(InventoryMenu $$0, Inventory $$1, Component $$2) {
-    super($$0, $$1, $$2);
-    throw new UnsupportedOperationException("Mixin constructor");
-  }
-
-  @Inject(method = "init", at = @At("TAIL"))
-  private void injectQuestlogButton(CallbackInfo info) {
-    if (QuestlogConfig.Button.enabled) {
-      InventoryScreen self = (InventoryScreen) (Object) this;
-      this.addRenderableWidget(new QuestlogOpenButton(self));
+    public InventoryScreenMixin(InventoryMenu $$0, Inventory $$1, Component $$2) {
+        super($$0, $$1, $$2);
+        throw new UnsupportedOperationException("Mixin constructor");
     }
-  }
+
+    @Inject(method = "init", at = @At("TAIL"))
+    private void injectQuestlogButton(CallbackInfo info) {
+        if (QuestlogConfig.Button.enabled) {
+            InventoryScreen self = (InventoryScreen) (Object) this;
+            this.addRenderableWidget(new QuestlogOpenButton(self));
+        }
+    }
 }

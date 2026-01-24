@@ -1,88 +1,92 @@
 package org.infernalstudios.questlog.core.quests.objectives;
 
 import com.google.gson.JsonObject;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import net.minecraft.nbt.CompoundTag;
-import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
 
-  private final ObjectiveDisplayData display;
+    private final ObjectiveDisplayData display;
+    private final int totalUnits;
+    @CheckForNull
+    private Quest parent;
+    private int units;
 
-  @CheckForNull
-  private Quest parent;
+    public Objective(JsonObject definition) {
+        this.totalUnits = JsonUtils.getOrDefault(definition, "total", 1);
+        this.units = 0;
 
-  private final int totalUnits;
-  private int units;
-
-  public Objective(JsonObject definition) {
-    this.totalUnits = JsonUtils.getOrDefault(definition, "total", 1);
-    this.units = 0;
-
-    this.display = new ObjectiveDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
-    this.display.setObjective(this);
-  }
-
-  public void registerEventListeners(QuestlogEventBus bus) {}
-
-  public final void setParent(Quest parent) {
-    this.parent = parent;
-  }
-
-  @Nullable
-  public final Quest getParent() {
-    return this.parent;
-  }
-
-  public final void setUnits(int units) {
-    this.units = Math.min(units, this.totalUnits);
-    if (this.getParent() != null) {
-      this.getParent().markForUpdate();
+        this.display = new ObjectiveDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+        this.display.setObjective(this);
     }
-  }
 
-  public final int getUnits() {
-    return this.units;
-  }
+    public void registerEventListeners(QuestlogEventBus bus) {
+    }
 
-  public final int getTotalUnits() {
-    return this.totalUnits;
-  }
+    @Nullable
+    public final Quest getParent() {
+        return this.parent;
+    }
 
-  public final boolean isCompleted() {
-    return this.units >= this.totalUnits;
-  }
+    public final void setParent(@Nullable Quest parent) {
+        this.parent = parent;
+    }
 
-  @Override
-  public ObjectiveDisplayData getDisplay() {
-    return this.display;
-  }
+    public final int getUnits() {
+        return this.units;
+    }
 
-  /** {@inheritDoc} */
-  @Override
-  public void writeInitialData(CompoundTag data) {
-    data.putInt("units", this.units);
-  }
+    public final void setUnits(int units) {
+        this.units = Math.min(units, this.totalUnits);
+        if (this.getParent() != null) {
+            this.getParent().markForUpdate();
+        }
+    }
 
-  /** {@inheritDoc} */
-  @Override
-  public void deserialize(CompoundTag data) {
-    this.units = data.getInt("units");
-  }
+    public final int getTotalUnits() {
+        return this.totalUnits;
+    }
 
-  /** {@inheritDoc} */
-  @Override
-  public CompoundTag serialize() {
-    CompoundTag tag = new CompoundTag();
-    tag.putInt("units", this.units);
-    return tag;
-  }
+    public final boolean isCompleted() {
+        return this.units >= this.totalUnits;
+    }
+
+    @Override
+    public ObjectiveDisplayData getDisplay() {
+        return this.display;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void writeInitialData(CompoundTag data) {
+        data.putInt("units", this.units);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deserialize(CompoundTag data) {
+        this.units = data.getInt("units");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CompoundTag serialize() {
+        CompoundTag tag = new CompoundTag();
+        tag.putInt("units", this.units);
+        return tag;
+    }
 }

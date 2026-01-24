@@ -12,24 +12,24 @@ import org.infernalstudios.questlog.network.IPacketContext;
 // and should be displayed in the quest log.
 // Sent only to notify the client to post a QuestTriggeredEvent.
 public class QuestTriggeredPacket {
-  public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
+    public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
 
-  private final ResourceLocation id;
+    private final ResourceLocation id;
 
-  public QuestTriggeredPacket(ResourceLocation id) {
-    this.id = id;
-  }
+    public QuestTriggeredPacket(ResourceLocation id) {
+        this.id = id;
+    }
 
-  public void encode(FriendlyByteBuf buf) {
-    buf.writeResourceLocation(this.id);
-  }
+    public static QuestTriggeredPacket decode(FriendlyByteBuf buf) {
+        return new QuestTriggeredPacket(buf.readResourceLocation());
+    }
 
-  public static QuestTriggeredPacket decode(FriendlyByteBuf buf) {
-    return new QuestTriggeredPacket(buf.readResourceLocation());
-  }
+    public static void handle(QuestTriggeredPacket packet, IPacketContext ctx) {
+        QuestManager manager = QuestlogClient.getLocal();
+        QuestlogEvents.onQuestTriggered(new QuestEvent.Triggered(manager.player, manager.getQuest(packet.id), false));
+    }
 
-  public static void handle(QuestTriggeredPacket packet, IPacketContext ctx) {
-    QuestManager manager = QuestlogClient.getLocal();
-    QuestlogEvents.onQuestTriggered(new QuestEvent.Triggered(manager.player, manager.getQuest(packet.id), false));
-  }
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(this.id);
+    }
 }

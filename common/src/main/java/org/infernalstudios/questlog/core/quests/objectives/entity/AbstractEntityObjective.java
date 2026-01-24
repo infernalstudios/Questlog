@@ -10,23 +10,23 @@ import org.infernalstudios.questlog.util.JsonUtils;
 
 public abstract class AbstractEntityObjective extends Objective {
 
-  private final CachedRegistryPredicate<EntityType<?>> entity;
+    private final CachedRegistryPredicate<EntityType<?>> entity;
 
-  public AbstractEntityObjective(JsonObject definition) {
-    super(definition);
-    this.entity = new CachedRegistryPredicate<>(
-      JsonUtils.getString(definition, "entity"),
-      BuiltInRegistries.ENTITY_TYPE,
-      Object::equals,
-      (tag, entity) -> entity.is(tag)
-    );
-  }
+    public AbstractEntityObjective(JsonObject definition) {
+        super(definition);
+        this.entity = new CachedRegistryPredicate<>(
+                JsonUtils.getString(definition, "entity"),
+                BuiltInRegistries.ENTITY_TYPE,
+                Object::equals,
+                (tag, entity) -> entity.is(tag)
+        );
+    }
 
-  protected boolean test(EntityType<?> entity) {
-    return this.entity.test(entity);
-  }
+    protected boolean test(EntityType<?> entity) {
+        return this.entity.test(entity);
+    }
 
-  protected boolean test(Entity entity) {
-    return this.test(entity.getType());
-  }
+    protected boolean test(Entity entity) {
+        return this.test(entity.getType());
+    }
 }
