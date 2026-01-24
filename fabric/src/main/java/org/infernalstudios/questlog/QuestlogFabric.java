@@ -8,13 +8,16 @@ import org.infernalstudios.questlog.networking.QuestlogPacketsFabric;
 public class QuestlogFabric implements ModInitializer, ClientModInitializer {
     @Override
     public void onInitialize() {
-        QuestlogPacketsFabric.register();
+        QuestlogPacketsFabric.registerCommon();
         QuestlogFabricEventForwarder.init();
     }
 
     @Override
     public void onInitializeClient() {
         Questlog.initClient();
+
+        QuestlogPacketsFabric.registerClient();
+
         KeyBindingHelper.registerKeyBinding(QuestlogClient.OPEN_SCREEN_KEY);
         QuestlogFabricEventForwarder.initClient();
     }

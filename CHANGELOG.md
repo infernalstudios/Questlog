@@ -1,1 +1,1 @@
-* Fix crash related to collecting rewards.
+* Fix Fabric server crash.

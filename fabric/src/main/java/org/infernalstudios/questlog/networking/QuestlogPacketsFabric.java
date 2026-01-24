@@ -9,12 +9,19 @@ import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.QuestlogPackets;
 
 public class QuestlogPacketsFabric {
-    public static void register() {
+
+    public static void registerCommon() {
+        for (QuestlogPackets.RegisteredPacket<?> packet : QuestlogPackets.PACKETS) {
+            if (packet.direction() == IPacketContext.Direction.CLIENT_TO_SERVER) {
+                registerC2SPacket(packet);
+            }
+        }
+    }
+
+    public static void registerClient() {
         for (QuestlogPackets.RegisteredPacket<?> packet : QuestlogPackets.PACKETS) {
             if (packet.direction() == IPacketContext.Direction.SERVER_TO_CLIENT) {
                 registerS2CPacket(packet);
-            } else {
-                registerC2SPacket(packet);
             }
         }
     }
@@ -56,5 +63,4 @@ public class QuestlogPacketsFabric {
             );
         });
     }
-
 }
