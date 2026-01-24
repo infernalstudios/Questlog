@@ -8,7 +8,7 @@ import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.packet.*;
 
 public class QuestlogPacketsFabric {
-    public static void register() {
+    public static void registerCommon() {
         // Register S2C Payloads
         PayloadTypeRegistry.playS2C().register(QuestDataPacket.TYPE, QuestDataPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(QuestDefinitionPacket.TYPE, QuestDefinitionPacket.STREAM_CODEC);
@@ -20,19 +20,19 @@ public class QuestlogPacketsFabric {
         PayloadTypeRegistry.playC2S().register(QuestDefinitionHandledPacket.TYPE, QuestDefinitionHandledPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC);
 
-        // Register Receivers
-        registerReceivers();
+        // Register Server Receivers
+        registerServerReceivers();
     }
 
-    private static void registerReceivers() {
-        // Client Receivers
+    public static void registerClient() {
         ClientPlayNetworking.registerGlobalReceiver(QuestDataPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDataPacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestDefinitionPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDefinitionPacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestRemovePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestRemovePacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestTriggeredPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestTriggeredPacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestCompletedPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestCompletedPacket.handle(payload, createClientContext())));
+    }
 
-        // Server Receivers
+    private static void registerServerReceivers() {
         ServerPlayNetworking.registerGlobalReceiver(QuestDefinitionHandledPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestDefinitionHandledPacket.handle(payload, createServerContext(context.player()))));
         ServerPlayNetworking.registerGlobalReceiver(QuestRewardCollectPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestRewardCollectPacket.handle(payload, createServerContext(context.player()))));
     }

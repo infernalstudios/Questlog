@@ -28,8 +28,10 @@ public class QuestlogEvents {
     }
 
     public static void onServerStop() {
-        ServerPlayerManager.INSTANCE.save();
-        ServerPlayerManager.INSTANCE = null;
+        if (ServerPlayerManager.INSTANCE != null) {
+            ServerPlayerManager.INSTANCE.save();
+            ServerPlayerManager.INSTANCE = null;
+        }
         Questlog.EVENTS.removeAllListeners();
     }
 

@@ -22,7 +22,7 @@ import org.infernalstudios.questlog.event.events.QLEntityEvent;
 
 public class QuestlogFabricEventForwarder {
     public static void init() {
-        ServerLifecycleEvents.SERVER_STARTING.register(QuestlogEvents::onServerStart);
+        ServerLifecycleEvents.SERVER_STARTED.register(QuestlogEvents::onServerStart);
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> QuestlogEvents.onServerStop());
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> QuestlogEvents.onServerPlayerLogin(handler.player));
 
