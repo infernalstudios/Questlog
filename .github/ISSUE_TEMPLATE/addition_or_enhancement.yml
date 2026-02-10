@@ -22,4 +22,4 @@ body:
             required: false
     -   type: markdown
         attributes:
-            value: "Thank you for taking the time to suggest this addition and to help improve our mod!"
+            value: "Thank you for taking the time to suggest this addition and to help improve Questlog!"

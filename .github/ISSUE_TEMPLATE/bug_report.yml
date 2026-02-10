@@ -44,11 +44,14 @@ body:
             label: Mod Version
             description: The version of the mod you were using
             options:
+                - "1.0.8"
                 - "1.0.7"
                 - "1.0.6"
                 - "1.0.5"
                 - "1.0.4"
+                - "1.0.3"
                 - "1.0.2"
+                - "1.0.1"
                 - "1.0.0"
         validations:
             required: true
@@ -83,4 +86,4 @@ body:
             required: false
     -   type: markdown
         attributes:
-            value: "Thank you for taking the time to fill out this bug report and helping us build **Infernal Expansion Redux**!"
+            value: "Thank you for taking the time to fill out this bug report and helping us build Questlog!"
