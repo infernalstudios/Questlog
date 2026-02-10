@@ -100,8 +100,10 @@ public class QuestlogCommands {
         quest.triggers.forEach(trigger -> trigger.setUnits(0));
         quest.objectives.forEach(objective -> objective.setUnits(0));
         quest.rewards.forEach(Reward::revokeReward);
+        quest.hasSentTrigger = false;
+        quest.hasSentCompletion = false;
 
-        ctx.getSource().sendSuccess(() -> Component.translatable("command.questlog.reset.success", quest.getId()), true);
+        ctx.getSource().sendSuccess(() -> Component.translatable("command.questlog.reset.success", quest.getId().toString()), true);
 
         return 0;
     }
