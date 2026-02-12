@@ -1,3 +1,3 @@
-### Fixed
+### Added
 
-- Fixed `/questlog reset` causing server disconnects.
+- Added `not` and `or` filtering for objectives.

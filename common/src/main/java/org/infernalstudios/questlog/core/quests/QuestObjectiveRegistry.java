@@ -8,6 +8,8 @@ import org.infernalstudios.questlog.core.quests.objectives.block.BlockMineObject
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockPlaceObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.*;
 import org.infernalstudios.questlog.core.quests.objectives.item.*;
+import org.infernalstudios.questlog.core.quests.objectives.logic.NotObjective;
+import org.infernalstudios.questlog.core.quests.objectives.logic.OrObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.*;
 import org.infernalstudios.questlog.util.JsonUtils;
 
@@ -30,6 +32,10 @@ public class QuestObjectiveRegistry {
         register(new ResourceLocation("questlog", "entity_kill"), EntityKillObjective::new);
         register(new ResourceLocation("questlog", "entity_approach"), EntityApproachObjective::new);
         register(new ResourceLocation("questlog", "entity_tame"), EntityTameObjective::new);
+
+        // Logic
+        register(new ResourceLocation("questlog", "or"), OrObjective::new);
+        register(new ResourceLocation("questlog", "not"), NotObjective::new);
 
         // Item
         register(new ResourceLocation("questlog", "item_craft"), ItemCraftObjective::new);
