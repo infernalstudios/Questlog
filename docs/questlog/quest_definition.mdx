@@ -65,7 +65,7 @@ An objective is a task that the player must complete to finish a quest.
 Objectives can be anything from killing a mob to crafting an item.
 
 <pre>
-{
+\{
 // The type of objective.
 // Some types of objectives may require additional properties, for example, a block mining quest
 // requires a "block" field to specify the block type to mine.
@@ -82,7 +82,7 @@ Objectives can be anything from killing a mob to crafting an item.
 //
 // If this objective is a trigger, this will be disregarded.
 <strong>display</strong>?: <a href="#objectivedisplay">ObjectiveDisplay</a>,
-}
+\}
 </pre>
 
 ## Reward
@@ -91,7 +91,7 @@ Rewards are items or other benefits that the player receives upon completing a q
 They only show up in the quest details after the quest is completed.
 
 <pre>
-{
+\{
 // The type of reward. Some types of rewards may require additional properties.
 // See <a href="./reward_types">Reward Types</a> for a list of built-in reward types.
 <strong>type</strong>: <a href="#resourcelocation">ResourceLocation</a>,
@@ -104,13 +104,13 @@ They only show up in the quest details after the quest is completed.
 // The display information for the reward.
 // If not provided, the reward will use the default display information for its type.
 <strong>display</strong>?: <a href="#rewarddisplay">RewardDisplay</a>,
-}
+\}
 </pre>
 
 ## QuestDisplay
 
 <pre>
-{
+\{
 // The title of the quest.
 // Example: `&quot;Mine 100 Stone&quot;`
 <strong>title</strong>: string,
@@ -141,13 +141,13 @@ They only show up in the quest details after the quest is completed.
 // Hides the quest from the quest log.
 // This is useful for quests that should only show a popup.
 <strong>hidden</strong>?: boolean,
-}
+\}
 </pre>
 
 ## ObjectiveDisplay
 
 <pre>
-{
+\{
 // The name of the objective.
 // Example: `&quot;Mine 100 Stone&quot;`
 <strong>name</strong>: string,
@@ -162,13 +162,13 @@ They only show up in the quest details after the quest is completed.
 // and the client will attempt to translate it using the player's language settings.
 // Defaults to: false
 <strong>translatable</strong>?: boolean,
-}
+\}
 </pre>
 
 ## RewardDisplay
 
 <pre>
-{
+\{
 // The name of the reward.
 // Example: `&quot;100 Experience&quot;`
 <strong>name</strong>: string,
@@ -186,13 +186,13 @@ They only show up in the quest details after the quest is completed.
 
 // The sound to play when a reward is claimed.
 <strong>sound</strong>?: <a href="#rewardsoundoptions">RewardSoundOptions</a>,
-}
+\}
 </pre>
 
 ## StyleOptions
 
 <pre>
-{
+\{
 // The texture to use for the quest details and toasts.
 // Defaults to: { "texture": "questlog:textures/gui/quest_peripherals.png" }
 <strong>peripheral</strong>?: <a href="#texture">Texture</a>,
@@ -225,34 +225,34 @@ They only show up in the quest details after the quest is completed.
 // The color to use for the progress text for objectives and rewards when they're unclaimed.
 // Defaults to: "#9E7852"
 <strong>progressTextColor</strong>: string,
-}
+\}
 </pre>
 
 ## QuestSoundOptions
 
 <pre>
-{
+\{
 // The sound to play when a quest is completed.
 <strong>completed</strong>?: <a href="#resourcelocation">ResourceLocation</a>,
 
 // The sound to play when a quest is triggered.
 <strong>triggered</strong>?: <a href="#resourcelocation">ResourceLocation</a>,
-}
+\}
 </pre>
 
 ## RewardSoundOptions
 
 <pre>
-{
+\{
 // The sound to play when a reward is claimed.
 <strong>claimed</strong>?: <a href="#resourcelocation">ResourceLocation</a>,
-}
+\}
 </pre>
 
 ## NotificationOptions
 
 <pre>
-{
+\{
 // Enables the toast notification when the quest is triggered.
 <strong>toastOnTrigger</strong>?: boolean,
 
@@ -262,7 +262,7 @@ They only show up in the quest details after the quest is completed.
 // Determines whether to show a popup on trigger instead of a toast.
 // Read more in <a href="./popup">Popup</a>.
 <strong>popup</strong>?: boolean,
-}
+\}
 </pre>
 
 ## ResourceLocation
@@ -284,9 +284,9 @@ The path to the texture file.<br />
 This texture should always be a 16x16 image.
 
 <pre>
-{
+\{
 <strong>texture</strong>: <a href="#resourcelocation">ResourceLocation</a>,
-}
+\}
 </pre>
 
 Example:
@@ -302,9 +302,9 @@ Item ID to be used for rendering.<br />
 This mod respects item models, so you can use any item ID here, not just regular 2d items.
 
 <pre>
-{
+\{
 <strong>item</strong>: <a href="#resourcelocation">ResourceLocation</a>,
-}
+\}
 </pre>
 
 Example:
