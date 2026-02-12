@@ -34,8 +34,8 @@ public class QuestObjectiveRegistry {
         register(ResourceLocation.fromNamespaceAndPath("questlog", "entity_tame"), EntityTameObjective::new);
 
         // Logic
-        register(new ResourceLocation("questlog", "or"), OrObjective::new);
-        register(new ResourceLocation("questlog", "not"), NotObjective::new);
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "or"), OrObjective::new);
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "not"), NotObjective::new);
 
         // Item
         register(ResourceLocation.fromNamespaceAndPath("questlog", "item_craft"), ItemCraftObjective::new);
