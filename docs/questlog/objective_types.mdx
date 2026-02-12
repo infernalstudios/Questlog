@@ -6,14 +6,13 @@ hide_meta: true
 ### `questlog:stat`
 Uses the player's statistics to track progress.
 Every time the server updates the specified statistic, the completion amount goes up by that value.
-
 Additional definition fields:
 
 - `stat`: The stat to track. See below for a list of valid stats.
-- `trackSinceStart` (optional, default: true):<br>
-      By default (true), value will be tracked and incremented since the creation of the quest.<br>
+- `trackSinceStart` (optional, default: true):<br />
+      By default (true), value will be tracked and incremented since the creation of the quest.<br />
       If set to false, the completion value will be the player's total stat value.
-      This may be useful for something that may want to check a global statistic amount instead of the change of that statistic since the start of the quest.
+This may be useful for something that may want to check a global statistic amount instead of the change of that statistic since the start of the quest.
 
 <details>
     <summary>List of stats</summary>
@@ -97,7 +96,6 @@ Additional definition fields:
 
 ### `questlog:block_mine`
 Tracks the number of blocks mined by the player.
-
 Additional definition fields:
 
 - `block`: The block to track. May be the block itself or a tag prefixed with `#`.
@@ -107,39 +105,37 @@ Tracks the number of blocks placed by the player.
 
 Additional definition fields:
 
-- `block`: The block to track. May be the block itself or a tag prefixed with `#`.
+- `block`: The block to track.
+May be the block itself or a tag prefixed with `#`.
 
 ### `questlog:entity_breed`
 Tracks the number of times the player breeds entities.
 
 Additional definition fields:
 
-- `entity`: The entity to track. Does not support tags yet.
+- `entity`: The entity to track.
+Does not support tags yet.
 
 ### `questlog:entity_death`
 Tracks the number of times the player dies to a specific entity.
-
 Additional definition fields:
 
 - `entity`: The entity to track. Does not support tags yet.
 
 ### `questlog:entity_kill`
 Tracks the number of a specific type of entity the player kills.
-
 Additional definition fields:
 
 - `entity`: The entity to track. Does not support tags yet.
 
 ### `questlog:entity_tame`
 Tracks the number of a specific type of entity the player tames.
-
 Additional definition fields:
 
 - `entity`: The entity to track. Does not support tags yet.
 
 ### `questlog:item_craft`
 Tracks the number of a specific item the player crafts. This also tracks smelting recipes.
-
 Additional definition fields:
 
 - `item`: The item to track. May be the item itself or a tag prefixed with `#`.
@@ -149,22 +145,27 @@ Tracks the number of a specific item the player drops.
 
 Additional definition fields:
 
-- `item`: The item to track. May be the item itself or a tag prefixed with `#`.
+- `item`: The item to track.
+May be the item itself or a tag prefixed with `#`.
 
 ### `questlog:item_equip`
 Tracks the number of times the player equips a specific item.
 
 Additional definition fields:
 
-- `item`: The item to track. May be the item itself or a tag prefixed with `#`.
+- `item`: The item to track.
+May be the item itself or a tag prefixed with `#`.
 - `slot`: The equipment slot to track.
 
 ### `questlog:item_obtain`
-Tracks the number of a specific item the player obtains. This method checks the entire inventory every second, and is generally not the option you're looking for. Avoid using this unless absolutely necessary.
+Tracks the number of a specific item the player obtains.
+This method checks the entire inventory every second, and is generally not the option you're looking for.
+Avoid using this unless absolutely necessary.
 
 Additional definition fields:
 
-- `item`: The item to track. May be the item itself or a tag prefixed with `#`.
+- `item`: The item to track.
+May be the item itself or a tag prefixed with `#`.
 
 ### `questlog:item_pickup`
 Tracks the number of a specific item the player picks up.
@@ -172,53 +173,50 @@ Note: Does not work on Fabric yet
 
 Additional definition fields:
 
-- `item`: The item to track. May be the item itself or a tag prefixed with `#`.
+- `item`: The item to track.
+May be the item itself or a tag prefixed with `#`.
 
 ### `questlog:item_use`
 Tracks the number of times the player uses a specific item.
 
 Additional definition fields:
 
-- `item`: The item to track. May be the item itself or a tag prefixed with `#`.
+- `item`: The item to track.
+May be the item itself or a tag prefixed with `#`.
 
 ### `questlog:visit_biome`
 Tracks the number of times the player visits a specific biome.
 
 Additional definition fields:
 
-- `biome`: The biome to track. Does not support tags yet.
+- `biome`: The biome to track.
+Does not support tags yet.
 
 ### `questlog:visit_dimension`
 Tracks the number of times the player visits a specific dimension.
-
 Additional definition fields:
 
 - `dimension`: The dimension to track. Does not support tags yet.
 
 ### `questlog:visit_position`
 Tracks the number of times the player visits a specific position.
-
 Additional definition fields:
 
-- `bounds`: The bounding box of the position to track. Contains the following fields (all optional, default to extrema):
+- `bounds`: The bounding box of the position to track.
+Contains the following fields (all optional, default to extrema):
   - `bounds.minX`: The minimum X coordinate of the bounding box.
-
   - `bounds.minY`: The minimum Y coordinate of the bounding box.
-
   - `bounds.minZ`: The minimum Z coordinate of the bounding box.
-
   - `bounds.maxX`: The maximum X coordinate of the bounding box.
-
   - `bounds.maxY`: The maximum Y coordinate of the bounding box.
-
   - `bounds.maxZ`: The maximum Z coordinate of the bounding box.
 
 ### `questlog:trample`
-Tracks the number of times the player tramples farmland. This also works with modded farmland (so long the block extends `FarmBlock`), like Farmer's Delight's Rich Soil.
+Tracks the number of times the player tramples farmland.
+This also works with modded farmland (so long the block extends `FarmBlock`), like Farmer's Delight's Rich Soil.
 
 ### `questlog:enchant`
 Tracks the number of times the player enchants an item with a specific enchantment.
-
 Additional definition fields:
 
 - `enchantment` (optional): The enchantment to track.
@@ -233,29 +231,27 @@ These fields are additive, they will only count if every specified predicate tes
 
 ### `questlog:effect_added`
 Tracks the number of times the player gains a specific effect. Does not support tags yet.
-
 Additional definition fields:
 
 - `effect`: The effect to track.
 
 ### `questlog:visit_structure`
 Tracks the number of times the player is in a structure.
-
 Additional definition fields:
 
 - `structure`: The structure to check.
 
 ### `questlog:or`
 Completes if **any** of the listed child objectives are completed.
-
 Additional definition fields:
 
-- `objectives`: A list of objective definitions. The quest logic will check each of these; if one is complete, the `or` objective is complete.
+- `objectives`: A list of objective definitions. The quest logic will check each of these;
+if one is complete, the `or` objective is complete.
 
 ### `questlog:not`
-Completes if the child objective is **not** completed. This acts as an inverter.
+Completes if the child objective is **not** completed.
+This acts as an inverter.
 This is primarily useful in **triggers** to start a quest only if a player has *not* done something (e.g., "Start this quest if the player has NOT visited the Nether yet").
-
 Additional definition fields:
 
 - `objective`: The single objective definition to invert.
