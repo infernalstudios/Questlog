@@ -12,7 +12,7 @@ subprojects {
 
 wiki {
     wikiAccessToken = System.getenv("WIKI_ACCESS_TOKEN")
-    docs.create("reliable-replacer") {
+    docs.create("questlog") {
         root = file("docs/")
     }
 }
