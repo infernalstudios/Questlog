@@ -33,11 +33,11 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         return this.parent;
     }
 
-    public final void setParent(@Nullable Quest parent) {
+    public void setParent(@Nullable Quest parent) {
         this.parent = parent;
     }
 
-    public final int getUnits() {
+    public int getUnits() {
         return this.units;
     }
 
@@ -48,11 +48,11 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         }
     }
 
-    public final int getTotalUnits() {
+    public int getTotalUnits() {
         return this.totalUnits;
     }
 
-    public final boolean isCompleted() {
+    public boolean isCompleted() {
         return this.units >= this.totalUnits;
     }
 
