@@ -1,0 +1,287 @@
+---
+title: Quest Definition
+hide_meta: true
+---
+
+## Quest
+To add quest definitions, you need to create a JSON file for each quest.
+These JSON files should be placed in the `quests` directory of your datapack.
+
+Note: There are no defaults for `triggers`, `objectives`, and `rewards`, they are always required, even if it's an empty array.  
+<pre>
+{
+  // A list of objectives that will trigger the quest to appear and start tracking the quest's objective goals.
+  // If the array is empty, the quest will be available to start immediately.
+  <strong>triggers</strong>: <a href="#Objective">Objective</a>[],
+
+  // A list of objectives that the player must complete to finish the quest.
+  // If the array is empty, the quest will be completed immediately.
+  <strong>objectives</strong>: <a href="#Objective">Objective</a>[],
+
+  // A list of rewards that the player will receive upon completing the quest.
+  // If the array is empty, the player will receive no rewards.
+  <strong>rewards</strong>: <a href="#Reward">Reward</a>[],
+
+  // The display information for the quest.
+  <strong>display</strong>: <a href="#QuestDisplay">QuestDisplay</a>,
+}
+</pre>
+
+Example: 
+```json
+{
+  "triggers": [],
+  "objectives": [
+    {
+     "type": "questlog:block_mine",
+     "total": 100
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "amount": 100,
+      "levels": false,
+      "instant": true,
+      "display": {
+        "name": "100 Experience",
+        "icon": { "item": "minecraft:experience_bottle" }
+      }
+    }
+  ],
+  "display": {
+      "title": "Mine 100 Stone",
+      "description": "Mine 100 stone blocks.",
+      "icon": "minecraft:textures/item/stone.png"
+  }
+}
+```
+## Objective
+An objective is a task that the player must complete to finish a quest.
+Objectives can be anything from killing a mob to crafting an item.  
+<pre>
+{
+  // The type of objective.
+  // Some types of objectives may require additional properties, for example, a block mining quest
+  // requires a "block" field to specify the block type to mine.
+  // 
+  // See <a href="./Objective-Types">Objective Types</a> for a list of built-in objective types.
+  <strong>type</strong>: <a href="#ResourceLocation">ResourceLocation</a>,
+
+  // The total number of times the player must complete the set task to finish the objective.
+  // For example, if the objective is to mine 100 stone blocks, the total would be `100`.
+  <strong>total</strong>: number,
+
+  // The display information for the objective.
+  // If not provided, the objective will use the default display information for its type.
+  // 
+  // If this objective is a trigger, this will be disregarded.
+  <strong>display</strong>?: <a href="#ObjectiveDisplay">ObjectiveDisplay</a>,
+}
+</pre>
+
+## Reward
+Rewards are items or other benefits that the player receives upon completing a quest.<br>
+They only show up in the quest details after the quest is completed.  
+<pre>
+{
+  // The type of reward. Some types of rewards may require additional properties.
+  // See <a href="./Reward-Types">Reward Types</a> for a list of built-in reward types.
+  <strong>type</strong>: <a href="#ResourceLocation">ResourceLocation</a>,
+
+  // Determines if the player will receive the reward instantly upon completing the quest or if
+  // they will have to claim it manually.
+  // Defaults to: false
+  <strong>instant</strong>?: boolean,
+
+  // The display information for the reward.
+  // If not provided, the reward will use the default display information for its type.
+  <strong>display</strong>?: <a href="#RewardDisplay">RewardDisplay</a>,
+}
+</pre>
+
+## QuestDisplay
+<pre>
+{
+  // The title of the quest.
+  // Example: `"Mine 100 Stone"`
+  <strong>title</strong>: string,
+
+  // The description of the quest. May contain line breaks (`\n`), or formatting codes using `§`.
+  // Example: `"Mine 100 stone blocks."`
+  <strong>description</strong>: string,
+
+  // The icon to display for the quest.
+  // This is used in the quest log and in the quest start toast.
+  // If not provided, no icon will be displayed.
+  <strong>icon</strong>?: <a href="#Renderable">Renderable</a>,
+
+  // Whether the title and description are translatable strings.
+  // If true, the title and description will be treated as translation keys,
+  // and the client will attempt to translate them using the player's language settings.
+  // Defaults to: false
+  <strong>translatable</strong>?: boolean,
+
+  // The sound to play when the quest is completed or triggered.
+  <strong>sound</strong>?: <a href="#QuestSoundOptions">QuestSoundOptions</a>,
+  <strong>style</strong>?: <a href="#StyleOptions">StyleOptions</a>,
+
+  // Notification options for the quest.
+  <strong>notification</strong>?: <a href="#NotificationOptions">NotificationOptions</a>,
+
+  // Hides the quest from the quest log.
+  // This is useful for quests that should only show a popup.
+  <strong>hidden</strong>?: boolean,
+}
+</pre>
+
+## ObjectiveDisplay
+<pre>
+{
+  // The name of the objective.
+  // Example: `"Mine 100 Stone"`
+  <strong>name</strong>: string,
+
+  // The icon to display for the objective.
+  // This is used in the quest details screen.
+  // If not provided, no icon will be displayed.
+  <strong>icon</strong>?: <a href="#Renderable">Renderable</a>,
+
+  // Whether the name is a translatable string.
+  // If true, the name will be treated as a translation key,
+  // and the client will attempt to translate it using the player's language settings.
+  // Defaults to: false
+  <strong>translatable</strong>?: boolean,
+}
+</pre>
+
+## RewardDisplay
+<pre>
+{
+  // The name of the reward.
+  // Example: `"100 Experience"`
+  <strong>name</strong>: string,
+
+  // The icon to display for the reward.
+  // This is used in the quest details screen.
+  // If not provided, the reward will use the default icon for its type.
+  <strong>icon</strong>?: <a href="#Renderable">Renderable</a>,
+
+  // Whether the name is a translatable string.
+  // If true, the name will be treated as a translation key,
+  // and the client will attempt to translate it using the player's language settings.
+  // Defaults to: false
+  <strong>translatable</strong>?: boolean,
+
+  // The sound to play when a reward is claimed.
+  <strong>sound</strong>?: <a href="#RewardSoundOptions">RewardSoundOptions</a>,
+}
+</pre>
+
+## StyleOptions
+<pre>
+{
+  // The texture to use for the quest details and toasts.
+  // Defaults to: { "texture": "questlog:textures/gui/quest_peripherals.png" }
+  <strong>peripheral</strong>?: <a href="#Texture">Texture</a>,
+
+  // The texture to use for the quest page background.
+  // Defaults to: { "texture": "questlog:textures/gui/quest_page.png" }
+  <strong>background</strong>?: <a href="#Texture">Texture</a>,
+
+  // The text to use for the "Back" button in the quest details screen.
+  // This is affected by the `translatable` option.
+  // Defaults to: "gui.back" translation
+  <strong>buttonText</strong>?: string,
+
+  // The text color to use for the description, objective, reward, and button text.
+  // Defaults to: "#4C381B"
+  <strong>textColor</strong>: string,
+
+  // The color to use for the "Completed" and "Collected" text for objectives and rewards.
+  // Defaults to: "#529E52"
+  <strong>completedTextColor</strong>: string,
+
+  // The color to use for the button text when the button is hovered over.
+  // Defaults to: "#FFFFFF"
+  <strong>hoveredTextColor</strong>: string,
+
+  // The color to use for the quest title.
+  // Defaults to: "#4C381B"
+  <strong>titleColor</strong>: string,
+
+  // The color to use for the progress text for objectives and rewards when they're unclaimed.
+  // Defaults to: "#9E7852"
+  <strong>progressTextColor</strong>: string,
+}
+</pre>
+
+## QuestSoundOptions
+<pre>
+{
+  // The sound to play when a quest is completed.
+  <strong>completed</strong>?: <a href="#ResourceLocation">ResourceLocation</a>,
+
+  // The sound to play when a quest is triggered.
+  <strong>triggered</strong>?: <a href="#ResourceLocation">ResourceLocation</a>,
+}
+</pre>
+
+## RewardSoundOptions
+<pre>
+{
+  // The sound to play when a reward is claimed.
+  <strong>claimed</strong>?: <a href="#ResourceLocation">ResourceLocation</a>,
+}
+</pre>
+
+## NotificationOptions
+<pre>
+{
+  // Enables the toast notification when the quest is triggered.
+  <strong>toastOnTrigger</strong>?: boolean,
+
+  // Enables the toast notification when the quest is completed.
+  <strong>toastOnComplete</strong>?: boolean,
+
+  // Determines whether to show a popup on trigger instead of a toast. Read more in <a href="./Popup">Popup</a>.
+  <strong>popup</strong>?: boolean,
+}
+</pre>
+
+## ResourceLocation
+A resource location is a string that identifies a resource in the game.<br>
+It is formatted as `namespace:path`. You may have seen this in Minecraft's
+item IDs, such as `minecraft:diamond_sword`.  
+Type: string
+
+## Renderable
+This provides a way to specify a texture or item to be rendered as an icon in the game.  
+Type: [Texture](#Texture) | [Item](#Item)
+
+## Texture
+The path to the texture file.<br>
+This texture should always be a 16x16 image.  
+<pre>
+{
+  <strong>texture</strong>: <a href="#ResourceLocation">ResourceLocation</a>,
+}
+</pre>
+
+Example: 
+```json
+{ "texture": "minecraft:textures/mob_effect/luck.png" }
+```
+## Item
+Item ID to be used for rendering.<br>
+This mod respects item models, so you can use any item ID here, not just regular 2d items.  
+<pre>
+{
+  <strong>item</strong>: <a href="#ResourceLocation">ResourceLocation</a>,
+}
+</pre>
+
+Example: 
+```json
+{ "item": "minecraft:grass_block" }
+```
