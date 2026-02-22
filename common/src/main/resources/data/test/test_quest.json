@@ -1,0 +1,26 @@
+{
+  "display": {
+    "title": "A Sticky Situation",
+    "description": "Pick up 5 sticks to test quest persistence.",
+    "icon": {
+      "item": "minecraft:stick"
+    },
+    "notification": {
+      "toastOnComplete": true
+    }
+  },
+  "triggers": [],
+  "objectives": [
+    {
+      "type": "questlog:item_pickup",
+      "item": "minecraft:stick",
+      "total": 5
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 10
+    }
+  ]
+}

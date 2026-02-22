@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class QuestManager {
-    public final Player player;
     private final Map<ResourceLocation, Quest> quests = new LinkedHashMap<>();
+    public Player player;
 
     public QuestManager(Player player) {
         this.player = player;

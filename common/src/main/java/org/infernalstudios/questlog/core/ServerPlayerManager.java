@@ -38,8 +38,10 @@ public class ServerPlayerManager {
     }
 
     public QuestManager getManagerByPlayer(Player player) {
-        if (!this.questManagers.containsKey(player.getUUID()) || this.questManagers.get(player.getUUID()).player != player) {
+        if (!this.questManagers.containsKey(player.getUUID())) {
             this.addPlayer(player);
+        } else if (this.questManagers.get(player.getUUID()).player != player) {
+            this.questManagers.get(player.getUUID()).player = player;
         }
 
         return this.questManagers.get(player.getUUID());

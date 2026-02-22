@@ -1,3 +1,3 @@
-### Added
+### Fixed
 
-- Added `not` and `or` filtering for objectives.
+- Fixed player data persistence on servers.
