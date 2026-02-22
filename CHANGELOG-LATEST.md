@@ -1,3 +1,3 @@
-### Fixed
+### Hotfix
 
-- Fixed player data persistence on servers.
+- Removed debug quest.
