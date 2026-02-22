@@ -25,17 +25,18 @@ public class QuestlogClient {
      */
     public static QuestManager getLocal() {
         if (QUEST_MANAGER_INSTANCE != null && QUEST_MANAGER_INSTANCE.player == null) {
-            // Destroy the QuestManager instance if the player is null
             QUEST_MANAGER_INSTANCE = null;
         }
 
-        if (QUEST_MANAGER_INSTANCE == null || !QUEST_MANAGER_INSTANCE.player.getUUID().equals(Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getUUID() : null)) {
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player == null) {
+        LocalPlayer mcPlayer = Minecraft.getInstance().player;
+        if (QUEST_MANAGER_INSTANCE == null || !QUEST_MANAGER_INSTANCE.player.getUUID().equals(mcPlayer != null ? mcPlayer.getUUID() : null)) {
+            if (mcPlayer == null) {
                 throw new NullPointerException("QuestManager cannot be initialized, player is null\n");
             }
 
-            QUEST_MANAGER_INSTANCE = new QuestManager(player);
+            QUEST_MANAGER_INSTANCE = new QuestManager(mcPlayer);
+        } else if (QUEST_MANAGER_INSTANCE.player != mcPlayer) {
+            QUEST_MANAGER_INSTANCE.player = mcPlayer;
         }
 
         if (!QUEST_MANAGER_INSTANCE.isClient()) {
