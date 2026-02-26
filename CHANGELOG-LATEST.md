@@ -1,3 +1,3 @@
-### Hotfix
+### Fixed
 
-- Removed debug quest.
+- `item_obtain` objectives no longer cause items to be unstackable.
