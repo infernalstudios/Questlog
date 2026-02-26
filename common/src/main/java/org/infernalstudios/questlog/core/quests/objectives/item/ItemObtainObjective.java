@@ -1,41 +1,17 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
 import com.google.gson.JsonObject;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class ItemObtainObjective extends AbstractItemObjective {
 
-    @Nullable
-    private String uniqueTagCache = null;
     private int ticksUntilCheck = 0;
 
     public ItemObtainObjective(JsonObject definition) {
         super(definition);
-    }
-
-    private String getUniqueTag() {
-        if (this.uniqueTagCache == null) {
-            this.uniqueTagCache =
-                    "questlog_tracked_" +
-                            Objects.hash(
-                                    this.getTotalUnits(),
-                                    this.getParent().getId(),
-                                    this.getParent().objectives.indexOf(this),
-                                    this.getParent().manager.player.getUUID()
-                            );
-        }
-        return this.uniqueTagCache;
     }
 
     @Override
@@ -47,27 +23,17 @@ public class ItemObtainObjective extends AbstractItemObjective {
     private void onPlayerTick(QLPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
-            List<ItemStack> stacks = new ArrayList<>();
+            int totalCount = 0;
 
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = player.getInventory().getItem(i);
                 if (this.test(stack)) {
-                    stacks.add(stack);
+                    totalCount += stack.getCount();
                 }
             }
 
-            for (ItemStack stack : stacks) {
-                CustomData customData = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY);
-                CompoundTag tag = customData.copyTag();
-
-                if (tag.contains(this.getUniqueTag()) && tag.getBoolean(this.getUniqueTag())) {
-                    continue;
-                }
-
-                this.setUnits(this.getUnits() + stack.getCount());
-
-                tag.putBoolean(this.getUniqueTag(), true);
-                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+            if (totalCount > this.getUnits()) {
+                this.setUnits(totalCount);
             }
 
             ticksUntilCheck = 20;
