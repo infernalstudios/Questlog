@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `item_obtain` objectives no longer cause items to be unstackable.
 
+### Changed
+
+- Deprecated `item_pickup` in favor of `item_obtain`.
+
 ## [1.1.2] - 2026-02-21
 
 ### Hotfix
