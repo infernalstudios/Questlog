@@ -1,26 +1,12 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
 import com.google.gson.JsonObject;
-import net.minecraft.server.level.ServerPlayer;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLEntityEvent;
+import org.infernalstudios.questlog.Questlog;
 
-public class ItemPickupObjective extends AbstractItemObjective {
+public class ItemPickupObjective extends ItemObtainObjective {
 
     public ItemPickupObjective(JsonObject definition) {
         super(definition);
-    }
-
-    @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onItemPickup);
-    }
-
-    private void onItemPickup(QLEntityEvent.PickupItem event) {
-        if (this.isCompleted() || this.getParent() == null) return;
-        if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.item)) {
-            this.setUnits(this.getUnits() + event.item.getCount());
-        }
+        Questlog.LOGGER.warn("Objective type 'questlog:item_pickup' is deprecated. It is currently redirecting to 'questlog:item_obtain' behavior and will be removed in a future release. Please update your quests!");
     }
 }

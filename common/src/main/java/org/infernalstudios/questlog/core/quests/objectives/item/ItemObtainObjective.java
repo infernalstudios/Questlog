@@ -22,21 +22,22 @@ public class ItemObtainObjective extends AbstractItemObjective {
 
     private void onPlayerTick(QLPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
-        if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
-            int totalCount = 0;
 
+        if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
+
+            int currentCount = 0;
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 ItemStack stack = player.getInventory().getItem(i);
                 if (this.test(stack)) {
-                    totalCount += stack.getCount();
+                    currentCount += stack.getCount();
                 }
             }
 
-            if (totalCount > this.getUnits()) {
-                this.setUnits(totalCount);
+            if (currentCount > this.getUnits()) {
+                this.setUnits(currentCount);
             }
 
-            ticksUntilCheck = 20;
+            this.ticksUntilCheck = 10;
         }
     }
 }
