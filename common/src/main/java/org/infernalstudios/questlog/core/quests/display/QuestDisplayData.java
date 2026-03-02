@@ -70,17 +70,10 @@ public class QuestDisplayData {
                 JsonUtils.getOrDefault(data, "progress_text_color", "#9E7852")
         );
 
-        String buttonTextRaw = JsonUtils.getOrDefault(data, "back_button_text", (String) null);
-        this.backButtonText = buttonTextRaw == null ? Component.translatable("gui.back") : (translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw));
-
-        String collectButtonTextRaw = JsonUtils.getOrDefault(data, "collect_button_text", (String) null);
-        this.collectButtonText = collectButtonTextRaw == null ? Component.translatable("questlog.reward.collect") : (translatable ? Component.translatable(collectButtonTextRaw) : Component.literal(collectButtonTextRaw));
-
-        String uncollectedTextRaw = JsonUtils.getOrDefault(data, "uncollected_text", (String) null);
-        this.uncollectedText = uncollectedTextRaw == null ? Component.translatable("questlog.reward.uncollected") : (translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw));
-
-        String collectedTextRaw = JsonUtils.getOrDefault(data, "collected_text", (String) null);
-        this.collectedText = collectedTextRaw == null ? Component.translatable("questlog.reward.collected") : (translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw));
+        this.backButtonText = parseComponent(data, "back_button_text", "gui.back", translatable);
+        this.collectButtonText = parseComponent(data, "collect_button_text", "questlog.reward.collect", translatable);
+        this.uncollectedText = parseComponent(data, "uncollected_text", "questlog.reward.uncollected", translatable);
+        this.collectedText = parseComponent(data, "collected_text", "questlog.reward.collected", translatable);
 
         this.toastOnTrigger = JsonUtils.getOrDefault(data, "toast_on_trigger", true);
         this.toastOnComplete = JsonUtils.getOrDefault(data, "toast_on_complete", true);
