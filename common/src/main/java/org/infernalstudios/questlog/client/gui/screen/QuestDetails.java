@@ -98,8 +98,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.backButton = new QuestlogButton(
                 this.x + BUTTON_X,
                 this.y + BUTTON_Y,
-                this.getPalette().textColor,
-                this.getPalette().hoveredTextColor,
+                this.getPalette().textColor(),
+                this.getPalette().hoveredTextColor(),
                 this.getDisplay().getBackButtonText(),
                 () -> {
                     if (this.quest.isCompleted() && !this.quest.isRewarded()) {
@@ -133,7 +133,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.y + CONTENT_Y,
                 CONTENT_WIDTH,
                 CONTENT_HEIGHT - this.getInfoHeight() - DESCRIPTION_INFO_PADDING,
-                new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor)
+                new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor())
         );
         // We render this ourselves, don't use addRenderableWidget.
         this.addWidget(this.description);
@@ -190,7 +190,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         // Title
         y += (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
-        ps.drawString(font, displayData.getTitle(), (int) x, (int) y, this.getPalette().titleColor, false);
+        ps.drawString(font, displayData.getTitle(), (int) x, (int) y, this.getPalette().titleColor(), false);
 
         this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, true);
     }
@@ -353,7 +353,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             Font font = Minecraft.getInstance().font;
             int x = this.x + (hasIcon ? 18 : 0);
             int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
-            ps.drawString(font, name, x, y, QuestDetails.this.getPalette().textColor, false);
+            ps.drawString(font, name, x, y, QuestDetails.this.getPalette().textColor(), false);
 
             return font.width(name) + (hasIcon ? 18 : 0);
         }
@@ -374,8 +374,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                     x,
                     y,
                     this.objectiveDisplayData.isCompleted()
-                            ? QuestDetails.this.getPalette().completedTextColor
-                            : QuestDetails.this.getPalette().progressTextColor,
+                            ? QuestDetails.this.getPalette().completedTextColor()
+                            : QuestDetails.this.getPalette().progressTextColor(),
                     false
             );
         }
@@ -404,8 +404,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                     x,
                     y,
                     this.rewardDisplayData.hasRewarded()
-                            ? QuestDetails.this.getPalette().completedTextColor
-                            : QuestDetails.this.getPalette().progressTextColor,
+                            ? QuestDetails.this.getPalette().completedTextColor()
+                            : QuestDetails.this.getPalette().progressTextColor(),
                     false
             );
         }
