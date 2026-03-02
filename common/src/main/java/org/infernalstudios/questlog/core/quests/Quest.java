@@ -62,7 +62,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     }
 
     public static Quest create(JsonObject definition, ResourceLocation id, QuestManager manager) {
-        QuestDisplayData display = new QuestDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+        QuestDisplayData display = new QuestDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()), id);
         List<Objective> triggers = new ArrayList<>();
         List<Objective> objectives = new ArrayList<>();
         List<Reward> rewards = new ArrayList<>();

@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -41,54 +40,27 @@ public class DefinitionUtil {
         protected @NotNull Map<ResourceLocation, JsonElement> prepare(ResourceManager manager, @NotNull ProfilerFiller profiler) {
             Map<ResourceLocation, JsonElement> prepared = new HashMap<>();
 
-            List<Resource> allQuestFiles = manager.getResourceStack(new ResourceLocation("questlog", "quests.json"));
+            Map<ResourceLocation, Resource> resources = manager.listResources("quests", loc -> loc.getPath().endsWith(".json"));
 
-            if (allQuestFiles.isEmpty()) {
-                Questlog.LOGGER.warn("No quests.json file found!");
-                return Map.of();
-            }
+            for (Map.Entry<ResourceLocation, Resource> entry : resources.entrySet()) {
+                ResourceLocation fullLoc = entry.getKey();
+                String path = fullLoc.getPath();
 
-            List<ResourceLocation> quests = new ArrayList<>();
-
-            for (Resource res : allQuestFiles) {
-                JsonObject json;
+                String questName = path.substring("quests/".length(), path.length() - ".json".length());
+                ResourceLocation questId = new ResourceLocation(fullLoc.getNamespace(), questName);
 
                 try {
-                    json = Util.getJsonResource(res);
+                    JsonObject json = Util.getJsonResource(entry.getValue());
+                    prepared.put(questId, json);
                 } catch (MalformedJsonException e) {
-                    Questlog.LOGGER.error("Malformed JSON in quests.json in datapack {}", res.sourcePackId(), e);
-                    continue;
+                    Questlog.LOGGER.error("Malformed JSON in quest file {}", fullLoc, e);
                 } catch (IOException e) {
-                    Questlog.LOGGER.error("Error reading quests.json in datapack {}", res.sourcePackId(), e);
-                    continue;
-                }
-
-                JsonArray locArray = json.getAsJsonArray("quests");
-
-                for (int i = 0; i < locArray.size(); i++) {
-                    ResourceLocation loc = new ResourceLocation(locArray.get(i).getAsString());
-                    if (quests.contains(loc)) {
-                        Questlog.LOGGER.warn("Duplicate quest in quests.json found: {}, skipping", loc);
-                    } else {
-                        quests.add(loc);
-                    }
+                    Questlog.LOGGER.error("Error reading quest file {}", fullLoc, e);
                 }
             }
 
-            if (quests.isEmpty()) {
-                Questlog.LOGGER.warn("No quests found!");
-                return Map.of();
-            }
-
-            for (ResourceLocation quest : quests) {
-                try {
-                    JsonObject json = Util.getJsonResource(manager, quest);
-                    prepared.put(quest, json);
-                } catch (MalformedJsonException e) {
-                    Questlog.LOGGER.error("Malformed JSON in quest file {}", quest, e);
-                } catch (IOException e) {
-                    Questlog.LOGGER.error("Error reading quest file {}", quest, e);
-                }
+            if (prepared.isEmpty()) {
+                Questlog.LOGGER.warn("No quests found in any datapacks!");
             }
 
             return prepared;

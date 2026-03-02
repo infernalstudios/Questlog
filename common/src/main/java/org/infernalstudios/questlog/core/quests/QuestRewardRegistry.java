@@ -26,11 +26,16 @@ public class QuestRewardRegistry {
     }
 
     public static Reward create(JsonObject definition) {
+        String typeString = JsonUtils.getString(definition, "type");
+        if (!typeString.contains(":")) {
+            typeString = "questlog:" + typeString;
+        }
+
         ResourceLocation type;
         try {
-            type = new ResourceLocation(JsonUtils.getString(definition, "type"));
+            type = new ResourceLocation(typeString);
         } catch (ResourceLocationException e) {
-            throw new IllegalStateException("Invalid reward type: " + JsonUtils.getString(definition, "type"));
+            throw new IllegalStateException("Invalid reward type: " + typeString);
         }
 
         return QuestRewardRegistry.create(type, definition);

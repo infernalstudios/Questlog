@@ -10,8 +10,8 @@ import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,43 +41,47 @@ public class QuestDisplayData {
     @Nullable
     private List<RewardDisplayData> rewardDisplay = null;
 
-    public QuestDisplayData(JsonObject data) {
-        boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
-        String title = JsonUtils.getString(data, "title");
-        String description = JsonUtils.getString(data, "description");
+    public QuestDisplayData(JsonObject data, ResourceLocation id) {
+        String formattedPath = id.getPath().replace('/', '.');
+        String defaultTitleKey = "quest." + id.getNamespace() + "." + formattedPath + ".title";
+        String defaultDescKey = "quest." + id.getNamespace() + "." + formattedPath + ".description";
 
-        this.title = translatable ? Component.translatable(title) : Component.literal(title);
-        this.description = translatable ? Component.translatable(description) : Component.literal(description);
+        String rawTitle = JsonUtils.getOrDefault(data, "title", (String) null);
+        String rawDescription = JsonUtils.getOrDefault(data, "description", (String) null);
+
+        boolean translatable;
+        if (data.has("translatable")) {
+            translatable = data.get("translatable").getAsBoolean();
+        } else {
+            translatable = (rawTitle == null);
+        }
+
+        String finalTitle = (rawTitle != null) ? rawTitle : defaultTitleKey;
+        String finalDescription = (rawDescription != null) ? rawDescription : defaultDescKey;
+
+        this.title = translatable ? Component.translatable(finalTitle) : Component.literal(finalTitle);
+        this.description = translatable ? Component.translatable(finalDescription) : Component.literal(finalDescription);
+
         this.icon = JsonUtils.getIcon(data, "icon");
 
-        String completedSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "completed", (String) null);
-
+        JsonObject sound = JsonUtils.getOrDefault(data, "sound", new JsonObject());
+        String completedSoundLoc = JsonUtils.getOrDefault(sound, "completed", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
 
-        String triggeredSoundLoc = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "triggered", (String) null);
-
+        String triggeredSoundLoc = JsonUtils.getOrDefault(sound, "triggered", (String) null);
         this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
         JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
 
         String backgroundLoc = style.has("background")
-                ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "background", new JsonObject()), "texture", (String) null)
+                ? JsonUtils.getOrDefault(style.getAsJsonObject("background"), "texture", (String) null)
                 : null;
-
-        if (backgroundLoc == null) {
-            backgroundLoc = Questlog.MODID + ":textures/gui/quest_page.png";
-        }
+        this.bgTexture = new ResourceLocation(backgroundLoc == null ? Questlog.MODID + ":textures/gui/quest_page.png" : backgroundLoc);
 
         String peripheralLoc = style.has("peripheral")
-                ? JsonUtils.getOrDefault(JsonUtils.getOrDefault(style, "peripheral", new JsonObject()), "texture", (String) null)
+                ? JsonUtils.getOrDefault(style.getAsJsonObject("peripheral"), "texture", (String) null)
                 : null;
-
-        if (peripheralLoc == null) {
-            peripheralLoc = Questlog.MODID + ":textures/gui/quest_peripherals.png";
-        }
-
-        this.bgTexture = new ResourceLocation(backgroundLoc);
-        this.peripheralTexture = new ResourceLocation(peripheralLoc);
+        this.peripheralTexture = new ResourceLocation(peripheralLoc == null ? Questlog.MODID + ":textures/gui/quest_peripherals.png" : peripheralLoc);
 
         this.palette = new Palette(
                 JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
@@ -87,41 +91,23 @@ public class QuestDisplayData {
                 JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
         );
 
-        String buttonTextRaw = JsonUtils.getOrDefault(style, "backButtonText", (String) null);
-        if (buttonTextRaw == null) {
-            this.backButtonText = Component.translatable("gui.back");
-        } else {
-            this.backButtonText = translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw);
-        }
-
-        String backButtonTextRaw = JsonUtils.getOrDefault(style, "collectButtonText", (String) null);
-        if (buttonTextRaw == null) {
-            this.collectButtonText = Component.translatable("questlog.reward.collect");
-        } else {
-            this.collectButtonText = translatable ? Component.translatable(backButtonTextRaw) : Component.literal(backButtonTextRaw);
-        }
-
-        String uncollectedTextRaw = JsonUtils.getOrDefault(style, "uncollectedText", (String) null);
-        if (uncollectedTextRaw == null) {
-            this.uncollectedText = Component.translatable("questlog.reward.uncollected");
-        } else {
-            this.uncollectedText = translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw);
-        }
-
-        String collectedTextRaw = JsonUtils.getOrDefault(style, "collectedText", (String) null);
-        if (collectedTextRaw == null) {
-            this.collectedText = Component.translatable("questlog.reward.collected");
-        } else {
-            this.collectedText = translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw);
-        }
+        this.backButtonText = parseComponent(style, "backButtonText", "gui.back", translatable);
+        this.collectButtonText = parseComponent(style, "collectButtonText", "questlog.reward.collect", translatable);
+        this.uncollectedText = parseComponent(style, "uncollectedText", "questlog.reward.uncollected", translatable);
+        this.collectedText = parseComponent(style, "collectedText", "questlog.reward.collected", translatable);
 
         JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
-
         this.toastOnTrigger = JsonUtils.getOrDefault(notification, "toastOnTrigger", true);
         this.toastOnComplete = JsonUtils.getOrDefault(notification, "toastOnComplete", true);
         this.popup = JsonUtils.getOrDefault(notification, "popup", false);
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
+    }
+
+    private Component parseComponent(JsonObject style, String key, String defaultKey, boolean translatable) {
+        String raw = JsonUtils.getOrDefault(style, key, (String) null);
+        if (raw == null) return Component.translatable(defaultKey);
+        return translatable ? Component.translatable(raw) : Component.literal(raw);
     }
 
     public void setQuest(Quest quest) {
