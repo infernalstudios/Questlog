@@ -27,7 +27,7 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
             this.isInstant = false;
         }
 
-        this.display = new RewardDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+        this.display = new RewardDisplayData(definition);
         this.display.setReward(this);
     }
 

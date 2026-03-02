@@ -29,12 +29,12 @@ public class RewardDisplayData {
             this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
         }
         this.icon = JsonUtils.getIcon(data, "icon");
-        String sound = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "claimed", (String) null);
 
-        this.claimSound = sound == null ? null : ResourceLocation.parse(sound);
+        String sound = JsonUtils.getOrDefault(data, "claim_sound", (String) null);
+        this.claimSound = sound == null ? null : ResourceLocation.tryParse(sound);
     }
 
-    public void setReward(Reward reward) {
+    public void setReward(@Nullable Reward reward) {
         this.reward = reward;
     }
 
