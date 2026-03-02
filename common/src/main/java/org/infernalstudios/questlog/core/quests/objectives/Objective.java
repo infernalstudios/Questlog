@@ -24,7 +24,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         this.totalUnits = JsonUtils.getOrDefault(definition, "total", 1);
         this.units = 0;
 
-        this.display = new ObjectiveDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()));
+        this.display = new ObjectiveDisplayData(definition);
         this.display.setObjective(this);
     }
 

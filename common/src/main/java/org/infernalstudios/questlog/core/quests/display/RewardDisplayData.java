@@ -30,8 +30,8 @@ public class RewardDisplayData {
             this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
         }
         this.icon = JsonUtils.getIcon(data, "icon");
-        String sound = JsonUtils.getOrDefault(JsonUtils.getOrDefault(data, "sound", new JsonObject()), "claimed", (String) null);
 
+        String sound = JsonUtils.getOrDefault(data, "claim_sound", (String) null);
         this.claimSound = sound == null ? null : new ResourceLocation(sound);
     }
 

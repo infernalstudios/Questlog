@@ -41,65 +41,50 @@ public class QuestDisplayData {
     @Nullable
     private List<RewardDisplayData> rewardDisplay = null;
 
-    public QuestDisplayData(JsonObject data, ResourceLocation id) {
-        String formattedPath = id.getPath().replace('/', '.');
-        String defaultTitleKey = "quest." + id.getNamespace() + "." + formattedPath + ".title";
-        String defaultDescKey = "quest." + id.getNamespace() + "." + formattedPath + ".description";
+    public QuestDisplayData(JsonObject data) {
+        boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
+        String title = JsonUtils.getString(data, "title");
+        String description = JsonUtils.getString(data, "description");
 
-        String rawTitle = JsonUtils.getOrDefault(data, "title", (String) null);
-        String rawDescription = JsonUtils.getOrDefault(data, "description", (String) null);
-
-        boolean translatable;
-        if (data.has("translatable")) {
-            translatable = data.get("translatable").getAsBoolean();
-        } else {
-            translatable = (rawTitle == null);
-        }
-
-        String finalTitle = (rawTitle != null) ? rawTitle : defaultTitleKey;
-        String finalDescription = (rawDescription != null) ? rawDescription : defaultDescKey;
-
-        this.title = translatable ? Component.translatable(finalTitle) : Component.literal(finalTitle);
-        this.description = translatable ? Component.translatable(finalDescription) : Component.literal(finalDescription);
-
+        this.title = translatable ? Component.translatable(title) : Component.literal(title);
+        this.description = translatable ? Component.translatable(description) : Component.literal(description);
         this.icon = JsonUtils.getIcon(data, "icon");
 
-        JsonObject sound = JsonUtils.getOrDefault(data, "sound", new JsonObject());
-        String completedSoundLoc = JsonUtils.getOrDefault(sound, "completed", (String) null);
+        String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
 
-        String triggeredSoundLoc = JsonUtils.getOrDefault(sound, "triggered", (String) null);
+        String triggeredSoundLoc = JsonUtils.getOrDefault(data, "triggered_sound", (String) null);
         this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
-        JsonObject style = JsonUtils.getOrDefault(data, "style", new JsonObject());
+        String backgroundLoc = JsonUtils.getOrDefault(data, "background", Questlog.MODID + ":textures/gui/quest_page.png");
+        String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral", Questlog.MODID + ":textures/gui/quest_peripherals.png");
 
-        String backgroundLoc = style.has("background")
-                ? JsonUtils.getOrDefault(style.getAsJsonObject("background"), "texture", (String) null)
-                : null;
-        this.bgTexture = new ResourceLocation(backgroundLoc == null ? Questlog.MODID + ":textures/gui/quest_page.png" : backgroundLoc);
-
-        String peripheralLoc = style.has("peripheral")
-                ? JsonUtils.getOrDefault(style.getAsJsonObject("peripheral"), "texture", (String) null)
-                : null;
-        this.peripheralTexture = new ResourceLocation(peripheralLoc == null ? Questlog.MODID + ":textures/gui/quest_peripherals.png" : peripheralLoc);
+        this.bgTexture = new ResourceLocation(backgroundLoc);
+        this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
         this.palette = new Palette(
-                JsonUtils.getOrDefault(style, "textColor", "#4C381B"),
-                JsonUtils.getOrDefault(style, "completedTextColor", "#529E52"),
-                JsonUtils.getOrDefault(style, "hoveredTextColor", "#FFFFFF"),
-                JsonUtils.getOrDefault(style, "titleColor", "#4C381B"),
-                JsonUtils.getOrDefault(style, "progressTextColor", "#9E7852")
+                JsonUtils.getOrDefault(data, "text_color", "#4C381B"),
+                JsonUtils.getOrDefault(data, "completed_text_color", "#529E52"),
+                JsonUtils.getOrDefault(data, "hovered_text_color", "#FFFFFF"),
+                JsonUtils.getOrDefault(data, "title_color", "#4C381B"),
+                JsonUtils.getOrDefault(data, "progress_text_color", "#9E7852")
         );
 
-        this.backButtonText = parseComponent(style, "backButtonText", "gui.back", translatable);
-        this.collectButtonText = parseComponent(style, "collectButtonText", "questlog.reward.collect", translatable);
-        this.uncollectedText = parseComponent(style, "uncollectedText", "questlog.reward.uncollected", translatable);
-        this.collectedText = parseComponent(style, "collectedText", "questlog.reward.collected", translatable);
+        String buttonTextRaw = JsonUtils.getOrDefault(data, "back_button_text", (String) null);
+        this.backButtonText = buttonTextRaw == null ? Component.translatable("gui.back") : (translatable ? Component.translatable(buttonTextRaw) : Component.literal(buttonTextRaw));
 
-        JsonObject notification = JsonUtils.getOrDefault(data, "notification", new JsonObject());
-        this.toastOnTrigger = JsonUtils.getOrDefault(notification, "toastOnTrigger", true);
-        this.toastOnComplete = JsonUtils.getOrDefault(notification, "toastOnComplete", true);
-        this.popup = JsonUtils.getOrDefault(notification, "popup", false);
+        String collectButtonTextRaw = JsonUtils.getOrDefault(data, "collect_button_text", (String) null);
+        this.collectButtonText = collectButtonTextRaw == null ? Component.translatable("questlog.reward.collect") : (translatable ? Component.translatable(collectButtonTextRaw) : Component.literal(collectButtonTextRaw));
+
+        String uncollectedTextRaw = JsonUtils.getOrDefault(data, "uncollected_text", (String) null);
+        this.uncollectedText = uncollectedTextRaw == null ? Component.translatable("questlog.reward.uncollected") : (translatable ? Component.translatable(uncollectedTextRaw) : Component.literal(uncollectedTextRaw));
+
+        String collectedTextRaw = JsonUtils.getOrDefault(data, "collected_text", (String) null);
+        this.collectedText = collectedTextRaw == null ? Component.translatable("questlog.reward.collected") : (translatable ? Component.translatable(collectedTextRaw) : Component.literal(collectedTextRaw));
+
+        this.toastOnTrigger = JsonUtils.getOrDefault(data, "toast_on_trigger", true);
+        this.toastOnComplete = JsonUtils.getOrDefault(data, "toast_on_complete", true);
+        this.popup = JsonUtils.getOrDefault(data, "popup", false);
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
     }

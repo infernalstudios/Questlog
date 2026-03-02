@@ -62,36 +62,27 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     }
 
     public static Quest create(JsonObject definition, ResourceLocation id, QuestManager manager) {
-        QuestDisplayData display = new QuestDisplayData(JsonUtils.getOrDefault(definition, "display", new JsonObject()), id);
+        QuestDisplayData display = new QuestDisplayData(definition);
         List<Objective> triggers = new ArrayList<>();
         List<Objective> objectives = new ArrayList<>();
         List<Reward> rewards = new ArrayList<>();
 
         for (JsonElement triggerElement : JsonUtils.getOrDefault(definition, "triggers", new JsonArray())) {
-            if (!triggerElement.isJsonObject()) {
-                throw new IllegalStateException("Trigger must be an object");
+            if (triggerElement.isJsonObject()) {
+                triggers.add(QuestObjectiveRegistry.create(triggerElement.getAsJsonObject()));
             }
-            JsonObject trigger = triggerElement.getAsJsonObject();
-            Objective triggerType = QuestObjectiveRegistry.create(trigger);
-            triggers.add(triggerType);
         }
 
         for (JsonElement objectiveElement : JsonUtils.getOrDefault(definition, "objectives", new JsonArray())) {
-            if (!objectiveElement.isJsonObject()) {
-                throw new IllegalStateException("Objective must be an object");
+            if (objectiveElement.isJsonObject()) {
+                objectives.add(QuestObjectiveRegistry.create(objectiveElement.getAsJsonObject()));
             }
-            JsonObject objective = objectiveElement.getAsJsonObject();
-            Objective objectiveType = QuestObjectiveRegistry.create(objective);
-            objectives.add(objectiveType);
         }
 
         for (JsonElement rewardElement : JsonUtils.getOrDefault(definition, "rewards", new JsonArray())) {
-            if (!rewardElement.isJsonObject()) {
-                throw new IllegalStateException("Reward must be an object");
+            if (rewardElement.isJsonObject()) {
+                rewards.add(QuestRewardRegistry.create(rewardElement.getAsJsonObject()));
             }
-            JsonObject reward = rewardElement.getAsJsonObject();
-            Reward rewardType = QuestRewardRegistry.create(reward);
-            rewards.add(rewardType);
         }
 
         return new Quest(display, triggers, objectives, rewards, id, manager);
