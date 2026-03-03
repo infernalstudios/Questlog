@@ -2,28 +2,31 @@ package org.infernalstudios.questlog;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 
-public class QuestlogForgeEventForwarder {
+public class QuestlogNeoForgeEventForwarder {
     @SubscribeEvent
     public static void onServerStart(ServerStartingEvent event) {
         QuestlogEvents.onServerStart(event.getServer());
@@ -56,7 +59,7 @@ public class QuestlogForgeEventForwarder {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public static void onClientTick(TickEvent.ClientTickEvent event) {
+    public static void onClientTick(ClientTickEvent.Post event) {
         QuestlogClientEvents.onClientTick();
     }
 
@@ -72,7 +75,6 @@ public class QuestlogForgeEventForwarder {
         QuestlogClientEvents.onClientPlayerLogout();
     }
 
-    // Event forwarding for objectives
     @SubscribeEvent
     public static void onBlockBreak(BlockEvent.BreakEvent event) {
         Questlog.EVENTS.post(new QLBlockEvent.Break(event.getState(), event.getPos(), event.getPlayer()));
@@ -82,6 +84,18 @@ public class QuestlogForgeEventForwarder {
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof LivingEntity entity) {
             Questlog.EVENTS.post(new QLBlockEvent.Place(event.getState(), event.getPos(), entity));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
+        if (!event.getLevel().isClientSide) {
+            Questlog.EVENTS.post(new QLBlockEvent.Interact(
+                    event.getLevel().getBlockState(event.getPos()),
+                    event.getPos(),
+                    event.getEntity(),
+                    event.getItemStack()
+            ));
         }
     }
 
@@ -113,8 +127,8 @@ public class QuestlogForgeEventForwarder {
     }
 
     @SubscribeEvent
-    public static void onItemPickup(PlayerEvent.ItemPickupEvent event) {
-        Questlog.EVENTS.post(new QLEntityEvent.PickupItem(event.getEntity(), event.getStack()));
+    public static void onItemPickup(ItemEntityPickupEvent.Post event) {
+        Questlog.EVENTS.post(new QLEntityEvent.PickupItem(event.getPlayer(), event.getOriginalStack()));
     }
 
     @SubscribeEvent
@@ -123,8 +137,8 @@ public class QuestlogForgeEventForwarder {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        Questlog.EVENTS.post(new QLPlayerEvent.Tick(event.player));
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Questlog.EVENTS.post(new QLPlayerEvent.Tick(event.getEntity()));
     }
 
     @SubscribeEvent

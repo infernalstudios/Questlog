@@ -36,6 +36,18 @@ public class QuestlogFabricEventForwarder {
             return InteractionResult.PASS;
         });
 
+        UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+            if (!player.isSpectator() && !world.isClientSide()) {
+                Questlog.EVENTS.post(new QLBlockEvent.Interact(
+                        world.getBlockState(hitResult.getBlockPos()),
+                        hitResult.getBlockPos(),
+                        player,
+                        player.getItemInHand(hand)
+                ));
+            }
+            return InteractionResult.PASS;
+        });
+
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> Questlog.EVENTS.post(new QLEntityEvent.Death(entity, source)));
 
         UseItemCallback.EVENT.register((player, world, hand) -> {
