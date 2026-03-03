@@ -74,13 +74,18 @@ public class QuestManager {
                 Quest quest;
                 try {
                     quest = Quest.create(definition, id, this);
+                    CompoundTag data = new CompoundTag();
+                    quest.writeInitialData(data);
+                    quest.deserialize(data);
+                    this.addQuest(quest);
                 } catch (Exception e) {
-                    throw new RuntimeException("Failed to create quest " + id, e);
+                    Questlog.LOGGER.error("=====================================================");
+                    Questlog.LOGGER.error(" QUESTLOG ERROR: Failed to load quest '{}'", id);
+                    Questlog.LOGGER.error(" The JSON file has a syntax error, typo, or missing field.");
+                    Questlog.LOGGER.error(" Skipping this quest...");
+                    Questlog.LOGGER.error(" Exception Details: ", e);
+                    Questlog.LOGGER.error("=====================================================");
                 }
-                CompoundTag data = new CompoundTag();
-                quest.writeInitialData(data);
-                quest.deserialize(data);
-                this.addQuest(quest);
             }
         }
     }

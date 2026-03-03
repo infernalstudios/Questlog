@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
@@ -25,13 +24,8 @@ public class StatisticObjective extends Objective {
     public StatisticObjective(JsonObject definition) {
         super(definition);
 
-        ResourceLocation id = new ResourceLocation(JsonUtils.getString(definition, "stat"));
-
-        this.stat = BuiltInRegistries.CUSTOM_STAT.get(id);
-
-        if (this.stat == null) {
-            Questlog.LOGGER.warn("Stat id '{}' was not found.", id);
-        }
+        ResourceLocation parsedLocation = ResourceLocation.parse(JsonUtils.getString(definition, "stat"));
+        this.stat = BuiltInRegistries.CUSTOM_STAT.get(parsedLocation);
 
         if (definition.has("trackSinceStart")) {
             this.trackSinceStart = JsonUtils.getBoolean(definition, "trackSinceStart");
@@ -46,10 +40,10 @@ public class StatisticObjective extends Objective {
 
     private void onStatAward(QLPlayerEvent.StatAward event) {
         if (this.isCompleted() || this.getParent() == null) return;
-        if (
-                event.player instanceof ServerPlayer player &&
-                        player.equals(this.getParent().manager.player) &&
-                        event.stat.equals(this.getStat())
+
+        if (event.player instanceof ServerPlayer player &&
+                player == this.getParent().manager.player &&
+                event.stat == this.getStat()
         ) {
             this.setUnits(this.getUnits() + event.amount);
         }

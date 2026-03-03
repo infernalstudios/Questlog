@@ -1,17 +1,11 @@
 package org.infernalstudios.questlog.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.MalformedJsonException;
+import com.google.gson.*;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.StatsCounter;
@@ -20,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -33,9 +26,8 @@ public final class Util {
     private static final Gson GSON = new GsonBuilder().create();
 
     private Util() {
-    } // Uninstantiable
+    }
 
-    @CheckForNull // No stats counter ONLY for other players, when calling from the client
     public static StatsCounter getStats(Player player) {
         // Important: check for ServerPlayer first, otherwise servers will crash
         if (player instanceof ServerPlayer serverPlayer) {
@@ -63,25 +55,11 @@ public final class Util {
 
     public static JsonObject getJsonResource(Resource resource) throws IOException {
         try (InputStream stream = resource.open()) {
-            return GSON.fromJson(new String(stream.readAllBytes(), StandardCharsets.UTF_8), JsonObject.class);
-        } catch (MalformedJsonException e) {
-            throw new MalformedJsonException("Malformed JSON in resource " + resource, e);
+            String content = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+            return GSON.fromJson(content, JsonObject.class);
+        } catch (JsonSyntaxException e) {
+            throw new IOException("Malformed JSON in resource " + resource + ": " + e.getMessage(), e);
         }
-    }
-
-    public static JsonObject getJsonResource(ResourceManager manager, ResourceLocation id) throws IOException {
-        ResourceLocation path = new ResourceLocation(id.getNamespace(), id.getPath() + ".json");
-        List<Resource> resources = manager.getResourceStack(path);
-
-        if (resources.isEmpty()) {
-            throw new IOException("Resource not found: " + path);
-        }
-
-        if (resources.size() > 1) {
-            throw new IOException("Multiple resources found: " + path);
-        }
-
-        return Util.getJsonResource(resources.get(0));
     }
 
     public static BoundingBox bbFromJson(JsonElement json) {
