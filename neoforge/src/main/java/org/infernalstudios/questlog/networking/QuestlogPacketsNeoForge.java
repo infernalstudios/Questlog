@@ -20,6 +20,9 @@ public class QuestlogPacketsNeoForge {
         registrar.playToServer(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC, (payload, context) ->
                 context.enqueueWork(() -> QuestRewardCollectPacket.handle(payload, createServerContext(context.player())))
         );
+        registrar.playToServer(QuestReadPacket.TYPE, QuestReadPacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> QuestReadPacket.handle(payload, createServerContext(context.player())))
+        );
 
         // Server to Client
         registrar.playToClient(QuestDataPacket.TYPE, QuestDataPacket.STREAM_CODEC, (payload, context) ->

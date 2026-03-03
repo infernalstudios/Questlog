@@ -3,7 +3,6 @@ package org.infernalstudios.questlog.core;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.stream.MalformedJsonException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -14,7 +13,6 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.Util;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,10 +50,12 @@ public class DefinitionUtil {
                 try {
                     JsonObject json = Util.getJsonResource(entry.getValue());
                     prepared.put(questId, json);
-                } catch (MalformedJsonException e) {
-                    Questlog.LOGGER.error("Malformed JSON in quest file {}", fullLoc, e);
-                } catch (IOException e) {
-                    Questlog.LOGGER.error("Error reading quest file {}", fullLoc, e);
+                } catch (Exception e) {
+                    Questlog.LOGGER.error("=====================================================");
+                    Questlog.LOGGER.error(" CRITICAL ERROR: Could not parse quest file: {}", fullLoc);
+                    Questlog.LOGGER.error(" Reason: {}", e.getMessage());
+                    Questlog.LOGGER.error(" This quest will be skipped!");
+                    Questlog.LOGGER.error("=====================================================");
                 }
             }
 

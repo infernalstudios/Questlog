@@ -24,4 +24,10 @@ public class QuestEvent extends QLPlayerEvent {
             super(player, quest, isServer);
         }
     }
+
+    public static class Read extends QuestEvent {
+        public Read(Player player, Quest quest, boolean isServer) {
+            super(player, quest, isServer);
+        }
+    }
 }

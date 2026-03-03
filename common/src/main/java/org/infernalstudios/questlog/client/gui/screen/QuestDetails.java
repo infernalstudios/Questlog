@@ -22,6 +22,7 @@ import org.infernalstudios.questlog.core.quests.display.Palette;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
+import org.infernalstudios.questlog.network.packet.QuestReadPacket;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.platform.Services;
 import org.infernalstudios.questlog.util.texture.Blittable;
@@ -102,6 +103,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.getPalette().hoveredTextColor(),
                 this.getDisplay().getBackButtonText(),
                 () -> {
+                    boolean needsRead = !this.quest.isCompleted() && this.quest.objectives.stream()
+                            .anyMatch(obj -> !obj.isCompleted() && obj.getClass().getSimpleName().equals("ReadObjective"));
+
                     if (this.quest.isCompleted() && !this.quest.isRewarded()) {
                         for (int i = 0; i < this.quest.rewards.size(); i++) {
                             Reward reward = this.quest.rewards.get(i);
@@ -119,6 +123,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                                 }
                             }
                         }
+                    } else if (needsRead) {
+                        Services.PLATFORM.sendPacketToServer(new QuestReadPacket(this.quest.getId()));
                     } else if (this.minecraft != null) {
                         this.minecraft.setScreen(this.previousScreen);
                     }
@@ -158,8 +164,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         this.renderBackground(ps, mouseX, mouseY, partialTicks);
         if (this.backButton != null) {
+            boolean needsRead = !this.quest.isCompleted() && this.quest.objectives.stream()
+                    .anyMatch(obj -> !obj.isCompleted() && obj.getClass().getSimpleName().equals("ReadObjective"));
+
             if (this.quest.isCompleted() && !this.quest.isRewarded()) {
                 this.backButton.setMessage(this.getDisplay().getCollectButtonText());
+            } else if (needsRead) {
+                this.backButton.setMessage(Component.translatable("questlog.button.read"));
             } else {
                 this.backButton.setMessage(this.getDisplay().getBackButtonText());
             }

@@ -19,6 +19,7 @@ public class QuestlogPacketsFabric {
         // Register C2S Payloads
         PayloadTypeRegistry.playC2S().register(QuestDefinitionHandledPacket.TYPE, QuestDefinitionHandledPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(QuestReadPacket.TYPE, QuestReadPacket.STREAM_CODEC);
 
         // Register Server Receivers
         registerServerReceivers();
@@ -35,6 +36,7 @@ public class QuestlogPacketsFabric {
     private static void registerServerReceivers() {
         ServerPlayNetworking.registerGlobalReceiver(QuestDefinitionHandledPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestDefinitionHandledPacket.handle(payload, createServerContext(context.player()))));
         ServerPlayNetworking.registerGlobalReceiver(QuestRewardCollectPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestRewardCollectPacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(QuestReadPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestReadPacket.handle(payload, createServerContext(context.player()))));
     }
 
     private static IPacketContext createClientContext() {

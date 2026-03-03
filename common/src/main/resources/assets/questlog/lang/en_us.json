@@ -1,6 +1,9 @@
 {
     "key.questlog.open": "Opens the Questlog screen",
     "key.questlog.category": "Questlog",
+
+    "questlog.button.read": "Read",
+
     "questlog.toast.quest_completed": "Quest Completed!",
     "questlog.toast.quest_added": "Quest Added!",
     "questlog.quest.completed": "Completed",
