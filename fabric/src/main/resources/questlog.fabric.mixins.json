@@ -8,7 +8,6 @@
         "FarmBlockMixin",
         "LivingEntityMixin",
         "MixinItemStack",
-        "PlayerDataStorageMixin",
         "ServerPlayerMixin",
         "ServerGamePacketListenerImplAccessor"
     ],
