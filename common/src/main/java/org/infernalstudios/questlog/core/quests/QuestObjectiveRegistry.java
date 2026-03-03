@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.core.quests.objectives.block.BlockInteractObjective;
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockMineObjective;
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockPlaceObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.*;
@@ -25,6 +26,7 @@ public class QuestObjectiveRegistry {
         // Block
         register(ResourceLocation.fromNamespaceAndPath("questlog", "block_mine"), BlockMineObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "block_place"), BlockPlaceObjective::new);
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "block_interact"), BlockInteractObjective::new);
 
         // Entity
         register(ResourceLocation.fromNamespaceAndPath("questlog", "entity_breed"), EntityBreedObjective::new);

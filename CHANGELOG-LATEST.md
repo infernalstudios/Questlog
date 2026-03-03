@@ -1,6 +1,7 @@
 ### Added
 
 - Added `quest_read` objective.
+- Added `block_interact` objective.
 - Added `advancement` objective.
 - Added `trigger_all` command.
 

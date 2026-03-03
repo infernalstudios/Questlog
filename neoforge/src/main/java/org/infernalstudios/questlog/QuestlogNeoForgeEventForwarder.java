@@ -16,6 +16,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
@@ -83,6 +84,18 @@ public class QuestlogNeoForgeEventForwarder {
     public static void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
         if (event.getEntity() instanceof LivingEntity entity) {
             Questlog.EVENTS.post(new QLBlockEvent.Place(event.getState(), event.getPos(), entity));
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
+        if (!event.getLevel().isClientSide) {
+            Questlog.EVENTS.post(new QLBlockEvent.Interact(
+                    event.getLevel().getBlockState(event.getPos()),
+                    event.getPos(),
+                    event.getEntity(),
+                    event.getItemStack()
+            ));
         }
     }
 
