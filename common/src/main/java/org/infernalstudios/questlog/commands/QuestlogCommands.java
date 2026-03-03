@@ -5,12 +5,15 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -27,11 +30,24 @@ public class QuestlogCommands {
         LiteralCommandNode<CommandSourceStack> root = dispatcher.register(
                 Commands.literal("questlog")
                         .requires(stack -> stack.hasPermission(2))
+                        .then(Commands.literal("trigger_all")
+                                .executes(QuestlogCommands::triggerAllQuests)
+                        )
                         .then(Commands.argument("quest", ResourceLocationArgument.id())
                                 .suggests((ctx, builder) -> {
-                                    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSource().getPlayerOrException());
-                                    manager.getAllQuests().stream().map(Quest::getId).forEach(id -> builder.suggest(id.toString()));
-                                    return builder.buildFuture();
+                                    if (!(ctx.getSource().getEntity() instanceof ServerPlayer player)) {
+                                        return Suggestions.empty();
+                                    }
+
+                                    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+                                    if (manager == null) {
+                                        return Suggestions.empty();
+                                    }
+
+                                    return SharedSuggestionProvider.suggestResource(
+                                            manager.getAllQuests().stream().map(Quest::getId),
+                                            builder
+                                    );
                                 })
                                 .then(Commands.literal("reset")
                                         .executes(ctx -> resetQuest(ctx, getQuest(ctx)))
@@ -246,5 +262,21 @@ public class QuestlogCommands {
         }
 
         return quest;
+    }
+
+    private static int triggerAllQuests(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(ctx.getSource().getPlayerOrException());
+        int count = 0;
+
+        for (Quest quest : manager.getAllQuests()) {
+            if (!quest.isTriggered()) {
+                quest.triggers.forEach(trigger -> trigger.setUnits(trigger.getTotalUnits()));
+                count++;
+            }
+        }
+
+        final int finalCount = count;
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully triggered " + finalCount + " quests."), true);
+        return count;
     }
 }
