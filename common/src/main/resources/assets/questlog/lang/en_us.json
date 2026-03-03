@@ -19,6 +19,9 @@
     "questlog.reward.default": "Unnamed Reward",
     "questlog.no_quests": "No Quests Available",
 
+    "questlog.info.objectives": "Objectives",
+    "questlog.info.rewards": "Rewards",
+
     "command.questlog.argument.quest.unknown": "Unknown quest",
     "command.questlog.argument.quest.invalid": "Invalid quest ID",
     "command.questlog.argument.trigger.invalid": "Invalid trigger index",

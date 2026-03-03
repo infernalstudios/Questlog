@@ -1,9 +1,11 @@
 package org.infernalstudios.questlog.mixin.fabric;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.QuestlogEvents;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,5 +27,10 @@ public class ServerPlayerMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(CallbackInfo ci) {
         Questlog.EVENTS.post(new QLPlayerEvent.Tick((ServerPlayer) (Object) this));
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    private void onAddAdditionalSaveData(CompoundTag nbt, CallbackInfo ci) {
+        QuestlogEvents.onPlayerSave((ServerPlayer) (Object) this);
     }
 }

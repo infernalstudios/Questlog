@@ -40,6 +40,11 @@ import java.util.List;
 
 public class QuestDetails extends Screen implements NarrationSupplier {
 
+    private static final int LEFT_PANEL_WIDTH = 275;
+    private static final int RIGHT_PANEL_WIDTH = 170;
+    private static final int PANEL_HEIGHT = 166;
+    private static final int PANEL_SPACING = 6;
+
     private static final int TITLE_X = 71;
     private static final int TITLE_Y = 13;
     private static final int TITLE_WIDTH = 132;
@@ -47,24 +52,27 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private static final int CONTENT_X = 18;
     private static final int CONTENT_Y = 36;
-    private static final int CONTENT_WIDTH = 237;
-    private static final int CONTENT_HEIGHT = 86;
+    private static final int LEFT_CONTENT_WIDTH = 237;
+    private static final int RIGHT_CONTENT_WIDTH = 134;
+    private static final int CONTENT_HEIGHT = 98;
 
-    private static final int BUTTON_X = 121;
     private static final int BUTTON_Y = 138;
-
-    private static final int DESCRIPTION_INFO_PADDING = 5;
 
     private final Quest quest;
 
     @Nullable
     private final Screen previousScreen;
 
-    private int x;
-    private int y;
+    private int panel1X;
+    private int panel2X;
+    private int startY;
+    private boolean showObjectives = true;
 
     @Nullable
     private QuestlogButton backButton;
+
+    @Nullable
+    private QuestlogButton objectivesButton;
 
     @Nullable
     private ScrollableComponent description;
@@ -98,13 +106,43 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             throw new IllegalStateException("Minecraft is null, UNREACHABLE");
         }
 
-        this.x = (this.width - this.getGuiSet().detailBackground.width()) / 2 + 375;
-        this.y = (this.height - this.getGuiSet().detailBackground.height()) / 2 + 174;
+        int totalWidth = this.showObjectives ? (LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + PANEL_SPACING) : LEFT_PANEL_WIDTH;
+        this.panel1X = (this.width - totalWidth) / 2;
+        this.panel2X = this.panel1X + LEFT_PANEL_WIDTH + PANEL_SPACING;
+        this.startY = (this.height - PANEL_HEIGHT) / 2;
+
+        int buttonY = this.startY + BUTTON_Y;
+        int btn1X, btn2X;
+
+        if (this.showObjectives) {
+            btn1X = this.panel1X + (LEFT_PANEL_WIDTH - this.getGuiSet().button.width()) / 2;
+            btn2X = this.panel2X + (RIGHT_PANEL_WIDTH - this.getGuiSet().button.width()) / 2;
+        } else {
+            int combinedBtnWidth = this.getGuiSet().button.width() * 2 + 8;
+            btn1X = this.panel1X + (LEFT_PANEL_WIDTH - combinedBtnWidth) / 2;
+            btn2X = btn1X + this.getGuiSet().button.width() + 8;
+        }
+
+        if (this.objectivesButton != null) this.removeWidget(this.objectivesButton);
+        this.objectivesButton = new QuestlogButton(
+                btn1X,
+                buttonY,
+                this.getPalette().textColor(),
+                this.getPalette().hoveredTextColor(),
+                Component.translatable("questlog.info.objectives"),
+                () -> {
+                    this.showObjectives = !this.showObjectives;
+                    this.clearWidgets();
+                    this.init();
+                },
+                this.getGuiSet()
+        );
+        this.addRenderableWidget(this.objectivesButton);
 
         if (this.backButton != null) this.removeWidget(this.backButton);
         this.backButton = new QuestlogButton(
-                this.x + BUTTON_X,
-                this.y + BUTTON_Y,
+                btn2X,
+                buttonY,
                 this.getPalette().textColor(),
                 this.getPalette().hoveredTextColor(),
                 this.getDisplay().getBackButtonText(),
@@ -116,14 +154,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                         for (int i = 0; i < this.quest.rewards.size(); i++) {
                             Reward reward = this.quest.rewards.get(i);
                             if (!reward.hasRewarded()) {
-                                // Send a packet to the server to collect the reward.
                                 Services.PLATFORM.sendPacketToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
-
-                                // Play sound
-                                SoundEvent sound = null;
-                                if (reward.getDisplay() != null) {
-                                    sound = reward.getDisplay().getClaimSound();
-                                }
+                                SoundEvent sound = reward.getDisplay() != null ? reward.getDisplay().getClaimSound() : null;
                                 if (sound != null) {
                                     this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1, 1));
                                 }
@@ -141,25 +173,27 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         if (this.description != null) this.removeWidget(this.description);
         this.description = new ScrollableComponent(
-                this.x + CONTENT_X,
-                this.y + CONTENT_Y,
-                CONTENT_WIDTH,
-                CONTENT_HEIGHT - this.getInfoHeight() - DESCRIPTION_INFO_PADDING,
+                this.panel1X + CONTENT_X,
+                this.startY + CONTENT_Y,
+                LEFT_CONTENT_WIDTH,
+                CONTENT_HEIGHT,
                 new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor())
         );
-        // We render this ourselves, don't use addRenderableWidget.
         this.addWidget(this.description);
 
         if (this.info != null) this.removeWidget(this.info);
-        this.info = new ScrollableComponent(
-                this.x + CONTENT_X,
-                this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight() + DESCRIPTION_INFO_PADDING,
-                CONTENT_WIDTH,
-                this.getInfoHeight(),
-                new InfoScrollable(this.getDisplay())
-        );
-        // We render this ourselves, don't use addRenderableWidget.
-        this.addWidget(this.info);
+        if (this.showObjectives) {
+            this.info = new ScrollableComponent(
+                    this.panel2X + CONTENT_X,
+                    this.startY + CONTENT_Y,
+                    RIGHT_CONTENT_WIDTH,
+                    CONTENT_HEIGHT,
+                    new InfoScrollable(this.getDisplay())
+            );
+            this.addWidget(this.info);
+        } else {
+            this.info = null;
+        }
     }
 
     private void drawHorizontalLine(GuiGraphics ps, int x, int y, boolean small) {
@@ -188,7 +222,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super.render(ps, mouseX, mouseY, partialTicks);
         this.renderTitle(ps);
         this.renderDescription(ps);
-        this.renderInfo(ps);
+
+        if (this.showObjectives) {
+            this.renderInfo(ps);
+        }
 
         if (this.description != null && this.description.isMouseOver(mouseX, mouseY)) {
             ScrollableText scrollableText = (ScrollableText) this.description.scrollable;
@@ -263,44 +300,45 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(ps, mouseX, mouseY, partialTick);
-        this.getGuiSet().detailBackground.blit(ps, this.x - 375, this.y - 174);
+
+        this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.startY);
+
+        if (this.showObjectives) {
+            this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.startY);
+        }
     }
 
     private void renderTitle(GuiGraphics ps) {
         QuestDisplayData displayData = this.getDisplay();
 
-        // Icon
         float titleWidth = this.font.width(displayData.getTitle()) + (displayData.getIcon() != null ? displayData.getIcon().width() + 4 : 0);
-        float x = this.x + TITLE_X + (TITLE_WIDTH - titleWidth) / 2;
-        float y = this.y + TITLE_Y;
+        float x = this.panel1X + TITLE_X + (TITLE_WIDTH - titleWidth) / 2;
+        float y = this.startY + TITLE_Y;
         if (displayData.getIcon() != null) {
-            displayData.getIcon().blit(ps, (int) x, this.y + TITLE_Y);
-            x += displayData.getIcon().width() + 4; // + padding
+            displayData.getIcon().blit(ps, (int) x, this.startY + TITLE_Y);
+            x += displayData.getIcon().width() + 4;
         }
 
-        // Title
         y += (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
         ps.drawString(font, displayData.getTitle(), (int) x, (int) y, this.getPalette().titleColor(), false);
 
-        this.drawHorizontalLine(ps, this.x + TITLE_X, this.y + TITLE_Y + TITLE_HEIGHT + 2, true);
-    }
-
-    private int getInfoHeight() {
-        return (
-                Math.min(
-                        2,
-                        this.quest.isCompleted() ? this.getDisplay().getRewardDisplayData().size() : this.getDisplay().getObjectiveDisplayData().size()
-                ) *
-                        InfoEntry.INFO_ENTRY_HEIGHT
-        );
+        this.drawHorizontalLine(ps, this.panel1X + TITLE_X, this.startY + TITLE_Y + TITLE_HEIGHT + 2, true);
     }
 
     private void renderInfo(GuiGraphics ps) {
-        if (this.info == null) throw new IllegalStateException("Info is null");
+        if (this.info == null) return;
+
+        Component titleText = this.quest.isCompleted() ? Component.translatable("questlog.info.rewards") : Component.translatable("questlog.info.objectives");
+        float titleWidth = this.font.width(titleText);
+
+        float x = this.panel2X + (RIGHT_PANEL_WIDTH - titleWidth) / 2;
+        float y = this.startY + TITLE_Y + (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
+
+        ps.drawString(font, titleText, (int) x, (int) y, this.getPalette().titleColor(), false);
+
+        this.getGuiSet().smallHR.blit(ps, this.panel2X + (RIGHT_PANEL_WIDTH - 140) / 2, this.startY + TITLE_Y + TITLE_HEIGHT + 2);
+
         this.info.render(ps, 0, 0, 0);
-        if (this.info.height != 0) {
-            this.drawHorizontalLine(ps, this.x + CONTENT_X, this.y + CONTENT_Y + CONTENT_HEIGHT - this.getInfoHeight(), false);
-        }
     }
 
     private void renderDescription(GuiGraphics ps) {
@@ -340,7 +378,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                         this.rewards.add(new InfoEntry(reward, 0, i * InfoEntry.INFO_ENTRY_HEIGHT, display));
                     }
                 }
-
                 return this.rewards;
             } else {
                 if (this.objectives == null) {
@@ -351,7 +388,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                         this.objectives.add(new InfoEntry(objective, 0, i * InfoEntry.INFO_ENTRY_HEIGHT));
                     }
                 }
-
                 return this.objectives;
             }
         }
@@ -382,10 +418,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private class InfoEntry implements Renderable, GuiEventListener {
 
-        private static final int INFO_ENTRY_HEIGHT = 18;
+        private static final int INFO_ENTRY_HEIGHT = 28;
 
         private final RewardDisplayData rewardDisplayData;
-
         private final ObjectiveDisplayData objectiveDisplayData;
 
         protected int x;
@@ -397,17 +432,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         public InfoEntry(@Nullable RewardDisplayData rewardDisplayData, int x, int y, @Nullable QuestDisplayData display) {
             this.rewardDisplayData = rewardDisplayData;
             this.objectiveDisplayData = null;
-
             this.x = x;
             this.y = y;
-
             this.display = display;
         }
 
         public InfoEntry(@Nullable ObjectiveDisplayData objectiveDisplayData, int x, int y) {
             this.rewardDisplayData = null;
             this.objectiveDisplayData = objectiveDisplayData;
-
             this.x = x;
             this.y = y;
         }
@@ -433,36 +465,32 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         private boolean drawIcon(GuiGraphics ps, @Nullable Blittable icon) {
             if (icon != null) {
-                icon.blit(ps, this.x, this.y);
+                icon.blit(ps, this.x, this.y + 4);
                 return true;
             }
             return false;
         }
 
-        private int drawName(GuiGraphics ps, Component name, boolean hasIcon) {
+        private void drawName(GuiGraphics ps, Component name, boolean hasIcon) {
             Font font = Minecraft.getInstance().font;
-            int x = this.x + (hasIcon ? 18 : 0);
-            int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
-            ps.drawString(font, name, x, y, QuestDetails.this.getPalette().textColor(), false);
-
-            return font.width(name) + (hasIcon ? 18 : 0);
+            int drawX = this.x + (hasIcon ? 20 : 0);
+            int drawY = this.y + 2;
+            ps.drawString(font, name, drawX, drawY, QuestDetails.this.getPalette().textColor(), false);
         }
 
-        private void drawProgress(GuiGraphics ps, int x) {
+        private void drawProgress(GuiGraphics ps, boolean hasIcon) {
             Font font = Minecraft.getInstance().font;
-            int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
+            int drawX = this.x + (hasIcon ? 20 : 0);
+            int drawY = this.y + 2 + font.lineHeight + 2;
 
-            if (!this.isObjective()) {
-                throw new IllegalCallerException("Progress can only be drawn for objectives");
-            }
+            if (!this.isObjective()) throw new IllegalCallerException("Progress can only be drawn for objectives");
 
             Component progress = this.objectiveDisplayData.getProgress();
-
             ps.drawString(
                     font,
                     progress,
-                    x,
-                    y,
+                    drawX,
+                    drawY,
                     this.objectiveDisplayData.isCompleted()
                             ? QuestDetails.this.getPalette().completedTextColor()
                             : QuestDetails.this.getPalette().progressTextColor(),
@@ -470,13 +498,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             );
         }
 
-        private void drawCollected(GuiGraphics ps, int x) {
+        private void drawCollected(GuiGraphics ps, boolean hasIcon) {
             Font font = Minecraft.getInstance().font;
-            int y = this.y + (INFO_ENTRY_HEIGHT - font.lineHeight) / 2;
+            int drawX = this.x + (hasIcon ? 20 : 0);
+            int drawY = this.y + 2 + font.lineHeight + 2;
 
-            if (!this.isReward()) {
-                throw new IllegalCallerException("Collected can only be drawn for rewards");
-            }
+            if (!this.isReward()) throw new IllegalCallerException("Collected can only be drawn for rewards");
 
             Component collected = this.rewardDisplayData.hasRewarded()
                     ? Component.translatable("questlog.reward.collected")
@@ -491,8 +518,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             ps.drawString(
                     font,
                     collected,
-                    x,
-                    y,
+                    drawX,
+                    drawY,
                     this.rewardDisplayData.hasRewarded()
                             ? QuestDetails.this.getPalette().completedTextColor()
                             : QuestDetails.this.getPalette().progressTextColor(),
@@ -502,18 +529,16 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         private void renderReward(GuiGraphics ps) {
             if (this.rewardDisplayData == null) throw new IllegalStateException("RewardDisplayData is null");
-
             boolean hasIcon = this.drawIcon(ps, this.rewardDisplayData.getIcon());
-            int nameWidth = this.drawName(ps, this.rewardDisplayData.getName(), hasIcon);
-            this.drawCollected(ps, this.x + nameWidth + 5);
+            this.drawName(ps, this.rewardDisplayData.getName(), hasIcon);
+            this.drawCollected(ps, hasIcon);
         }
 
         private void renderObjective(GuiGraphics ps) {
             if (this.objectiveDisplayData == null) throw new IllegalStateException("ObjectiveDisplayData is null");
-
             boolean hasIcon = this.drawIcon(ps, this.objectiveDisplayData.getIcon());
-            int nameWidth = this.drawName(ps, this.objectiveDisplayData.getName(), hasIcon);
-            this.drawProgress(ps, this.x + nameWidth + 5);
+            this.drawName(ps, this.objectiveDisplayData.getName(), hasIcon);
+            this.drawProgress(ps, hasIcon);
         }
 
         @Override
