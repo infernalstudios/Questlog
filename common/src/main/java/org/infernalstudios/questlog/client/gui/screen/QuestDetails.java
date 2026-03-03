@@ -55,17 +55,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private static final int LEFT_CONTENT_WIDTH = 237;
     private static final int RIGHT_CONTENT_WIDTH = 134;
     private static final int CONTENT_HEIGHT = 98;
-
+    private static boolean showDetails = true;
     private final Quest quest;
-
     @Nullable
     private final Screen previousScreen;
-
     private int panel1X;
     private int panel2X;
     private int startY;
-    private boolean showObjectives = true;
-
     @Nullable
     private QuestlogButton backButton;
 
@@ -100,7 +96,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     protected void init() {
         super.init();
 
-        int totalWidth = this.showObjectives ? (LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + PANEL_SPACING) : LEFT_PANEL_WIDTH;
+        int totalWidth = showDetails ? (LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + PANEL_SPACING) : LEFT_PANEL_WIDTH;
         this.panel1X = (this.width - totalWidth) / 2;
         this.panel2X = this.panel1X + LEFT_PANEL_WIDTH + PANEL_SPACING;
         this.startY = (this.height - PANEL_HEIGHT) / 2;
@@ -117,7 +113,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.getPalette().hoveredTextColor(),
                 Component.translatable("questlog.info.details"),
                 () -> {
-                    this.showObjectives = !this.showObjectives;
+                    showDetails = !showDetails;
                     this.clearWidgets();
                     this.init();
                 },
@@ -168,7 +164,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.addWidget(this.description);
 
         if (this.info != null) this.removeWidget(this.info);
-        if (this.showObjectives) {
+        if (showDetails) {
             this.info = new ScrollableComponent(
                     this.panel2X + CONTENT_X,
                     this.startY + CONTENT_Y,
@@ -209,7 +205,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.renderTitle(ps);
         this.renderDescription(ps);
 
-        if (this.showObjectives) {
+        if (showDetails) {
             this.renderInfo(ps);
         }
 
@@ -289,7 +285,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.startY);
 
-        if (this.showObjectives) {
+        if (showDetails) {
             this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.startY);
         }
     }
