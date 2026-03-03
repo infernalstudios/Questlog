@@ -56,8 +56,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private static final int RIGHT_CONTENT_WIDTH = 134;
     private static final int CONTENT_HEIGHT = 98;
 
-    private static final int BUTTON_Y = 138;
-
     private final Quest quest;
 
     @Nullable
@@ -110,18 +108,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.panel1X = (this.width - totalWidth) / 2;
         this.panel2X = this.panel1X + LEFT_PANEL_WIDTH + PANEL_SPACING;
         this.startY = (this.height - PANEL_HEIGHT) / 2;
+        int buttonY = this.startY + PANEL_HEIGHT + 4;
 
-        int buttonY = this.startY + BUTTON_Y;
-        int btn1X, btn2X;
-
-        if (this.showObjectives) {
-            btn1X = this.panel1X + (LEFT_PANEL_WIDTH - this.getGuiSet().button.width()) / 2;
-            btn2X = this.panel2X + (RIGHT_PANEL_WIDTH - this.getGuiSet().button.width()) / 2;
-        } else {
-            int combinedBtnWidth = this.getGuiSet().button.width() * 2 + 8;
-            btn1X = this.panel1X + (LEFT_PANEL_WIDTH - combinedBtnWidth) / 2;
-            btn2X = btn1X + this.getGuiSet().button.width() + 8;
-        }
+        int btn1X = this.panel1X;
+        int btn2X = this.panel1X + LEFT_PANEL_WIDTH - this.getGuiSet().button.width();
 
         if (this.objectivesButton != null) this.removeWidget(this.objectivesButton);
         this.objectivesButton = new QuestlogButton(
