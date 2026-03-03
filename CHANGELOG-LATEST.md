@@ -1,4 +1,16 @@
+### Added
+
+- Added `quest_read` objective.
+- Added `trigger_all` command.
+
+### Removed
+
+- Removed `quests.json`.
+    - Quests will now load recursively from valid JSONs in `questlog/quests`
+
 ### Changed
 
-- Fixed `item_obtain` objectives causing tracked items to not be stackable.
-- Deprecated `item_pickup` in favor of `item_obtain`.
+- Improved error logging.
+- Invalid quests no longer prevent you from loading worlds.
+- Simplified quest definitions.
+    - These will be automatically converted from the legacy format on first load.
