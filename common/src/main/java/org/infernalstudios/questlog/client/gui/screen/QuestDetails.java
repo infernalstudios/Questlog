@@ -100,18 +100,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     protected void init() {
         super.init();
 
-        if (this.minecraft == null) {
-            throw new IllegalStateException("Minecraft is null, UNREACHABLE");
-        }
-
         int totalWidth = this.showObjectives ? (LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + PANEL_SPACING) : LEFT_PANEL_WIDTH;
         this.panel1X = (this.width - totalWidth) / 2;
         this.panel2X = this.panel1X + LEFT_PANEL_WIDTH + PANEL_SPACING;
         this.startY = (this.height - PANEL_HEIGHT) / 2;
-        int buttonY = this.startY + PANEL_HEIGHT + 4;
+        int buttonY = this.startY + PANEL_HEIGHT + 12;
 
-        int btn1X = this.panel1X;
-        int btn2X = this.panel1X + LEFT_PANEL_WIDTH - this.getGuiSet().button.width();
+        int btn2X = this.panel1X + LEFT_PANEL_WIDTH - this.getGuiSet().button.width() + 25;
+        int btn1X = btn2X - this.getGuiSet().button.width() + 10;
 
         if (this.objectivesButton != null) this.removeWidget(this.objectivesButton);
         this.objectivesButton = new QuestlogButton(
@@ -119,7 +115,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 buttonY,
                 this.getPalette().textColor(),
                 this.getPalette().hoveredTextColor(),
-                Component.translatable("questlog.info.objectives"),
+                Component.translatable("questlog.info.details"),
                 () -> {
                     this.showObjectives = !this.showObjectives;
                     this.clearWidgets();
@@ -326,7 +322,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         ps.drawString(font, titleText, (int) x, (int) y, this.getPalette().titleColor(), false);
 
-        this.getGuiSet().smallHR.blit(ps, this.panel2X + (RIGHT_PANEL_WIDTH - 140) / 2, this.startY + TITLE_Y + TITLE_HEIGHT + 2);
+        this.getGuiSet().panelHR.blit(ps, this.panel2X + (RIGHT_PANEL_WIDTH - 140) / 2, this.startY + TITLE_Y + TITLE_HEIGHT + 2);
 
         this.info.render(ps, 0, 0, 0);
     }

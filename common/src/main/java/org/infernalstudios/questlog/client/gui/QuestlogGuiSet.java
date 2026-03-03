@@ -24,6 +24,7 @@ public class QuestlogGuiSet {
     public final Texture buttonLongHovered;
     public final Texture toast;
     public final Texture important;
+    public final Texture panelHR;
     public final Texture smallHR;
     public final Texture bigHR;
     public final ScrollbarTexture scrollbar;
@@ -54,6 +55,7 @@ public class QuestlogGuiSet {
         this.buttonLongHovered = new Texture(peripheralLoc, 108, 38, 112, 95, 256, 256);
         this.toast = new Texture(peripheralLoc, 173, 51, 81, 2, 256, 256);
         this.important = new Texture(peripheralLoc, 28, 36, 2, 2, 256, 256);
+        this.panelHR = new Texture(peripheralLoc, 140, 9, 2, 157, 256, 256);
         this.smallHR = new Texture(peripheralLoc, 252, 9, 2, 135, 256, 256);
         this.bigHR = new Texture(peripheralLoc, 252, 9, 2, 146, 256, 256);
         this.scrollbar = new ScrollbarTexture(

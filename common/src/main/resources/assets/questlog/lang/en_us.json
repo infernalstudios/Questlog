@@ -20,6 +20,7 @@
     "questlog.no_quests": "No Quests Available",
 
     "questlog.info.objectives": "Objectives",
+    "questlog.info.details": "Details",
     "questlog.info.rewards": "Rewards",
 
     "command.questlog.argument.quest.unknown": "Unknown quest",
