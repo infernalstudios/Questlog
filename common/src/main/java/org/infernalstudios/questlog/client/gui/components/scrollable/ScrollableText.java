@@ -2,7 +2,9 @@ package org.infernalstudios.questlog.client.gui.components.scrollable;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
@@ -11,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ScrollableText implements Scrollable {
+public class ScrollableText implements Scrollable, GuiEventListener {
 
     private final Font font;
     private final FormattedText text;
@@ -52,6 +54,33 @@ public class ScrollableText implements Scrollable {
                     false
             );
         }
+    }
+
+    @Nullable
+    public Style getStyleAt(double mouseX, double mouseY) {
+        if (this.getLines() == null || this.scroller == null) return null;
+
+        int lineIndex = (int) mouseY / this.font.lineHeight;
+
+        if (lineIndex >= 0 && lineIndex < this.getLines().size()) {
+            return this.font.getSplitter().componentStyleAtWidth(this.getLines().get(lineIndex), (int) mouseX);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        Style style = this.getStyleAt(mouseX, mouseY);
+        return style != null && style.getClickEvent() != null;
+    }
+
+    @Override
+    public boolean isFocused() {
+        return false;
+    }
+
+    @Override
+    public void setFocused(boolean b) {
     }
 
     @Override

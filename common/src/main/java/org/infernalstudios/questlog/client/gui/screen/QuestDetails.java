@@ -9,8 +9,13 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.narration.NarrationSupplier;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
@@ -27,9 +32,9 @@ import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.platform.Services;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,7 +168,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ps);
+        this.renderBackground(ps, mouseX, mouseY, partialTicks);
+        long window = this.minecraft.getWindow().getWindow();
+        boolean isHoveringLink = false;
+
         if (this.backButton != null) {
             boolean needsRead = !this.quest.isCompleted() && this.quest.objectives.stream()
                     .anyMatch(obj -> !obj.isCompleted() && obj.getClass().getSimpleName().equals("ReadObjective"));
@@ -176,15 +184,85 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.backButton.setMessage(this.getDisplay().getBackButtonText());
             }
         }
+
         super.render(ps, mouseX, mouseY, partialTicks);
         this.renderTitle(ps);
         this.renderDescription(ps);
         this.renderInfo(ps);
+
+        if (this.description != null && this.description.isMouseOver(mouseX, mouseY)) {
+            ScrollableText scrollableText = (ScrollableText) this.description.scrollable;
+            double relX = mouseX - this.description.getXOffset();
+            double relY = mouseY - this.description.getYOffset();
+
+            Style style = scrollableText.getStyleAt(relX, relY);
+
+            if (style != null) {
+                if (style.getClickEvent() != null) {
+                    isHoveringLink = true;
+                    GLFW.glfwSetCursor(window, GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+                }
+
+                if (style.getHoverEvent() != null) {
+                    HoverEvent hover = style.getHoverEvent();
+                    if (hover.getAction() == HoverEvent.Action.SHOW_TEXT) {
+                        Component hoverComponent = (Component) hover.getValue(hover.getAction());
+                        if (hoverComponent != null) {
+                            String hoverText = hoverComponent.getString();
+                            if (hoverText.startsWith("image:")) {
+                                String[] parts = hoverText.split(":");
+                                if (parts.length == 5) {
+                                    ResourceLocation imgLoc = ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]);
+                                    int imgWidth = Integer.parseInt(parts[3]);
+                                    int imgHeight = Integer.parseInt(parts[4]);
+
+                                    ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + imgWidth + 4, mouseY - 8 + imgHeight + 4, 0xDD000000);
+                                    ps.blit(imgLoc, mouseX + 10, mouseY - 6, 0, 0, imgWidth, imgHeight, imgWidth, imgHeight);
+                                }
+                            } else {
+                                ps.renderComponentHoverEffect(this.font, style, mouseX, mouseY);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!isHoveringLink) {
+            GLFW.glfwSetCursor(window, 0L);
+        }
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics ps) {
-        super.renderBackground(ps);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.description != null && this.description.isMouseOver(mouseX, mouseY)) {
+            ScrollableText scrollableText = (ScrollableText) this.description.scrollable;
+            double relX = mouseX - this.description.getXOffset();
+            double relY = mouseY - this.description.getYOffset();
+
+            Style style = scrollableText.getStyleAt(relX, relY);
+            if (style != null && style.getClickEvent() != null) {
+                ClickEvent click = style.getClickEvent();
+
+                if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
+                    ResourceLocation targetQuestId = ResourceLocation.parse(click.getValue());
+                    Quest targetQuest = QuestlogClient.getLocal().getQuest(targetQuestId);
+
+                    if (targetQuest != null) {
+                        if (this.minecraft != null) {
+                            this.minecraft.setScreen(new QuestDetails(this, targetQuest));
+                        }
+                        return true;
+                    }
+                }
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(ps, mouseX, mouseY, partialTick);
         this.getGuiSet().detailBackground.blit(ps, this.x - 375, this.y - 174);
     }
 
@@ -306,10 +384,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         private static final int INFO_ENTRY_HEIGHT = 18;
 
-        @CheckForNull
         private final RewardDisplayData rewardDisplayData;
 
-        @CheckForNull
         private final ObjectiveDisplayData objectiveDisplayData;
 
         protected int x;
