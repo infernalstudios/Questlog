@@ -12,7 +12,8 @@
 
 ### Changed
 
+- Improved quest details page to a multipanel layout.
 - Improved error logging.
 - Invalid quests no longer prevent you from loading worlds.
-- Simplified quest definitions.
+- Simplified quest definitions to reduce nesting.
     - These will be automatically converted from the legacy format on first load.
