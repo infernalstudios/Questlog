@@ -56,6 +56,7 @@ public class QuestObjectiveRegistry {
         register(ResourceLocation.fromNamespaceAndPath("questlog", "visit_structure"), VisitStructureObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "quest_complete"), QuestCompleteObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "read"), ReadObjective::new);
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "advancement"), AdvancementObjective::new);
     }
 
     public static void register(ResourceLocation id, Function<JsonObject, Objective> factory) {
