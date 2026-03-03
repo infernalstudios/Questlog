@@ -27,7 +27,7 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
 
     public final int width;
     public final int height;
-    private final Scrollable scrollable;
+    public final Scrollable scrollable;
     private final int left;
     private final int right;
     private final int top;

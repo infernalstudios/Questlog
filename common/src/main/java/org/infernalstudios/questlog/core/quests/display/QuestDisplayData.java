@@ -1,6 +1,8 @@
 package org.infernalstudios.questlog.core.quests.display;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -44,10 +46,35 @@ public class QuestDisplayData {
     public QuestDisplayData(JsonObject data) {
         boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
         String title = JsonUtils.getString(data, "title");
-        String description = JsonUtils.getString(data, "description");
-
         this.title = translatable ? Component.translatable(title) : Component.literal(title);
-        this.description = translatable ? Component.translatable(description) : Component.literal(description);
+
+        JsonElement descriptionElement = data.get("description");
+        Component parsedDescription = null;
+
+        if (descriptionElement != null) {
+            try {
+                if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
+                    parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
+                } else if (descriptionElement.isJsonPrimitive()) {
+                    String rawStr = descriptionElement.getAsString();
+                    if (rawStr.startsWith("[") || rawStr.startsWith("{")) {
+                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                    } else {
+                        parsedDescription = translatable ? Component.translatable(rawStr) : Component.literal(rawStr);
+                    }
+                }
+            } catch (Exception e) {
+                Questlog.LOGGER.error("Failed to parse description for quest", e);
+            }
+        }
+
+        if (parsedDescription == null) {
+            String rawStr = JsonUtils.getOrDefault(data, "description", "");
+            parsedDescription = translatable ? Component.translatable(rawStr) : Component.literal(rawStr);
+        }
+
+        this.description = parsedDescription;
+
         this.icon = JsonUtils.getIcon(data, "icon");
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
