@@ -1,6 +1,7 @@
 ### Added
 
 - Added `quest_read` objective.
+- Added `advancement` objective.
 - Added `trigger_all` command.
 
 ### Removed
