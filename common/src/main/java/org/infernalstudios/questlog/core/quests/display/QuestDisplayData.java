@@ -38,6 +38,13 @@ public class QuestDisplayData {
     private final Component collectedText;
     private final Component uncollectedText;
     private final Palette palette;
+
+    private final String chapter;
+    @Nullable
+    private final Blittable chapterIcon;
+    private final boolean showInMain;
+    private final boolean isPrimaryChapter;
+
     @Nullable
     private List<ObjectiveDisplayData> objectiveDisplay = null;
     @Nullable
@@ -74,8 +81,12 @@ public class QuestDisplayData {
         }
 
         this.description = parsedDescription;
-
         this.icon = JsonUtils.getIcon(data, "icon");
+
+        this.chapter = JsonUtils.getOrDefault(data, "chapter", "main");
+        this.chapterIcon = JsonUtils.getIcon(data, "chapter_icon");
+        this.showInMain = JsonUtils.getOrDefault(data, "show_in_main", this.chapter.equals("main"));
+        this.isPrimaryChapter = JsonUtils.getOrDefault(data, "is_primary_chapter", this.chapter.equals("main"));
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
@@ -120,6 +131,45 @@ public class QuestDisplayData {
         this.rewardDisplay = quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
     }
 
+    public boolean matchesSearch(String query) {
+        if (query == null || query.isBlank()) return true;
+        String lowerQuery = query.toLowerCase();
+
+        if (this.title.getString().toLowerCase().contains(lowerQuery)) return true;
+        if (this.description.getString().toLowerCase().contains(lowerQuery)) return true;
+
+        if (this.objectiveDisplay != null) {
+            for (ObjectiveDisplayData obj : this.objectiveDisplay) {
+                if (obj.getName().getString().toLowerCase().contains(lowerQuery)) return true;
+            }
+        }
+
+        if (this.rewardDisplay != null) {
+            for (RewardDisplayData rew : this.rewardDisplay) {
+                if (rew.getName().getString().toLowerCase().contains(lowerQuery)) return true;
+            }
+        }
+
+        return false;
+    }
+
+    public String getChapter() {
+        return this.chapter;
+    }
+
+    @Nullable
+    public Blittable getChapterIcon() {
+        return this.chapterIcon;
+    }
+
+    public boolean shouldShowInMain() {
+        return this.showInMain;
+    }
+
+    public boolean isPrimaryChapter() {
+        return this.isPrimaryChapter;
+    }
+
     public Component getTitle() {
         return this.title;
     }
@@ -129,16 +179,14 @@ public class QuestDisplayData {
     }
 
     public List<ObjectiveDisplayData> getObjectiveDisplayData() {
-        if (this.objectiveDisplay == null) {
+        if (this.objectiveDisplay == null)
             throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
-        }
         return this.objectiveDisplay;
     }
 
     public List<RewardDisplayData> getRewardDisplayData() {
-        if (this.rewardDisplay == null) {
+        if (this.rewardDisplay == null)
             throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
-        }
         return this.rewardDisplay;
     }
 
@@ -158,9 +206,7 @@ public class QuestDisplayData {
     }
 
     public QuestlogGuiSet getGuiSet() {
-        return (
-                this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc)
-        )
+        return (this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc))
                 ? QuestlogGuiSet.DEFAULT
                 : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
     }
