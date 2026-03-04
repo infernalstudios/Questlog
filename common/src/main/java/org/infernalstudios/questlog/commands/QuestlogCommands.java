@@ -188,7 +188,7 @@ public class QuestlogCommands {
                 quest.requirements.forEach(trigger -> trigger.setUnits(0));
                 quest.objectives.forEach(obj -> obj.setUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
-                quest.hasSentTrigger = false;
+                quest.hasSentTrigger = quest.requirements.isEmpty();
                 quest.hasSentCompletion = false;
             }
         }
@@ -206,7 +206,7 @@ public class QuestlogCommands {
             quest.requirements.forEach(trigger -> trigger.setUnits(0));
             quest.objectives.forEach(obj -> obj.setUnits(0));
             quest.rewards.forEach(Reward::revokeReward);
-            quest.hasSentTrigger = false;
+            quest.hasSentTrigger = quest.requirements.isEmpty();
             quest.hasSentCompletion = false;
         }
 

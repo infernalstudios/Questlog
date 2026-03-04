@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.platform.Services;
+import org.infernalstudios.questlog.util.JsonUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -35,7 +36,22 @@ public class DefinitionUtil {
     }
 
     public static List<ResourceLocation> getCachedChapterKeys() {
-        return new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
+        List<ResourceLocation> keys = new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
+        keys.sort((a, b) -> {
+            boolean aMain = a.getNamespace().equals(Questlog.MODID) && a.getPath().equals("main");
+            boolean bMain = b.getNamespace().equals(Questlog.MODID) && b.getPath().equals("main");
+            if (aMain && !bMain) return -1;
+            if (!aMain && bMain) return 1;
+
+            int orderA = JsonUtils.getOrDefault(CHAPTER_DEFINITION_CACHE.get(a), "order", 0);
+            int orderB = JsonUtils.getOrDefault(CHAPTER_DEFINITION_CACHE.get(b), "order", 0);
+
+            if (orderA != orderB) {
+                return Integer.compare(orderA, orderB);
+            }
+            return a.compareTo(b);
+        });
+        return keys;
     }
 
     public static synchronized JsonObject getCachedChapter(ResourceLocation path) {
