@@ -104,7 +104,7 @@ public class QuestlogScreen extends Screen {
         int listX = (this.width - listWidth) / 2 + 1;
         int listY = (this.height - listHeight) / 2 + 1;
 
-        int searchY = listY - 33;
+        int searchY = listY - 32;
         int searchWidth = this.searchExpanded ? 193 : 28;
         int searchX = listX + listWidth - searchWidth + 12;
 

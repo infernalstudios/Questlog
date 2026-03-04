@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.core;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -9,7 +10,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.mixin.MinecraftServerAccessor;
 import org.infernalstudios.questlog.mixin.PlayerDataStorageAccessor;
-import org.infernalstudios.questlog.network.packet.QuestDefinitionPacket;
+import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 import org.infernalstudios.questlog.platform.Services;
 
 import java.io.File;
@@ -121,7 +122,7 @@ public class ServerPlayerManager {
         }
 
         boolean shouldSave = false;
-        questManager.createAllQuests();
+        questManager.reload();
         for (Quest quest : questManager.getAllQuests()) {
             if (data.contains(quest.getId().toString())) {
                 CompoundTag questData = data.getCompound(quest.getId().toString());
@@ -129,21 +130,26 @@ public class ServerPlayerManager {
             } else {
                 shouldSave = true;
             }
-            Questlog.LOGGER.trace(
-                    "Loaded quest {} for {}, sending definition packet",
-                    quest.getId(),
-                    questManager.player.getGameProfile().getName()
-            );
-            Services.PLATFORM.sendPacketToClient(
-                    (ServerPlayer) questManager.player,
-                    new QuestDefinitionPacket(quest.getId(), DefinitionUtil.getCached(quest.getId()))
-            );
-            // This is handled when client responds with QuestDefinitionHandledPacket with questManager.sync()
-            // NetworkHandler.sendToPlayer(new QuestDataPacket(quest.getId(), quest.serialize()), (ServerPlayer) event.getEntity());
         }
 
         if (shouldSave) {
             this.save(questManager);
+        }
+
+        this.syncPlayer(questManager);
+    }
+
+    public void syncPlayer(QuestManager questManager) {
+        if (questManager.player instanceof ServerPlayer serverPlayer) {
+            Map<ResourceLocation, String> definitions = new HashMap<>();
+            Map<ResourceLocation, CompoundTag> data = new HashMap<>();
+
+            for (Quest quest : questManager.getAllQuests()) {
+                definitions.put(quest.getId(), DefinitionUtil.getCached(quest.getId()).toString());
+                data.put(quest.getId(), quest.serialize());
+            }
+
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, data));
         }
     }
 

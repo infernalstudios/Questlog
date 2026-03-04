@@ -120,7 +120,15 @@ public class QuestlogCommands {
         DefinitionUtil.loadFromConfig();
         int count = DefinitionUtil.getCachedKeys().size();
 
-        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + count + " quests from config. Players may need to rejoin to see changes."), true);
+        if (ServerPlayerManager.INSTANCE != null) {
+            for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+                QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+                manager.reload();
+                ServerPlayerManager.INSTANCE.syncPlayer(manager);
+            }
+        }
+
+        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + count + " quests from config and synced to all players."), true);
         return count;
     }
 
