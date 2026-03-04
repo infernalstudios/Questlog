@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -19,6 +20,7 @@ import java.util.function.Consumer;
 
 public class QuestList extends AbstractContainerEventHandler implements Scrollable {
 
+    public final boolean condensed;
     protected final Minecraft minecraft;
     protected final int itemHeight;
     private final Consumer<Quest> onSelect;
@@ -30,9 +32,10 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     @Nullable
     private ScrollableComponent scroller;
 
-    public QuestList(Minecraft minecraft, List<Quest> quests, Consumer<Quest> onSelect) {
+    public QuestList(Minecraft minecraft, List<Quest> quests, Consumer<Quest> onSelect, boolean condensed) {
         this.minecraft = minecraft;
-        this.itemHeight = 28;
+        this.condensed = condensed;
+        this.itemHeight = condensed ? 18 : 28;
         this.onSelect = onSelect;
 
         for (Quest quest : quests) {
@@ -134,7 +137,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
     // Renderers
 
-    public void render(GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+    public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
         this.renderList(ps, mouseX, mouseY, partialTicks);
     }
@@ -225,12 +228,33 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
             Font font = Minecraft.getInstance().font;
             int dx = 5;
             if (this.quest.getDisplay().getIcon() != null) {
+                int iconY = this.list.condensed ? yPosition + (height - 16) / 2 : yPosition + 5;
                 this.quest.getDisplay()
                         .getIcon()
-                        .blit(ps, xPosition + dx + (int) this.list.scroller.getXOffset(), yPosition + 5 + (int) this.list.scroller.getYOffset());
+                        .blit(ps, xPosition + dx + (int) this.list.scroller.getXOffset(), iconY + (int) this.list.scroller.getYOffset());
                 dx += 20;
             }
-            if (this.quest.isCompleted()) {
+
+            if (this.list.condensed) {
+                int y = yPosition + (int) this.list.scroller.getYOffset() + (height - font.lineHeight) / 2 + 2;
+                int currentX = xPosition + (int) this.list.scroller.getXOffset() + dx;
+
+                Component title = this.quest.getDisplay().getTitle();
+                ps.drawString(font, title, currentX, y, 0x4C381B, false);
+
+                if (this.quest.isCompleted()) {
+                    int titleWidth = font.width(title);
+                    int statusX = currentX + titleWidth + 8;
+
+                    Component statusText = this.quest.isRewarded()
+                            ? Component.translatable("questlog.quest.completed")
+                            : Component.translatable("questlog.quest.uncollected");
+
+                    int statusColor = this.quest.isRewarded() ? 0x529E52 : 0x9e6632;
+
+                    ps.drawString(font, statusText, statusX, y, statusColor, false);
+                }
+            } else if (this.quest.isCompleted()) {
                 int linesHeight = font.lineHeight * 2;
                 int dy = (height - linesHeight) / 2;
 
@@ -267,7 +291,6 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
             }
 
             if (this.hasNext()) {
-                // A lot of effort went into deriving this
                 QuestlogGuiSet.DEFAULT.bigHR.blit(
                         ps,
                         (int) this.list.scroller.getXOffset() - 2,

@@ -62,6 +62,7 @@ public class JsonUtils {
 
     @Nullable
     public static Blittable getIcon(JsonObject obj, String key) {
+        if (obj == null) return null;
         if (obj.has(key)) {
             if (!obj.get(key).isJsonObject()) {
                 throw new IllegalArgumentException("Field " + key + " must be an object");

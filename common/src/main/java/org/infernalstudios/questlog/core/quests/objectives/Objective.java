@@ -13,12 +13,12 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
 
     private final ObjectiveDisplayData display;
-    private final int totalUnits;
+    private final int requiredAmount;
     private Quest parent;
     private int units;
 
     public Objective(JsonObject definition) {
-        this.totalUnits = JsonUtils.getOrDefault(definition, "total", 1);
+        this.requiredAmount = JsonUtils.getOrDefault(definition, "required_amount", 1);
         this.units = 0;
 
         this.display = new ObjectiveDisplayData(definition);
@@ -42,18 +42,18 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     }
 
     public final void setUnits(int units) {
-        this.units = Math.min(units, this.totalUnits);
+        this.units = Math.min(units, this.requiredAmount);
         if (this.getParent() != null) {
             this.getParent().markForUpdate();
         }
     }
 
-    public int getTotalUnits() {
-        return this.totalUnits;
+    public int getRequiredAmount() {
+        return this.requiredAmount;
     }
 
     public boolean isCompleted() {
-        return this.units >= this.totalUnits;
+        return this.units >= this.requiredAmount;
     }
 
     @Override
@@ -61,25 +61,16 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         return this.display;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void writeInitialData(CompoundTag data) {
         data.putInt("units", this.units);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deserialize(CompoundTag data) {
         this.units = data.getInt("units");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public CompoundTag serialize() {
         CompoundTag tag = new CompoundTag();

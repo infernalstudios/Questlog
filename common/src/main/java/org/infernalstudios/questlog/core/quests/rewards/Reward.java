@@ -13,18 +13,18 @@ import org.jetbrains.annotations.Nullable;
 public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDisplayData> {
 
     private final RewardDisplayData display;
-    private final boolean isInstant;
+    private final boolean autoClaim;
     private Quest parent;
     private boolean rewarded = false;
 
     public Reward(JsonObject definition) {
-        if (definition.has("instant")) {
-            if (!definition.get("instant").isJsonPrimitive()) {
-                throw new IllegalStateException("Reward instant must be a boolean");
+        if (definition.has("auto_claim")) {
+            if (!definition.get("auto_claim").isJsonPrimitive()) {
+                throw new IllegalStateException("Reward auto_claim must be a boolean");
             }
-            this.isInstant = JsonUtils.getBoolean(definition, "instant");
+            this.autoClaim = JsonUtils.getBoolean(definition, "auto_claim");
         } else {
-            this.isInstant = false;
+            this.autoClaim = false;
         }
 
         this.display = new RewardDisplayData(definition);
@@ -46,9 +46,8 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
         return this.display;
     }
 
-    public boolean rewardsInstantly() {
-        // TODO
-        return this.isInstant;
+    public boolean isAutoClaim() {
+        return this.autoClaim;
     }
 
     public void applyReward(ServerPlayer player) {
@@ -69,17 +68,11 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
         return this.rewarded;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void writeInitialData(CompoundTag data) {
         data.putBoolean("rewarded", false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public CompoundTag serialize() {
         CompoundTag tag = new CompoundTag();
@@ -87,9 +80,6 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
         return tag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deserialize(CompoundTag data) {
         this.rewarded = data.getBoolean("rewarded");

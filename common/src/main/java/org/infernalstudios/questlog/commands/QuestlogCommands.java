@@ -2,7 +2,6 @@ package org.infernalstudios.questlog.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -12,6 +11,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,26 +65,26 @@ public class QuestlogCommands {
 
                         .then(Commands.literal("open")
                                 .executes(ctx -> open(ctx, null))
-                                .then(Commands.argument("target", StringArgumentType.string())
+                                .then(Commands.argument("target", ResourceLocationArgument.id())
                                         .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                        .executes(ctx -> open(ctx, StringArgumentType.getString(ctx, "target")))
+                                        .executes(ctx -> open(ctx, ResourceLocationArgument.getId(ctx, "target").toString()))
                                 )
                         )
 
                         .then(Commands.literal("progress")
                                 .then(Commands.literal("reset")
-                                        .then(Commands.argument("target", StringArgumentType.string())
+                                        .then(Commands.argument("target", ResourceLocationArgument.id())
                                                 .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                                .executes(ctx -> modifyProgress(ctx, StringArgumentType.getString(ctx, "target"), false))
+                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), false))
                                         )
                                         .then(Commands.literal("all")
                                                 .executes(QuestlogCommands::resetAllProgress)
                                         )
                                 )
                                 .then(Commands.literal("complete")
-                                        .then(Commands.argument("target", StringArgumentType.string())
+                                        .then(Commands.argument("target", ResourceLocationArgument.id())
                                                 .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                                .executes(ctx -> modifyProgress(ctx, StringArgumentType.getString(ctx, "target"), true))
+                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), true))
                                         )
                                         .then(Commands.literal("all")
                                                 .executes(QuestlogCommands::completeAllProgress)
@@ -96,9 +96,9 @@ public class QuestlogCommands {
                                 .then(Commands.literal("all")
                                         .executes(ctx -> trigger(ctx, "all"))
                                 )
-                                .then(Commands.argument("target", StringArgumentType.string())
+                                .then(Commands.argument("target", ResourceLocationArgument.id())
                                         .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                        .executes(ctx -> trigger(ctx, StringArgumentType.getString(ctx, "target")))
+                                        .executes(ctx -> trigger(ctx, ResourceLocationArgument.getId(ctx, "target").toString()))
                                 )
                         )
 
@@ -128,7 +128,7 @@ public class QuestlogCommands {
             }
         }
 
-        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + questCount + " quests and " + chapterCount + " chapters from config and synced to all players."), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + questCount + " quests and " + chapterCount + " chapters from config."), true);
         return questCount;
     }
 
@@ -160,7 +160,7 @@ public class QuestlogCommands {
         int count = 0;
         for (Quest quest : affectedQuests) {
             if (!quest.isTriggered()) {
-                quest.triggers.forEach(trigger -> trigger.setUnits(trigger.getTotalUnits()));
+                quest.requirements.forEach(trigger -> trigger.setUnits(trigger.getRequiredAmount()));
                 count++;
             }
         }
@@ -183,9 +183,9 @@ public class QuestlogCommands {
 
         for (Quest quest : affectedQuests) {
             if (complete) {
-                quest.objectives.forEach(obj -> obj.setUnits(obj.getTotalUnits()));
+                quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
             } else {
-                quest.triggers.forEach(trigger -> trigger.setUnits(0));
+                quest.requirements.forEach(trigger -> trigger.setUnits(0));
                 quest.objectives.forEach(obj -> obj.setUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
                 quest.hasSentTrigger = false;
@@ -203,7 +203,7 @@ public class QuestlogCommands {
         QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
 
         for (Quest quest : manager.getAllQuests()) {
-            quest.triggers.forEach(trigger -> trigger.setUnits(0));
+            quest.requirements.forEach(trigger -> trigger.setUnits(0));
             quest.objectives.forEach(obj -> obj.setUnits(0));
             quest.rewards.forEach(Reward::revokeReward);
             quest.hasSentTrigger = false;
@@ -219,7 +219,7 @@ public class QuestlogCommands {
         QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
 
         for (Quest quest : manager.getAllQuests()) {
-            quest.objectives.forEach(obj -> obj.setUnits(obj.getTotalUnits()));
+            quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
         }
 
         ctx.getSource().sendSuccess(() -> Component.literal("Successfully completed all quests."), true);

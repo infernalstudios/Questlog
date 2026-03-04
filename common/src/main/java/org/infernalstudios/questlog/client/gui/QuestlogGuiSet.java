@@ -45,6 +45,11 @@ public class QuestlogGuiSet {
     public final Texture tabMain;
     public final Texture tabMainActive;
 
+    public final Texture expandButton;
+    public final Texture expandButtonHovered;
+    public final Texture condenseButton;
+    public final Texture condenseButtonHovered;
+
     public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation peripheralLoc, int leftPanelWidth, int rightPanelWidth, int panelHeight) {
         this.backgroundLoc = backgroundLoc;
         this.peripheralLoc = peripheralLoc;
@@ -83,5 +88,10 @@ public class QuestlogGuiSet {
         this.tabSecondaryActive = new Texture(this.searchTabButtonsLoc, 28, 29, 75, 208, 256, 256);
         this.tabMain = new Texture(this.searchTabButtonsLoc, 28, 23, 131, 174, 256, 256);
         this.tabMainActive = new Texture(this.searchTabButtonsLoc, 28, 29, 131, 208, 256, 256);
+
+        this.expandButton = new Texture(this.searchTabButtonsLoc, 14, 14, 128, 8, 256, 256);
+        this.expandButtonHovered = new Texture(this.searchTabButtonsLoc, 14, 14, 156, 8, 256, 256);
+        this.condenseButton = new Texture(this.searchTabButtonsLoc, 14, 14, 128, 36, 256, 256);
+        this.condenseButtonHovered = new Texture(this.searchTabButtonsLoc, 14, 14, 156, 36, 256, 256);
     }
 }

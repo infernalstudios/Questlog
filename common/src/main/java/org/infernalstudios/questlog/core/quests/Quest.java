@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
-    public final List<Objective> triggers;
+    public final List<Objective> requirements;
     public final List<Objective> objectives;
     public final List<Reward> rewards;
     public final QuestManager manager;
@@ -32,23 +32,23 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
     public Quest(
             QuestDisplayData display,
-            List<Objective> triggers,
+            List<Objective> requirements,
             List<Objective> objectives,
             List<Reward> rewards,
             ResourceLocation id,
             QuestManager manager
     ) {
         this.display = display;
-        this.triggers = triggers;
+        this.requirements = requirements;
         this.objectives = objectives;
         this.rewards = rewards;
         this.id = id;
         this.manager = manager;
 
-        this.triggers.forEach(trigger -> {
-            trigger.setParent(this);
+        this.requirements.forEach(requirement -> {
+            requirement.setParent(this);
             if (!this.manager.isClient()) {
-                trigger.registerEventListeners(Questlog.EVENTS);
+                requirement.registerEventListeners(Questlog.EVENTS);
             }
         });
         this.objectives.forEach(objective -> {
@@ -63,13 +63,13 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
     public static Quest create(JsonObject definition, ResourceLocation id, QuestManager manager) {
         QuestDisplayData display = new QuestDisplayData(definition);
-        List<Objective> triggers = new ArrayList<>();
+        List<Objective> requirements = new ArrayList<>();
         List<Objective> objectives = new ArrayList<>();
         List<Reward> rewards = new ArrayList<>();
 
-        for (JsonElement triggerElement : JsonUtils.getOrDefault(definition, "triggers", new JsonArray())) {
-            if (triggerElement.isJsonObject()) {
-                triggers.add(QuestObjectiveRegistry.create(triggerElement.getAsJsonObject()));
+        for (JsonElement reqElement : JsonUtils.getOrDefault(definition, "requirements", new JsonArray())) {
+            if (reqElement.isJsonObject()) {
+                requirements.add(QuestObjectiveRegistry.create(reqElement.getAsJsonObject()));
             }
         }
 
@@ -85,7 +85,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
             }
         }
 
-        return new Quest(display, triggers, objectives, rewards, id, manager);
+        return new Quest(display, requirements, objectives, rewards, id, manager);
     }
 
     public ResourceLocation getId() {
@@ -98,12 +98,11 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     }
 
     public boolean isTriggered() {
-        for (Objective trigger : this.triggers) {
-            if (!trigger.isCompleted()) {
+        for (Objective req : this.requirements) {
+            if (!req.isCompleted()) {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -113,7 +112,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -123,7 +121,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
                 return false;
             }
         }
-
         return true;
     }
 
@@ -131,19 +128,16 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         this.manager.sync(this.id);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void writeInitialData(CompoundTag data) {
         data.putBoolean("completed", this.hasSentCompletion);
         data.putBoolean("triggered", this.hasSentTrigger);
 
         data.put(
-                "triggers",
-                Util.toNbtList(this.triggers, trigger -> {
+                "requirements",
+                Util.toNbtList(this.requirements, requirement -> {
                     CompoundTag tag = new CompoundTag();
-                    trigger.writeInitialData(tag);
+                    requirement.writeInitialData(tag);
                     return tag;
                 })
         );
@@ -167,17 +161,14 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deserialize(CompoundTag data) {
         this.hasSentCompletion = data.getBoolean("completed");
         this.hasSentTrigger = data.getBoolean("triggered");
 
-        List<Tag> triggerData = data.getList("triggers", Tag.TAG_COMPOUND);
-        for (int i = 0; i < Math.min(triggerData.size(), this.triggers.size()); i++) {
-            this.triggers.get(i).deserialize((CompoundTag) triggerData.get(i));
+        List<Tag> reqData = data.getList("requirements", Tag.TAG_COMPOUND);
+        for (int i = 0; i < Math.min(reqData.size(), this.requirements.size()); i++) {
+            this.requirements.get(i).deserialize((CompoundTag) reqData.get(i));
         }
 
         List<Tag> objectiveData = data.getList("objectives", Tag.TAG_COMPOUND);
@@ -191,15 +182,12 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public CompoundTag serialize() {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("completed", this.hasSentCompletion);
         tag.putBoolean("triggered", this.hasSentTrigger);
-        tag.put("triggers", Util.toNbtList(this.triggers, Objective::serialize));
+        tag.put("requirements", Util.toNbtList(this.requirements, Objective::serialize));
         tag.put("objectives", Util.toNbtList(this.objectives, Objective::serialize));
         tag.put("rewards", Util.toNbtList(this.rewards, Reward::serialize));
         return tag;

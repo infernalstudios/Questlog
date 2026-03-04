@@ -39,7 +39,7 @@ public class NotObjective extends Objective {
     }
 
     @Override
-    public int getTotalUnits() {
+    public int getRequiredAmount() {
         return 1;
     }
 

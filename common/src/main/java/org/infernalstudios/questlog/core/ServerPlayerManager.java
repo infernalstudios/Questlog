@@ -152,7 +152,12 @@ public class ServerPlayerManager {
             }
 
             for (ResourceLocation chapterId : DefinitionUtil.getCachedChapterKeys()) {
-                chapterDefinitions.put(chapterId, DefinitionUtil.getCachedChapter(chapterId).toString());
+                var chapterJson = DefinitionUtil.getCachedChapter(chapterId);
+                if (chapterJson != null) {
+                    chapterDefinitions.put(chapterId, chapterJson.toString());
+                } else {
+                    Questlog.LOGGER.warn("Attempted to sync missing chapter definition: {}", chapterId);
+                }
             }
 
             Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data));

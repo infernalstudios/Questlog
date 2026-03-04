@@ -38,11 +38,15 @@ public class DefinitionUtil {
         return new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
     }
 
-    public static JsonObject getCachedChapter(ResourceLocation path) {
+    public static synchronized JsonObject getCachedChapter(ResourceLocation path) {
         return CHAPTER_DEFINITION_CACHE.get(path);
     }
 
-    public static void loadFromConfig() {
+    public static void putCachedChapter(ResourceLocation path, JsonObject definition) {
+        CHAPTER_DEFINITION_CACHE.put(path, definition);
+    }
+
+    public static synchronized void loadFromConfig() {
         QUEST_DEFINITION_CACHE.clear();
         CHAPTER_DEFINITION_CACHE.clear();
 
@@ -52,6 +56,22 @@ public class DefinitionUtil {
 
         createDirIfNotExists(questDir);
         createDirIfNotExists(chapterDir);
+
+        Path defaultMainChapter = chapterDir.resolve("main.json");
+        if (!Files.exists(defaultMainChapter)) {
+            try {
+                JsonObject mainChapter = new JsonObject();
+                JsonObject iconObj = new JsonObject();
+                iconObj.addProperty("item", "minecraft:knowledge_book");
+                mainChapter.add("icon", iconObj);
+                mainChapter.addProperty("default_chapter", true);
+                mainChapter.addProperty("hidden", false);
+
+                Files.writeString(defaultMainChapter, GSON.toJson(mainChapter));
+            } catch (IOException e) {
+                Questlog.LOGGER.error("Failed to create default main.json chapter", e);
+            }
+        }
 
         loadFiles(questDir, QUEST_DEFINITION_CACHE);
         loadFiles(chapterDir, CHAPTER_DEFINITION_CACHE);

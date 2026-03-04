@@ -60,7 +60,7 @@ public class OrObjective extends Objective {
     }
 
     @Override
-    public int getTotalUnits() {
+    public int getRequiredAmount() {
         return 1;
     }
 
