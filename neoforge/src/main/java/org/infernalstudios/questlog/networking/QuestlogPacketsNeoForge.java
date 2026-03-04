@@ -39,6 +39,12 @@ public class QuestlogPacketsNeoForge {
         registrar.playToClient(QuestCompletedPacket.TYPE, QuestCompletedPacket.STREAM_CODEC, (payload, context) ->
                 context.enqueueWork(() -> QuestCompletedPacket.handle(payload, createClientContext()))
         );
+        registrar.playToClient(QuestOpenPacket.TYPE, QuestOpenPacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> QuestOpenPacket.handle(payload, createClientContext()))
+        );
+        registrar.playToClient(QuestEditModePacket.TYPE, QuestEditModePacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> QuestEditModePacket.handle(payload, createClientContext()))
+        );
     }
 
     private static IPacketContext createClientContext() {

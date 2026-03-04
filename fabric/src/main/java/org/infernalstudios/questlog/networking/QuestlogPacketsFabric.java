@@ -16,6 +16,8 @@ public class QuestlogPacketsFabric {
         PayloadTypeRegistry.playS2C().register(QuestRemovePacket.TYPE, QuestRemovePacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(QuestTriggeredPacket.TYPE, QuestTriggeredPacket.STREAM_CODEC);
         PayloadTypeRegistry.playS2C().register(QuestCompletedPacket.TYPE, QuestCompletedPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(QuestOpenPacket.TYPE, QuestOpenPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playS2C().register(QuestEditModePacket.TYPE, QuestEditModePacket.STREAM_CODEC);
 
         // Register C2S Payloads
         PayloadTypeRegistry.playC2S().register(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC);
@@ -32,6 +34,8 @@ public class QuestlogPacketsFabric {
         ClientPlayNetworking.registerGlobalReceiver(QuestRemovePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestRemovePacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestTriggeredPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestTriggeredPacket.handle(payload, createClientContext())));
         ClientPlayNetworking.registerGlobalReceiver(QuestCompletedPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestCompletedPacket.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestOpenPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestOpenPacket.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestEditModePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestEditModePacket.handle(payload, createClientContext())));
     }
 
     private static void registerServerReceivers() {
