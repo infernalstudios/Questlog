@@ -7,7 +7,6 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
-import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -7,7 +7,7 @@ import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
-import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
+import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;

@@ -17,50 +17,65 @@ public class QuestlogButton extends AbstractButton {
     private final int textColorHovered;
 
     public QuestlogButton(int x, int y, int textColor, int textColorHovered, Component message, Callable onPress, QuestlogGuiSet guiSet) {
-        super(x - 10, y - 10, guiSet.button.width() - 20, guiSet.button.height() - 20, message);
+        super(x, y, getExpectedWidth(message, guiSet), guiSet.button.height(), message);
         this.guiSet = guiSet;
         this.onPress = onPress;
         this.textColor = textColor;
         this.textColorHovered = textColorHovered;
     }
 
-    private boolean isLong() {
+    private static int getExpectedWidth(Component message, QuestlogGuiSet guiSet) {
+        return Minecraft.getInstance().font.width(message) > 46 ? guiSet.buttonLong.width() : guiSet.button.width();
+    }
+
+    public int getExpectedWidth() {
+        return getExpectedWidth(this.getMessage(), this.guiSet);
+    }
+
+    public boolean isLong() {
         return Minecraft.getInstance().font.width(this.getMessage()) > 46;
     }
 
-    protected void renderBg(GuiGraphics poseStack, Minecraft minecraft, int mouseX, int mouseY) {
-        int actualX = this.getX() - 10;
-        int actualY = this.getY() - 10;
+    @Override
+    protected void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+        Minecraft minecraft = Minecraft.getInstance();
+        this.width = getExpectedWidth(this.getMessage(), this.guiSet);
+
         if (this.isLong()) {
-            actualX -= (34 / 2); // Hacky
-            if (this.isMouseOver(mouseX, mouseY)) {
-                this.guiSet.buttonLongHovered.blit(poseStack, actualX, actualY);
+            if (this.isHovered) {
+                this.guiSet.buttonLongHovered.blit(ps, this.getX(), this.getY());
             } else {
-                this.guiSet.buttonLong.blit(poseStack, actualX, actualY);
+                this.guiSet.buttonLong.blit(ps, this.getX(), this.getY());
             }
         } else {
-            if (this.isMouseOver(mouseX, mouseY)) {
-                this.guiSet.buttonHovered.blit(poseStack, actualX, actualY);
+            if (this.isHovered) {
+                this.guiSet.buttonHovered.blit(ps, this.getX(), this.getY());
             } else {
-                this.guiSet.button.blit(poseStack, actualX, actualY);
+                this.guiSet.button.blit(ps, this.getX(), this.getY());
             }
         }
-    }
 
-    @Override
-    protected void renderWidget(GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        Minecraft minecraft = Minecraft.getInstance();
-        this.renderBg(ps, minecraft, mouseX, mouseY);
+        int textWidth = minecraft.font.width(this.getMessage());
+        int maxTextWidth = this.width - 8;
 
-        int x = this.getX() + (this.width - minecraft.font.width(this.getMessage())) / 2 + 1;
-        int y = this.getY() + (this.height - 8) / 2;
+        int textY = this.getY() + (this.height - minecraft.font.lineHeight) / 2 + 2;
 
-        ps.drawString(minecraft.font, this.getMessage(), x, y, this.isMouseOver(mouseX, mouseY) ? this.textColorHovered : this.textColor, false);
-    }
+        if (textWidth > maxTextWidth && maxTextWidth > 0) {
+            ps.pose().pushPose();
+            float scale = (float) maxTextWidth / textWidth;
+            float scaledTextWidth = textWidth * scale;
 
-    @Override
-    public boolean isMouseOver(double x, double y) {
-        return x >= this.getX() - 10 && x <= this.getX() + this.width && y >= this.getY() - 10 && y <= this.getY() + this.height;
+            float scaledTextX = this.getX() + (this.width - scaledTextWidth) / 2.0f;
+            float scaledTextY = textY + (minecraft.font.lineHeight * (1.0f - scale)) / 2.0f;
+
+            ps.pose().translate(scaledTextX, scaledTextY, 0);
+            ps.pose().scale(scale, scale, 1.0f);
+            ps.drawString(minecraft.font, this.getMessage(), 0, 0, this.isHovered ? this.textColorHovered : this.textColor, false);
+            ps.pose().popPose();
+        } else {
+            int textX = this.getX() + (this.width - textWidth) / 2;
+            ps.drawString(minecraft.font, this.getMessage(), textX, textY, this.isHovered ? this.textColorHovered : this.textColor, false);
+        }
     }
 
     @Override
