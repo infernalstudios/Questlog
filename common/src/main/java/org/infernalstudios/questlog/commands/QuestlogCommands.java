@@ -15,6 +15,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
@@ -42,11 +43,14 @@ public class QuestlogCommands {
         List<String> suggestions = new ArrayList<>();
         for (Quest quest : manager.getAllQuests()) {
             suggestions.add(quest.getId().toString());
-            String category = quest.getDisplay().getChapter();
-            if (category != null && !suggestions.contains(category)) {
-                suggestions.add(category);
-            }
         }
+        for (ResourceLocation chapterId : DefinitionUtil.getCachedChapterKeys()) {
+            suggestions.add(chapterId.toString());
+        }
+        if (!suggestions.contains(Questlog.MODID + ":main") && !suggestions.contains("main")) {
+            suggestions.add(Questlog.MODID + ":main");
+        }
+
         return SharedSuggestionProvider.suggest(suggestions, builder);
     };
 
@@ -113,7 +117,8 @@ public class QuestlogCommands {
 
     private static int reloadQuests(CommandContext<CommandSourceStack> ctx) {
         DefinitionUtil.loadFromConfig();
-        int count = DefinitionUtil.getCachedKeys().size();
+        int questCount = DefinitionUtil.getCachedQuestKeys().size();
+        int chapterCount = DefinitionUtil.getCachedChapterKeys().size();
 
         if (ServerPlayerManager.INSTANCE != null) {
             for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
@@ -123,8 +128,8 @@ public class QuestlogCommands {
             }
         }
 
-        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + count + " quests from config and synced to all players."), true);
-        return count;
+        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + questCount + " quests and " + chapterCount + " chapters from config and synced to all players."), true);
+        return questCount;
     }
 
     private static int open(CommandContext<CommandSourceStack> ctx, String target) throws CommandSyntaxException {

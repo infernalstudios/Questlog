@@ -40,10 +40,6 @@ public class QuestDisplayData {
     private final Palette palette;
 
     private final String chapter;
-    @Nullable
-    private final Blittable chapterIcon;
-    private final boolean showInMain;
-    private final boolean isPrimaryChapter;
 
     private final int leftPanelWidth;
     private final int rightPanelWidth;
@@ -88,9 +84,6 @@ public class QuestDisplayData {
         this.icon = JsonUtils.getIcon(data, "icon");
 
         this.chapter = JsonUtils.getOrDefault(data, "chapter", "main");
-        this.chapterIcon = JsonUtils.getIcon(data, "chapter_icon");
-        this.showInMain = JsonUtils.getOrDefault(data, "show_in_main", this.chapter.equals("main"));
-        this.isPrimaryChapter = JsonUtils.getOrDefault(data, "is_primary_chapter", this.chapter.equals("main"));
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : ResourceLocation.tryParse(completedSoundLoc);
@@ -163,19 +156,6 @@ public class QuestDisplayData {
 
     public String getChapter() {
         return this.chapter;
-    }
-
-    @Nullable
-    public Blittable getChapterIcon() {
-        return this.chapterIcon;
-    }
-
-    public boolean shouldShowInMain() {
-        return this.showInMain;
-    }
-
-    public boolean isPrimaryChapter() {
-        return this.isPrimaryChapter;
     }
 
     public Component getTitle() {

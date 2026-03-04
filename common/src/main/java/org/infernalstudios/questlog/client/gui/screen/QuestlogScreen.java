@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.client.gui.screen;
 
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,10 +13,12 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.*;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
-import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
+import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,10 +40,10 @@ public class QuestlogScreen extends Screen {
     private static final int MAX_TABS = 8;
     private final Screen previousScreen;
     private final QuestManager manager;
-    private final Map<String, ChapterInfo> availableChapters = new LinkedHashMap<>();
+    private final Map<ResourceLocation, ChapterInfo> availableChapters = new LinkedHashMap<>();
     @Nullable
     private ScrollableComponent questList;
-    private String currentChapter = "main";
+    private ResourceLocation currentChapter = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "main");
     private String searchQuery = "";
     private NoShadowEditBox searchBox;
     private int tabOffset = 0;
@@ -57,24 +60,23 @@ public class QuestlogScreen extends Screen {
         super.init();
 
         this.availableChapters.clear();
-        this.availableChapters.put("main", new ChapterInfo(null, true));
-        for (Quest quest : this.manager.getAllQuests()) {
-            if (quest.isTriggered() && !quest.getDisplay().isHidden()) {
-                QuestDisplayData display = quest.getDisplay();
-                String chap = display.getChapter();
-                ChapterInfo info = this.availableChapters.get(chap);
 
-                if (info == null) {
-                    this.availableChapters.put(chap, new ChapterInfo(display.getChapterIcon(), display.isPrimaryChapter()));
-                } else {
-                    if (display.isPrimaryChapter() && !info.isPrimary) {
-                        info.isPrimary = true;
-                    }
-                    if (info.icon == null && display.getChapterIcon() != null) {
-                        info.icon = display.getChapterIcon();
-                    }
-                }
-            }
+        for (ResourceLocation chapterId : DefinitionUtil.getCachedChapterKeys()) {
+            JsonObject chapterDef = DefinitionUtil.getCachedChapter(chapterId);
+
+            Blittable icon = JsonUtils.getIcon(chapterDef, "icon");
+            boolean isPrimary = JsonUtils.getOrDefault(chapterDef, "is_primary_chapter", false);
+            boolean showInMain = JsonUtils.getOrDefault(chapterDef, "show_in_main", false);
+
+            this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, showInMain));
+        }
+
+        if (!this.availableChapters.containsKey(this.currentChapter)) {
+            this.availableChapters.put(this.currentChapter, new ChapterInfo(
+                    new ItemRenderable(ResourceLocation.parse("minecraft:grass_block")),
+                    true,
+                    true
+            ));
         }
 
         this.refreshList();
@@ -162,7 +164,7 @@ public class QuestlogScreen extends Screen {
     }
 
     private void buildTabs() {
-        List<String> chapterKeys = new ArrayList<>(this.availableChapters.keySet());
+        List<ResourceLocation> chapterKeys = new ArrayList<>(this.availableChapters.keySet());
         int listWidth = 245;
         int listHeight = 136;
         int listX = (this.width - listWidth) / 2 + 1;
@@ -179,7 +181,7 @@ public class QuestlogScreen extends Screen {
         }
 
         for (int i = 0; i < MAX_TABS && i + this.tabOffset < chapterKeys.size(); i++) {
-            String chap = chapterKeys.get(i + this.tabOffset);
+            ResourceLocation chap = chapterKeys.get(i + this.tabOffset);
             ChapterInfo info = this.availableChapters.get(chap);
             boolean isSelected = chap.equals(this.currentChapter);
 
@@ -207,9 +209,15 @@ public class QuestlogScreen extends Screen {
         List<Quest> quests = this.manager.getAllQuests().stream()
                 .filter(quest -> quest.isTriggered() && !quest.getDisplay().isHidden())
                 .filter(quest -> {
-                    QuestDisplayData display = quest.getDisplay();
-                    return display.getChapter().equals(this.currentChapter) ||
-                            (this.currentChapter.equals("main") && display.shouldShowInMain());
+                    ResourceLocation questChapter = ResourceLocation.tryParse(quest.getDisplay().getChapter());
+                    if (questChapter == null)
+                        questChapter = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "main");
+
+                    ChapterInfo questChapterInfo = this.availableChapters.get(questChapter);
+                    boolean shouldShowInMain = questChapterInfo != null && questChapterInfo.showInMain;
+
+                    return questChapter.equals(this.currentChapter) ||
+                            (this.currentChapter.getPath().equals("main") && shouldShowInMain);
                 })
                 .filter(quest -> quest.getDisplay().matchesSearch(this.searchQuery))
                 .toList();
@@ -289,10 +297,12 @@ public class QuestlogScreen extends Screen {
     private static class ChapterInfo {
         Blittable icon;
         boolean isPrimary;
+        boolean showInMain;
 
-        ChapterInfo(Blittable icon, boolean isPrimary) {
+        ChapterInfo(Blittable icon, boolean isPrimary, boolean showInMain) {
             this.icon = icon;
             this.isPrimary = isPrimary;
+            this.showInMain = showInMain;
         }
     }
 }
