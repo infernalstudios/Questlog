@@ -62,7 +62,7 @@ public class QuestManager {
     }
 
     public boolean isClient() {
-        return this.player.isLocalPlayer();
+        return this.player.level().isClientSide();
     }
 
     /**

@@ -19,7 +19,7 @@ public class StatisticObjective extends Objective {
 
     private final ResourceLocation stat;
     private int statAtStart = 0;
-    private boolean trackSinceStart = true;
+    private boolean retroactive = true;
 
     public StatisticObjective(JsonObject definition) {
         super(definition);
@@ -27,8 +27,8 @@ public class StatisticObjective extends Objective {
         ResourceLocation parsedLocation = ResourceLocation.parse(JsonUtils.getString(definition, "stat"));
         this.stat = BuiltInRegistries.CUSTOM_STAT.get(parsedLocation);
 
-        if (definition.has("trackSinceStart")) {
-            this.trackSinceStart = JsonUtils.getBoolean(definition, "trackSinceStart");
+        if (definition.has("retroactive")) {
+            this.retroactive = JsonUtils.getBoolean(definition, "retroactive");
         }
     }
 
@@ -60,7 +60,7 @@ public class StatisticObjective extends Objective {
     @Override
     public void writeInitialData(CompoundTag data) {
         super.writeInitialData(data);
-        if (this.trackSinceStart) {
+        if (this.retroactive) {
             this.statAtStart = this.getStatValue();
             data.putInt("statAtStart", this.statAtStart);
         }
@@ -69,7 +69,7 @@ public class StatisticObjective extends Objective {
     @Override
     public CompoundTag serialize() {
         CompoundTag data = super.serialize();
-        if (this.trackSinceStart) {
+        if (this.retroactive) {
             data.putInt("statAtStart", this.statAtStart);
         }
         return data;
@@ -78,7 +78,7 @@ public class StatisticObjective extends Objective {
     @Override
     public void deserialize(CompoundTag data) {
         super.deserialize(data);
-        if (this.trackSinceStart) {
+        if (this.retroactive) {
             this.statAtStart = data.getInt("statAtStart");
         }
     }

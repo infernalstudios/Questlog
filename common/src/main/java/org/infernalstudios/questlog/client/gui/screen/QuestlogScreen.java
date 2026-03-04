@@ -18,7 +18,6 @@ import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
-import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,6 +47,7 @@ public class QuestlogScreen extends Screen {
     private NoShadowEditBox searchBox;
     private int tabOffset = 0;
     private boolean searchExpanded = false;
+    private boolean descriptionsCondensed = false;
 
     public QuestlogScreen(@Nullable Screen previousScreen) {
         super(Component.empty());
@@ -58,25 +58,20 @@ public class QuestlogScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-
         this.availableChapters.clear();
 
         for (ResourceLocation chapterId : DefinitionUtil.getCachedChapterKeys()) {
             JsonObject chapterDef = DefinitionUtil.getCachedChapter(chapterId);
 
+            if (chapterDef == null) {
+                continue;
+            }
+
             Blittable icon = JsonUtils.getIcon(chapterDef, "icon");
-            boolean isPrimary = JsonUtils.getOrDefault(chapterDef, "is_primary_chapter", false);
-            boolean showInMain = JsonUtils.getOrDefault(chapterDef, "show_in_main", false);
+            boolean isPrimary = JsonUtils.getOrDefault(chapterDef, "default_chapter", false);
+            boolean hidden = JsonUtils.getOrDefault(chapterDef, "hidden", false);
 
-            this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, showInMain));
-        }
-
-        if (!this.availableChapters.containsKey(this.currentChapter)) {
-            this.availableChapters.put(this.currentChapter, new ChapterInfo(
-                    new ItemRenderable(ResourceLocation.parse("minecraft:grass_block")),
-                    true,
-                    true
-            ));
+            this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, hidden));
         }
 
         this.refreshList();
@@ -158,6 +153,28 @@ public class QuestlogScreen extends Screen {
                 this.refreshQuestListOnly();
             });
             this.addRenderableWidget(this.searchBox);
+
+            this.addRenderableWidget(new AbstractButton(searchX - 18, searchY + 2, 14, 14, Component.empty()) {
+                @Override
+                public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+                    boolean hovered = isMouseOver(mouseX, mouseY);
+                    if (descriptionsCondensed) {
+                        (hovered ? QuestlogGuiSet.DEFAULT.expandButtonHovered : QuestlogGuiSet.DEFAULT.expandButton).blit(ps, getX(), getY());
+                    } else {
+                        (hovered ? QuestlogGuiSet.DEFAULT.condenseButtonHovered : QuestlogGuiSet.DEFAULT.condenseButton).blit(ps, getX(), getY());
+                    }
+                }
+
+                @Override
+                public void onPress() {
+                    descriptionsCondensed = !descriptionsCondensed;
+                    refreshList();
+                }
+
+                @Override
+                protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+                }
+            });
         } else {
             this.searchBox = null;
         }
@@ -209,15 +226,16 @@ public class QuestlogScreen extends Screen {
         List<Quest> quests = this.manager.getAllQuests().stream()
                 .filter(quest -> quest.isTriggered() && !quest.getDisplay().isHidden())
                 .filter(quest -> {
-                    ResourceLocation questChapter = ResourceLocation.tryParse(quest.getDisplay().getChapter());
-                    if (questChapter == null)
-                        questChapter = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "main");
+                    String chapterStr = quest.getDisplay().getChapter();
+                    ResourceLocation questChapter = chapterStr.contains(":")
+                            ? ResourceLocation.tryParse(chapterStr)
+                            : ResourceLocation.fromNamespaceAndPath(Questlog.MODID, chapterStr);
 
                     ChapterInfo questChapterInfo = this.availableChapters.get(questChapter);
-                    boolean shouldShowInMain = questChapterInfo != null && questChapterInfo.showInMain;
+                    boolean shouldShowChapter = questChapterInfo != null && !questChapterInfo.hidden;
 
                     return questChapter.equals(this.currentChapter) ||
-                            (this.currentChapter.getPath().equals("main") && shouldShowInMain);
+                            (this.currentChapter.getPath().equals("main") && quest.getDisplay().shouldIncludeInMain() && shouldShowChapter);
                 })
                 .filter(quest -> quest.getDisplay().matchesSearch(this.searchQuery))
                 .toList();
@@ -232,7 +250,7 @@ public class QuestlogScreen extends Screen {
                     if (this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, displayData));
                     }
-                })
+                }, this.descriptionsCondensed)
         );
     }
 
@@ -297,12 +315,12 @@ public class QuestlogScreen extends Screen {
     private static class ChapterInfo {
         Blittable icon;
         boolean isPrimary;
-        boolean showInMain;
+        boolean hidden;
 
-        ChapterInfo(Blittable icon, boolean isPrimary, boolean showInMain) {
+        ChapterInfo(Blittable icon, boolean isPrimary, boolean hidden) {
             this.icon = icon;
             this.isPrimary = isPrimary;
-            this.showInMain = showInMain;
+            this.hidden = hidden;
         }
     }
 }

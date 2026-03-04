@@ -27,7 +27,7 @@ public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
     public static final Type<QuestSyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "sync"));
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestSyncPacket> STREAM_CODEC = new StreamCodec<>() {
         @Override
-        public @NotNull QuestSyncPacket decode(RegistryFriendlyByteBuf buf) {
+        public @NotNull QuestSyncPacket decode(@NotNull RegistryFriendlyByteBuf buf) {
             Map<ResourceLocation, String> defs = readMap(buf, ByteBufCodecs.STRING_UTF8);
             Map<ResourceLocation, String> chapters = readMap(buf, ByteBufCodecs.STRING_UTF8);
             Map<ResourceLocation, CompoundTag> data = readMap(buf, ByteBufCodecs.COMPOUND_TAG);
@@ -35,7 +35,7 @@ public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
         }
 
         @Override
-        public void encode(RegistryFriendlyByteBuf buf, QuestSyncPacket packet) {
+        public void encode(@NotNull RegistryFriendlyByteBuf buf, QuestSyncPacket packet) {
             writeMap(buf, packet.definitions(), ByteBufCodecs.STRING_UTF8);
             writeMap(buf, packet.chapterDefinitions(), ByteBufCodecs.STRING_UTF8);
             writeMap(buf, packet.data(), ByteBufCodecs.COMPOUND_TAG);
@@ -78,13 +78,15 @@ public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
     }
 
     private static void process(QuestSyncPacket packet) {
-        Questlog.LOGGER.info("Received full quest & chapter sync from server.");
+        Questlog.LOGGER.info("Received quest & chapter sync from server.");
 
         DefinitionUtil.getCachedChapterKeys().clear();
         for (Map.Entry<ResourceLocation, String> entry : packet.chapterDefinitions().entrySet()) {
             try {
                 JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
-                // TODO: DefinitionUtil.CHAPTER_DEFINITION_CACHE.put(entry.getKey(), def);
+                if (def != null) {
+                    DefinitionUtil.putCachedChapter(entry.getKey(), def);
+                }
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to parse synced chapter {}", entry.getKey(), e);
             }

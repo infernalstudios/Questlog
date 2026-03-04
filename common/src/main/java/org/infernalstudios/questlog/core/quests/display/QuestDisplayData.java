@@ -27,10 +27,11 @@ public class QuestDisplayData {
     private final ResourceLocation completedSound;
     @Nullable
     private final ResourceLocation triggeredSound;
-    private final boolean toastOnTrigger;
+    private final boolean toastOnUnlock;
     private final boolean toastOnComplete;
-    private final boolean popup;
+    private final boolean showPopupOnUnlock;
     private final boolean hidden;
+    private final boolean includeInMain;
     private final ResourceLocation bgTexture;
     private final ResourceLocation peripheralTexture;
     private final Component backButtonText;
@@ -83,7 +84,9 @@ public class QuestDisplayData {
         this.description = parsedDescription;
         this.icon = JsonUtils.getIcon(data, "icon");
 
-        this.chapter = JsonUtils.getOrDefault(data, "chapter", "main");
+        this.chapter = JsonUtils.getOrDefault(data, "chapter", "questlog:main");
+        boolean isMainChapter = this.chapter.equals("questlog:main") || this.chapter.equals("main");
+        this.includeInMain = JsonUtils.getOrDefault(data, "include_in_main", isMainChapter);
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
@@ -91,8 +94,8 @@ public class QuestDisplayData {
         String triggeredSoundLoc = JsonUtils.getOrDefault(data, "triggered_sound", (String) null);
         this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
-        String backgroundLoc = JsonUtils.getOrDefault(data, "background", Questlog.MODID + ":textures/gui/quest_page.png");
-        String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral", Questlog.MODID + ":textures/gui/quest_peripherals.png");
+        String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
+        String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
 
         this.bgTexture = new ResourceLocation(backgroundLoc);
         this.peripheralTexture = new ResourceLocation(peripheralLoc);
@@ -110,9 +113,9 @@ public class QuestDisplayData {
         this.uncollectedText = parseComponent(data, "uncollected_text", "questlog.reward.uncollected", translatable);
         this.collectedText = parseComponent(data, "collected_text", "questlog.reward.collected", translatable);
 
-        this.toastOnTrigger = JsonUtils.getOrDefault(data, "toast_on_trigger", true);
+        this.toastOnUnlock = JsonUtils.getOrDefault(data, "toast_on_unlock", true);
         this.toastOnComplete = JsonUtils.getOrDefault(data, "toast_on_complete", true);
-        this.popup = JsonUtils.getOrDefault(data, "popup", false);
+        this.showPopupOnUnlock = JsonUtils.getOrDefault(data, "show_popup_on_unlock", false);
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
 
@@ -215,16 +218,20 @@ public class QuestDisplayData {
                 : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture, this.leftPanelWidth, this.rightPanelWidth, this.panelHeight);
     }
 
-    public boolean shouldToastOnTrigger() {
-        return this.toastOnTrigger;
+    public boolean shouldToastOnUnlock() {
+        return this.toastOnUnlock;
     }
 
     public boolean shouldToastOnComplete() {
         return this.toastOnComplete;
     }
 
-    public boolean shouldPopup() {
-        return this.popup;
+    public boolean shouldShowPopupOnUnlock() {
+        return this.showPopupOnUnlock;
+    }
+
+    public boolean shouldIncludeInMain() {
+        return this.includeInMain;
     }
 
     public boolean isHidden() {

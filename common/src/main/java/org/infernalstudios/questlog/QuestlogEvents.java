@@ -56,7 +56,7 @@ public class QuestlogEvents {
             Services.PLATFORM.sendPacketToClient((ServerPlayer) event.player, new QuestCompletedPacket(event.quest.getId()));
 
             for (Reward reward : event.quest.rewards) {
-                if (reward.rewardsInstantly()) {
+                if (reward.isAutoClaim()) {
                     if (!reward.hasRewarded()) {
                         reward.applyReward((ServerPlayer) event.player);
                     }

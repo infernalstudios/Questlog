@@ -26,13 +26,10 @@ public class ItemEquipObjective extends AbstractItemObjective {
 
     private void onPlayerTick(QLPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
-        if (
-                event.player instanceof ServerPlayer player &&
-                        this.getParent().manager.player.equals(player) &&
-                        --ticksUntilCheck <= 0 &&
-                        this.test(player.getItemBySlot(this.slot))
-        ) {
-            this.setUnits(this.getUnits() + 1);
+        if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
+            if (this.test(player.getItemBySlot(this.slot))) {
+                this.setUnits(this.getUnits() + 1);
+            }
             ticksUntilCheck = 20;
         }
     }

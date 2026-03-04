@@ -14,15 +14,14 @@ public class EntityBreedObjective extends AbstractEntityObjective {
     @Override
     public void registerEventListeners(QuestlogEventBus bus) {
         super.registerEventListeners(bus);
-        bus.addListener(this::onPlayerMove);
+        bus.addListener(this::onEntityBreed);
     }
 
-    private void onPlayerMove(QLEntityEvent.Breed event) {
+    private void onEntityBreed(QLEntityEvent.Breed event) {
         if (this.isCompleted() || this.getParent() == null) return;
-        if (
-                event.causedByPlayer instanceof ServerPlayer player &&
-                        this.getParent().manager.player.equals(player) &&
-                        (this.test(event.parentA) || this.test(event.parentB))
+        if (event.causedByPlayer instanceof ServerPlayer player &&
+                this.getParent().manager.player.equals(player) &&
+                (this.test(event.parentA) || this.test(event.parentB))
         ) {
             this.setUnits(this.getUnits() + 1);
         }

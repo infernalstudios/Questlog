@@ -19,7 +19,6 @@ import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class QuestlogClientEvents {
     public static void onClientTick() {
@@ -55,13 +54,13 @@ public class QuestlogClientEvents {
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {
         if (
-                event.quest.getDisplay().shouldPopup() &&
+                event.quest.getDisplay().shouldShowPopupOnUnlock() &&
                         Minecraft.getInstance().hasSingleplayerServer() &&
-                        !(Minecraft.getInstance().getSingleplayerServer() != null && Minecraft.getInstance().getSingleplayerServer().isPublished())
+                        !Minecraft.getInstance().getSingleplayerServer().isPublished()
         ) {
             QuestToastState.resetCheckDelay();
             QuestToastState.queuedPopups.add(event.quest);
-        } else if (event.quest.getDisplay().shouldToastOnTrigger()) {
+        } else if (event.quest.getDisplay().shouldToastOnUnlock()) {
             QuestToastState.resetCheckDelay();
             QuestToastState.addedToasts.add(new QuestAddedToast(event.quest.getDisplay()));
         }
@@ -84,11 +83,8 @@ public class QuestlogClientEvents {
         }
 
         for (Reward reward : event.quest.rewards) {
-            if (reward.rewardsInstantly()) {
-                // Reward claiming is handled by the server for instant rewards
-
-                // Play sound
-                SoundEvent sound = Objects.requireNonNull(reward.getDisplay()).getClaimSound();
+            if (reward.isAutoClaim()) {
+                SoundEvent sound = reward.getDisplay().getClaimSound();
                 if (sound != null) {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, 1, 1));
                 }
@@ -101,19 +97,16 @@ public class QuestlogClientEvents {
             return;
         }
 
-        // Don't display popups if the player is viewing the QuestDetails screen
-        // Make sure to reset the check delay so that the popup is displayed after the screen is closed
         if (Minecraft.getInstance().screen instanceof QuestDetails) {
             QuestToastState.resetCheckDelay();
             return;
         }
 
-        // Don't display popups if the player is holding an item in their cursor
         if (Minecraft.getInstance().screen instanceof MenuAccess<?> screen && !screen.getMenu().getCarried().isEmpty()) {
             return;
         }
 
-        Quest quest = QuestToastState.queuedPopups.get(0);
+        Quest quest = QuestToastState.queuedPopups.getFirst();
         QuestToastState.queuedPopups.remove(quest);
 
         Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, quest));
@@ -123,7 +116,7 @@ public class QuestlogClientEvents {
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, 1, 1));
         }
 
-        QuestToastState.resetCheckDelay(); // Reset the check delay to ensure any following popups are displayed
+        QuestToastState.resetCheckDelay();
     }
 
     private static void displayQueuedToasts() {
@@ -141,7 +134,7 @@ public class QuestlogClientEvents {
 
         if (toasts.getToast(QuestCompletedToast.class, Toast.NO_TOKEN) != null) {
             QuestToastState.resetCheckDelay();
-            return; // Return early so all completion toasts display before addition toasts
+            return;
         }
 
         if (!QuestToastState.addedToasts.isEmpty()) {
@@ -153,10 +146,6 @@ public class QuestlogClientEvents {
     }
 
     private static class QuestToastState {
-
-        // This allows for all network packets to be received before displaying toasts
-        // This is necessary because the server may send an added quest before a completed quest,
-        // and we want to display the completed quest first.
         public static int tickDelayForCheck = -1;
         public static List<QuestAddedToast> addedToasts = new ArrayList<>();
         public static List<QuestCompletedToast> completedToasts = new ArrayList<>();
