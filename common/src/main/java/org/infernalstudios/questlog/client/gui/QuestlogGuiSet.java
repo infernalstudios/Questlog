@@ -3,21 +3,24 @@ package org.infernalstudios.questlog.client.gui;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.ScrollbarTexture;
+import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.NineSliceTexture;
 import org.infernalstudios.questlog.util.texture.Texture;
 
 public class QuestlogGuiSet {
 
     public static final QuestlogGuiSet DEFAULT = new QuestlogGuiSet(
-            new ResourceLocation(Questlog.MODID, "textures/gui/quest_page.png"),
-            new ResourceLocation(Questlog.MODID, "textures/gui/quest_peripherals.png")
+            ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/quest_page.png"),
+            ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/quest_peripherals.png"),
+            275, 170, 166
     );
 
     public final ResourceLocation backgroundLoc;
     public final ResourceLocation peripheralLoc;
     public final ResourceLocation searchTabButtonsLoc;
 
-    public final Texture detailBackgroundLeft;
-    public final Texture detailBackgroundRight;
+    public final Blittable detailBackgroundLeft;
+    public final Blittable detailBackgroundRight;
     public final Texture button;
     public final Texture buttonHovered;
     public final Texture buttonLong;
@@ -42,13 +45,14 @@ public class QuestlogGuiSet {
     public final Texture tabMain;
     public final Texture tabMainActive;
 
-    public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation peripheralLoc) {
+    public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation peripheralLoc, int leftPanelWidth, int rightPanelWidth, int panelHeight) {
         this.backgroundLoc = backgroundLoc;
         this.peripheralLoc = peripheralLoc;
         this.searchTabButtonsLoc = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/questlog_search_tab_buttons.png");
 
-        this.detailBackgroundLeft = new Texture(backgroundLoc, 275, 166, 375, 174, 1024, 512);
-        this.detailBackgroundRight = new Texture(backgroundLoc, 170, 166, 700, 174, 1024, 512);
+        this.detailBackgroundLeft = new NineSliceTexture(backgroundLoc, leftPanelWidth, panelHeight, 375, 174, 275, 166, 1024, 512, 16, 16);
+        this.detailBackgroundRight = new NineSliceTexture(backgroundLoc, rightPanelWidth, panelHeight, 700, 174, 170, 166, 1024, 512, 16, 16);
+
         this.button = new Texture(peripheralLoc, 74, 38, 36, 55, 256, 256);
         this.buttonHovered = new Texture(peripheralLoc, 74, 38, 112, 55, 256, 256);
         this.buttonLong = new Texture(peripheralLoc, 108, 38, 2, 95, 256, 256);

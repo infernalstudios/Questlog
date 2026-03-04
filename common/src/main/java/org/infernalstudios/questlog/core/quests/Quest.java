@@ -176,17 +176,17 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         this.hasSentTrigger = data.getBoolean("triggered");
 
         List<Tag> triggerData = data.getList("triggers", Tag.TAG_COMPOUND);
-        for (int i = 0; i < triggerData.size(); i++) {
+        for (int i = 0; i < Math.min(triggerData.size(), this.triggers.size()); i++) {
             this.triggers.get(i).deserialize((CompoundTag) triggerData.get(i));
         }
 
         List<Tag> objectiveData = data.getList("objectives", Tag.TAG_COMPOUND);
-        for (int i = 0; i < objectiveData.size(); i++) {
+        for (int i = 0; i < Math.min(objectiveData.size(), this.objectives.size()); i++) {
             this.objectives.get(i).deserialize((CompoundTag) objectiveData.get(i));
         }
 
         List<Tag> rewardData = data.getList("rewards", Tag.TAG_COMPOUND);
-        for (int i = 0; i < rewardData.size(); i++) {
+        for (int i = 0; i < Math.min(rewardData.size(), this.rewards.size()); i++) {
             this.rewards.get(i).deserialize((CompoundTag) rewardData.get(i));
         }
     }
