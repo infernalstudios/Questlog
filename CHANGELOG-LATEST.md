@@ -11,6 +11,9 @@
 
 - Removed `quests.json`.
     - Quests will now load recursively from valid JSONs in `config/questlog/quests`.
+- Fully removed `item_pickup` objective/trigger.
+    - This was previous deprecated and redirected to `item_obtain`. Any existing quests using `item_pickup` will be
+      automatically converted.
 
 ### Changed
 

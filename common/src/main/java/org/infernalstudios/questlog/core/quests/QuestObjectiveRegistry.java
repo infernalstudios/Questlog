@@ -44,7 +44,6 @@ public class QuestObjectiveRegistry {
         register(ResourceLocation.fromNamespaceAndPath("questlog", "item_drop"), ItemDropObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "item_equip"), ItemEquipObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "item_obtain"), ItemObtainObjective::new);
-        register(ResourceLocation.fromNamespaceAndPath("questlog", "item_pickup"), ItemPickupObjective::new);
         register(ResourceLocation.fromNamespaceAndPath("questlog", "item_use"), ItemUseObjective::new);
 
         // Misc
