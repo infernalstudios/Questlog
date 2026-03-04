@@ -181,7 +181,12 @@ public class QuestlogScreen extends Screen {
     }
 
     private void buildTabs() {
-        List<ResourceLocation> chapterKeys = new ArrayList<>(this.availableChapters.keySet());
+        List<ResourceLocation> chapterKeys = new ArrayList<>();
+        for (Map.Entry<ResourceLocation, ChapterInfo> entry : this.availableChapters.entrySet()) {
+            if (!entry.getValue().hidden) {
+                chapterKeys.add(entry.getKey());
+            }
+        }
         int listWidth = 245;
         int listHeight = 136;
         int listX = (this.width - listWidth) / 2 + 1;

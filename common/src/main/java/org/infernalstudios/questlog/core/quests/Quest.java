@@ -45,6 +45,10 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         this.id = id;
         this.manager = manager;
 
+        if (this.requirements.isEmpty()) {
+            this.hasSentTrigger = true;
+        }
+
         this.requirements.forEach(requirement -> {
             requirement.setParent(this);
             if (!this.manager.isClient()) {
@@ -165,6 +169,10 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     public void deserialize(CompoundTag data) {
         this.hasSentCompletion = data.getBoolean("completed");
         this.hasSentTrigger = data.getBoolean("triggered");
+
+        if (this.requirements.isEmpty()) {
+            this.hasSentTrigger = true;
+        }
 
         List<Tag> reqData = data.getList("requirements", Tag.TAG_COMPOUND);
         for (int i = 0; i < Math.min(reqData.size(), this.requirements.size()); i++) {
