@@ -7,7 +7,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
@@ -21,7 +20,6 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
@@ -45,11 +43,6 @@ public class QuestlogNeoForgeEventForwarder {
     @SubscribeEvent
     public static void onServerPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         QuestlogEvents.onServerPlayerLogin((ServerPlayer) event.getEntity());
-    }
-
-    @SubscribeEvent
-    public static void addReloadListener(AddReloadListenerEvent event) {
-        event.addListener(new DefinitionUtil.QuestDefinitionReloadListener());
     }
 
     @SubscribeEvent
@@ -90,12 +83,7 @@ public class QuestlogNeoForgeEventForwarder {
     @SubscribeEvent
     public static void onBlockInteract(PlayerInteractEvent.RightClickBlock event) {
         if (!event.getLevel().isClientSide) {
-            Questlog.EVENTS.post(new QLBlockEvent.Interact(
-                    event.getLevel().getBlockState(event.getPos()),
-                    event.getPos(),
-                    event.getEntity(),
-                    event.getItemStack()
-            ));
+            Questlog.EVENTS.post(new QLBlockEvent.Interact(event.getLevel().getBlockState(event.getPos()), event.getPos(), event.getEntity(), event.getItemStack()));
         }
     }
 

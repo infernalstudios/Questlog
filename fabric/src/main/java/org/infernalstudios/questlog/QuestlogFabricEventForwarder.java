@@ -9,14 +9,9 @@ import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
-import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 
@@ -26,7 +21,6 @@ public class QuestlogFabricEventForwarder {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> QuestlogEvents.onServerStop());
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> QuestlogEvents.onServerPlayerLogin(handler.player));
 
-        // Event forwarding for objectives (events not seen here are not supported by fabric api, and are posted using mixins)
         PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, entity) -> Questlog.EVENTS.post(new QLBlockEvent.Break(state, pos, player)));
 
         UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
@@ -57,8 +51,6 @@ public class QuestlogFabricEventForwarder {
             return InteractionResultHolder.pass(ItemStack.EMPTY);
         });
 
-        ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(new FabricQuestDefinitionReloadListener());
-
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> QuestlogEvents.registerCommands(dispatcher));
     }
 
@@ -66,12 +58,5 @@ public class QuestlogFabricEventForwarder {
         ClientTickEvents.START_CLIENT_TICK.register(minecraft -> QuestlogClientEvents.onClientTick());
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> QuestlogClientEvents.onClientPlayerLogin());
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> QuestlogClientEvents.onClientPlayerLogout());
-    }
-
-    public static class FabricQuestDefinitionReloadListener extends DefinitionUtil.QuestDefinitionReloadListener implements IdentifiableResourceReloadListener {
-        @Override
-        public ResourceLocation getFabricId() {
-            return new ResourceLocation(Questlog.MODID, "quest_data");
-        }
     }
 }

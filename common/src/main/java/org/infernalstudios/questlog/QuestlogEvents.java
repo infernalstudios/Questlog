@@ -5,6 +5,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.commands.QuestlogCommands;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
@@ -15,8 +16,8 @@ import org.infernalstudios.questlog.platform.Services;
 
 public class QuestlogEvents {
 
-    // These initialize the ServerPlayerManager instance
     public static void onServerStart(MinecraftServer server) {
+        DefinitionUtil.loadFromConfig();
         ServerPlayerManager.INSTANCE = new ServerPlayerManager(server);
         ServerPlayerManager.INSTANCE.load();
     }
@@ -56,7 +57,6 @@ public class QuestlogEvents {
 
             for (Reward reward : event.quest.rewards) {
                 if (reward.rewardsInstantly()) {
-                    // Reward claiming is handled by the server for instant rewards
                     if (!reward.hasRewarded()) {
                         reward.applyReward((ServerPlayer) event.player);
                     }
