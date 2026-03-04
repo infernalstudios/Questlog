@@ -26,20 +26,32 @@ public class QuestManager {
         this.player = player;
     }
 
-    /**
-     * Adds a quest to the player's tracked quest list.
-     * Does not sync between server and client.
-     */
     public void addQuest(Quest quest) {
-        if (this.quests.containsKey(quest.getId())) {
-            return;
-        }
         this.quests.put(quest.getId(), quest);
+    }
+
+    public void clearQuests() {
+        this.quests.clear();
+    }
+
+    public void reload() {
+        CompoundTag savedData = new CompoundTag();
+        for (Quest quest : this.quests.values()) {
+            savedData.put(quest.getId().toString(), quest.serialize());
+        }
+
+        this.quests.clear();
+        this.createAllQuests();
+
+        for (Quest quest : this.quests.values()) {
+            if (savedData.contains(quest.getId().toString())) {
+                quest.deserialize(savedData.getCompound(quest.getId().toString()));
+            }
+        }
     }
 
     /**
      * Removes a quest from the player's tracked quest list.
-     * Does not sync between server and client.
      */
     public void removeQuest(ResourceLocation id) {
         this.quests.remove(id);

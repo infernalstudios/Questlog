@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -14,7 +15,6 @@ import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.IPacketContext;
-import org.infernalstudios.questlog.platform.Services;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -51,10 +51,15 @@ public class QuestDefinitionPacket implements CustomPacketPayload {
         try {
             QuestManager manager = QuestlogClient.getLocal();
 
-            Quest quest = Quest.create(Objects.requireNonNull(packet.definition), packet.id, manager);
-            manager.addQuest(quest);
+            Quest existing = manager.getQuest(packet.id());
+            CompoundTag savedData = existing != null ? existing.serialize() : null;
 
-            Services.PLATFORM.sendPacketToServer(new QuestDefinitionHandledPacket(packet.id));
+            Quest quest = Quest.create(Objects.requireNonNull(packet.definition), packet.id(), manager);
+            if (savedData != null) {
+                quest.deserialize(savedData);
+            }
+
+            manager.addQuest(quest);
         } catch (Throwable e) {
             Questlog.LOGGER.error("Failed to handle QuestDefinitionPacket", e);
         }
