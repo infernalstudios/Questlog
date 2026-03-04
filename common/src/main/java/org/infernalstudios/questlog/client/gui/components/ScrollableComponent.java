@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
+import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.infernalstudios.questlog.util.ScrollbarTexture;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -293,13 +294,4 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
         }
     }
 
-    public interface Scrollable extends Renderable {
-        int getHeight();
-
-        default void setScrollableComponent(ScrollableComponent component) {
-        }
-
-        default void renderBackground(GuiGraphics poseStack, int mouseX, int mouseY, float partialTicks) {
-        }
-    }
 }

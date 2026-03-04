@@ -7,10 +7,8 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
-import org.infernalstudios.questlog.client.gui.components.ScrollableComponent.Scrollable;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class ScrollableText implements Scrollable, GuiEventListener {
@@ -43,7 +41,7 @@ public class ScrollableText implements Scrollable, GuiEventListener {
     }
 
     @Override
-    public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         for (int i = 0; i < this.getLines().size(); i++) {
             ps.drawString(
                     this.font,

@@ -89,4 +89,8 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         tag.putInt("units", this.units);
         return tag;
     }
+
+    public boolean isReadObjective() {
+        return false;
+    }
 }

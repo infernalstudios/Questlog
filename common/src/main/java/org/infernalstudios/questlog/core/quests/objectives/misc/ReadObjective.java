@@ -22,4 +22,9 @@ public class ReadObjective extends Objective {
             this.setUnits(this.getUnits() + 1);
         }
     }
+
+    @Override
+    public boolean isReadObjective() {
+        return true;
+    }
 }
