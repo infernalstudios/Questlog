@@ -14,6 +14,7 @@ import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -32,6 +33,9 @@ public class QuestlogCommands {
                         .requires(stack -> stack.hasPermission(2))
                         .then(Commands.literal("trigger_all")
                                 .executes(QuestlogCommands::triggerAllQuests)
+                        )
+                        .then(Commands.literal("reload")
+                                .executes(QuestlogCommands::reloadQuests)
                         )
                         .then(Commands.argument("quest", ResourceLocationArgument.id())
                                 .suggests((ctx, builder) -> {
@@ -112,7 +116,15 @@ public class QuestlogCommands {
         dispatcher.register(Commands.literal("ql").requires(stack -> stack.hasPermission(2)).redirect(root));
     }
 
-    private static int resetQuest(CommandContext<CommandSourceStack> ctx, Quest quest) throws CommandSyntaxException {
+    private static int reloadQuests(CommandContext<CommandSourceStack> ctx) {
+        DefinitionUtil.loadFromConfig();
+        int count = DefinitionUtil.getCachedKeys().size();
+
+        ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + count + " quests from config. Players may need to rejoin to see changes."), true);
+        return count;
+    }
+
+    private static int resetQuest(CommandContext<CommandSourceStack> ctx, Quest quest) {
         quest.triggers.forEach(trigger -> trigger.setUnits(0));
         quest.objectives.forEach(objective -> objective.setUnits(0));
         quest.rewards.forEach(Reward::revokeReward);
@@ -132,7 +144,7 @@ public class QuestlogCommands {
         return 0;
     }
 
-    private static int setAllObjectives(CommandContext<CommandSourceStack> ctx, Quest quest) throws CommandSyntaxException {
+    private static int setAllObjectives(CommandContext<CommandSourceStack> ctx, Quest quest) {
         quest.objectives.forEach(objective -> objective.setUnits(objective.getTotalUnits()));
 
         ctx.getSource().sendSuccess(() -> Component.translatable("command.questlog.objective.set_all"), true);
@@ -173,7 +185,7 @@ public class QuestlogCommands {
         return 0;
     }
 
-    private static int setAllTriggers(CommandContext<CommandSourceStack> ctx, Quest quest) throws CommandSyntaxException {
+    private static int setAllTriggers(CommandContext<CommandSourceStack> ctx, Quest quest) {
         quest.triggers.forEach(trigger -> trigger.setUnits(trigger.getTotalUnits()));
 
         ctx.getSource().sendSuccess(() -> Component.translatable("command.questlog.trigger.set_all"), true);
@@ -214,7 +226,7 @@ public class QuestlogCommands {
         return 0;
     }
 
-    private static int collectAllRewards(CommandContext<CommandSourceStack> ctx, Quest quest) throws CommandSyntaxException {
+    private static int collectAllRewards(CommandContext<CommandSourceStack> ctx, Quest quest) {
         quest.rewards.forEach(reward -> {
             if (!reward.hasRewarded()) {
                 reward.applyReward(ctx.getSource().getPlayer());
