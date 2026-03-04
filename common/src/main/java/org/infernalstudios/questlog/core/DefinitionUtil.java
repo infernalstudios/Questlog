@@ -20,65 +20,72 @@ import java.util.stream.Stream;
 
 public class DefinitionUtil {
     private static final Map<ResourceLocation, JsonObject> QUEST_DEFINITION_CACHE = new Object2ObjectOpenHashMap<>();
+    private static final Map<ResourceLocation, JsonObject> CHAPTER_DEFINITION_CACHE = new Object2ObjectOpenHashMap<>();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    public static List<ResourceLocation> getCachedKeys() {
+    public static List<ResourceLocation> getCachedQuestKeys() {
         return new ArrayList<>(QUEST_DEFINITION_CACHE.keySet());
     }
 
-    public static JsonObject getCached(ResourceLocation path) {
+    public static JsonObject getCachedQuest(ResourceLocation path) {
         if (!QUEST_DEFINITION_CACHE.containsKey(path)) {
             throw new NullPointerException("Quest not found: " + path);
         }
-
         return QUEST_DEFINITION_CACHE.get(path);
+    }
+
+    public static List<ResourceLocation> getCachedChapterKeys() {
+        return new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
+    }
+
+    public static JsonObject getCachedChapter(ResourceLocation path) {
+        return CHAPTER_DEFINITION_CACHE.get(path);
     }
 
     public static void loadFromConfig() {
         QUEST_DEFINITION_CACHE.clear();
-        Path questDir = Services.PLATFORM.getConfigDirectory().resolve("questlog").resolve("quests");
+        CHAPTER_DEFINITION_CACHE.clear();
 
-        if (!Files.exists(questDir)) {
+        Path configDir = Services.PLATFORM.getConfigDirectory().resolve("questlog");
+        Path questDir = configDir.resolve("quests");
+        Path chapterDir = configDir.resolve("chapters");
+
+        createDirIfNotExists(questDir);
+        createDirIfNotExists(chapterDir);
+
+        loadFiles(questDir, QUEST_DEFINITION_CACHE);
+        loadFiles(chapterDir, CHAPTER_DEFINITION_CACHE);
+
+        Questlog.LOGGER.info("Loaded {} quests and {} chapters from config.", QUEST_DEFINITION_CACHE.size(), CHAPTER_DEFINITION_CACHE.size());
+    }
+
+    private static void createDirIfNotExists(Path dir) {
+        if (!Files.exists(dir)) {
             try {
-                Files.createDirectories(questDir);
+                Files.createDirectories(dir);
             } catch (IOException e) {
-                Questlog.LOGGER.error("Failed to create quests directory: {}", questDir, e);
-                return;
+                Questlog.LOGGER.error("Failed to create directory: {}", dir, e);
             }
-        }
-
-        try (Stream<Path> paths = Files.walk(questDir)) {
-            paths.filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".json"))
-                    .forEach(DefinitionUtil::loadQuestFile);
-        } catch (IOException e) {
-            Questlog.LOGGER.error("Failed to read quests from directory: {}", questDir, e);
-        }
-
-        if (QUEST_DEFINITION_CACHE.isEmpty()) {
-            Questlog.LOGGER.warn("No quests found in config/questlog/quests!");
-        } else {
-            Questlog.LOGGER.info("Loaded {} quests from config.", QUEST_DEFINITION_CACHE.size());
         }
     }
 
-    private static void loadQuestFile(Path path) {
-        try (FileReader reader = new FileReader(path.toFile())) {
-            JsonObject json = GSON.fromJson(reader, JsonObject.class);
-
-            Path questDir = Services.PLATFORM.getConfigDirectory().resolve("questlog").resolve("quests");
-            Path relative = questDir.relativize(path);
-            String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
-
-            ResourceLocation questId = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, resourcePath);
-
-            QUEST_DEFINITION_CACHE.put(questId, json);
-        } catch (Exception e) {
-            Questlog.LOGGER.error("=====================================================");
-            Questlog.LOGGER.error(" CRITICAL ERROR: Could not parse quest file: {}", path);
-            Questlog.LOGGER.error(" Reason: {}", e.getMessage());
-            Questlog.LOGGER.error(" This quest will be skipped!");
-            Questlog.LOGGER.error("=====================================================");
+    private static void loadFiles(Path dir, Map<ResourceLocation, JsonObject> cache) {
+        try (Stream<Path> paths = Files.walk(dir)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".json"))
+                    .forEach(path -> {
+                        try (FileReader reader = new FileReader(path.toFile())) {
+                            JsonObject json = GSON.fromJson(reader, JsonObject.class);
+                            Path relative = dir.relativize(path);
+                            String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
+                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, resourcePath);
+                            cache.put(id, json);
+                        } catch (Exception e) {
+                            Questlog.LOGGER.error("Failed to parse file: {}", path, e);
+                        }
+                    });
+        } catch (IOException e) {
+            Questlog.LOGGER.error("Failed to read files from directory: {}", dir, e);
         }
     }
 }

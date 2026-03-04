@@ -12,6 +12,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.IPacketContext;
@@ -21,40 +22,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
+                              Map<ResourceLocation, String> chapterDefinitions,
                               Map<ResourceLocation, CompoundTag> data) implements CustomPacketPayload {
     public static final Type<QuestSyncPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "sync"));
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestSyncPacket> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public @NotNull QuestSyncPacket decode(RegistryFriendlyByteBuf buf) {
-            Map<ResourceLocation, String> defs = new HashMap<>();
-            int defSize = buf.readVarInt();
-            for (int i = 0; i < defSize; i++) {
-                defs.put(ResourceLocation.STREAM_CODEC.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf));
-            }
-
-            Map<ResourceLocation, CompoundTag> data = new HashMap<>();
-            int dataSize = buf.readVarInt();
-            for (int i = 0; i < dataSize; i++) {
-                data.put(ResourceLocation.STREAM_CODEC.decode(buf), ByteBufCodecs.COMPOUND_TAG.decode(buf));
-            }
-            return new QuestSyncPacket(defs, data);
+            Map<ResourceLocation, String> defs = readMap(buf, ByteBufCodecs.STRING_UTF8);
+            Map<ResourceLocation, String> chapters = readMap(buf, ByteBufCodecs.STRING_UTF8);
+            Map<ResourceLocation, CompoundTag> data = readMap(buf, ByteBufCodecs.COMPOUND_TAG);
+            return new QuestSyncPacket(defs, chapters, data);
         }
 
         @Override
         public void encode(RegistryFriendlyByteBuf buf, QuestSyncPacket packet) {
-            buf.writeVarInt(packet.definitions().size());
-            for (Map.Entry<ResourceLocation, String> entry : packet.definitions().entrySet()) {
-                ResourceLocation.STREAM_CODEC.encode(buf, entry.getKey());
-                ByteBufCodecs.STRING_UTF8.encode(buf, entry.getValue());
-            }
+            writeMap(buf, packet.definitions(), ByteBufCodecs.STRING_UTF8);
+            writeMap(buf, packet.chapterDefinitions(), ByteBufCodecs.STRING_UTF8);
+            writeMap(buf, packet.data(), ByteBufCodecs.COMPOUND_TAG);
+        }
 
-            buf.writeVarInt(packet.data().size());
-            for (Map.Entry<ResourceLocation, CompoundTag> entry : packet.data().entrySet()) {
+        private <V> Map<ResourceLocation, V> readMap(RegistryFriendlyByteBuf buf, StreamCodec<? super RegistryFriendlyByteBuf, V> valueCodec) {
+            Map<ResourceLocation, V> map = new HashMap<>();
+            int size = buf.readVarInt();
+            for (int i = 0; i < size; i++) {
+                map.put(ResourceLocation.STREAM_CODEC.decode(buf), valueCodec.decode(buf));
+            }
+            return map;
+        }
+
+        private <V> void writeMap(RegistryFriendlyByteBuf buf, Map<ResourceLocation, V> map, StreamCodec<? super RegistryFriendlyByteBuf, V> valueCodec) {
+            buf.writeVarInt(map.size());
+            for (Map.Entry<ResourceLocation, V> entry : map.entrySet()) {
                 ResourceLocation.STREAM_CODEC.encode(buf, entry.getKey());
-                ByteBufCodecs.COMPOUND_TAG.encode(buf, entry.getValue());
+                valueCodec.encode(buf, entry.getValue());
             }
         }
     };
+
     private static final Gson GSON = new GsonBuilder().create();
     private static QuestSyncPacket DEFERRED_PACKET = null;
 
@@ -74,7 +78,17 @@ public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
     }
 
     private static void process(QuestSyncPacket packet) {
-        Questlog.LOGGER.info("Received full quest sync from server.");
+        Questlog.LOGGER.info("Received full quest & chapter sync from server.");
+
+        DefinitionUtil.getCachedChapterKeys().clear();
+        for (Map.Entry<ResourceLocation, String> entry : packet.chapterDefinitions().entrySet()) {
+            try {
+                JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
+                // TODO: DefinitionUtil.CHAPTER_DEFINITION_CACHE.put(entry.getKey(), def);
+            } catch (Exception e) {
+                Questlog.LOGGER.error("Failed to parse synced chapter {}", entry.getKey(), e);
+            }
+        }
         QuestManager manager = QuestlogClient.getLocal();
         manager.clearQuests();
 

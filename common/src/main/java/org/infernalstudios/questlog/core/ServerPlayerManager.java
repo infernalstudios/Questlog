@@ -142,14 +142,19 @@ public class ServerPlayerManager {
     public void syncPlayer(QuestManager questManager) {
         if (questManager.player instanceof ServerPlayer serverPlayer) {
             Map<ResourceLocation, String> definitions = new HashMap<>();
+            Map<ResourceLocation, String> chapterDefinitions = new HashMap<>();
             Map<ResourceLocation, CompoundTag> data = new HashMap<>();
 
             for (Quest quest : questManager.getAllQuests()) {
-                definitions.put(quest.getId(), DefinitionUtil.getCached(quest.getId()).toString());
+                definitions.put(quest.getId(), DefinitionUtil.getCachedQuest(quest.getId()).toString());
                 data.put(quest.getId(), quest.serialize());
             }
 
-            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, data));
+            for (ResourceLocation chapterId : DefinitionUtil.getCachedChapterKeys()) {
+                chapterDefinitions.put(chapterId, DefinitionUtil.getCachedChapter(chapterId).toString());
+            }
+
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data));
         }
     }
 

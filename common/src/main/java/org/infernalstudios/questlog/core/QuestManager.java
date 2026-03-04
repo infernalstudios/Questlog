@@ -78,11 +78,11 @@ public class QuestManager {
      * If not, it fetches the quest definition from the cache, creates a new quest instance and adds it to the player's quest list.
      */
     public void createAllQuests() {
-        List<ResourceLocation> ids = DefinitionUtil.getCachedKeys();
+        List<ResourceLocation> ids = DefinitionUtil.getCachedQuestKeys();
 
         for (ResourceLocation id : ids) {
             if (!this.quests.containsKey(id)) {
-                JsonObject definition = DefinitionUtil.getCached(id);
+                JsonObject definition = DefinitionUtil.getCachedQuest(id);
                 Quest quest;
                 try {
                     quest = Quest.create(definition, id, this);

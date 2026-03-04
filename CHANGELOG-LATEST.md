@@ -6,6 +6,10 @@
 - Added `trigger_all` command.
 - Added JSON fields for left panel width, right panel width, and panel height.
     - Works on a per-quest basis.
+- Added support for hot-reloading quests with `/ql reload`.
+- Added `ql open` command to force a player to open their questlog (optionally to a specific entry).
+- Added `ql progress` command.
+- Added `ql trigger` command.
 
 ### Removed
 
@@ -17,6 +21,7 @@
 
 ### Changed
 
+- Fully reworked commands for better autofill and additional functionality.
 - Improved quest details page to a multipanel layout.
 - Added field for searching.
 - Added categories to the questlog.
