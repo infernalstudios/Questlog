@@ -27,7 +27,7 @@ public class ScrollableInfo implements Scrollable {
     }
 
     private List<InfoEntry> getEntries() {
-        if (questDetails.getQuest().isCompleted()) {
+        if (questDetails.quest.isCompleted()) {
             if (this.rewards == null) {
                 this.rewards = new ArrayList<>();
                 List<RewardDisplayData> data = questDetails.getDisplay().getRewardDisplayData();

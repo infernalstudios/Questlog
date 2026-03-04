@@ -45,6 +45,10 @@ public class QuestDisplayData {
     private final boolean showInMain;
     private final boolean isPrimaryChapter;
 
+    private final int leftPanelWidth;
+    private final int rightPanelWidth;
+    private final int panelHeight;
+
     @Nullable
     private List<ObjectiveDisplayData> objectiveDisplay = null;
     @Nullable
@@ -118,6 +122,10 @@ public class QuestDisplayData {
         this.popup = JsonUtils.getOrDefault(data, "popup", false);
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
+
+        this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
+        this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
+        this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
     }
 
     private Component parseComponent(JsonObject style, String key, String defaultKey, boolean translatable) {
@@ -205,10 +213,26 @@ public class QuestDisplayData {
         return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
     }
 
+    public int getLeftPanelWidth() {
+        return this.leftPanelWidth;
+    }
+
+    public int getRightPanelWidth() {
+        return this.rightPanelWidth;
+    }
+
+    public int getPanelHeight() {
+        return this.panelHeight;
+    }
+
     public QuestlogGuiSet getGuiSet() {
-        return (this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) && this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc))
+        return (this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) &&
+                this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc) &&
+                this.leftPanelWidth == 275 &&
+                this.rightPanelWidth == 170 &&
+                this.panelHeight == 166)
                 ? QuestlogGuiSet.DEFAULT
-                : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture);
+                : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture, this.leftPanelWidth, this.rightPanelWidth, this.panelHeight);
     }
 
     public boolean shouldToastOnTrigger() {
