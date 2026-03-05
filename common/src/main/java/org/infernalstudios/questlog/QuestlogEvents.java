@@ -2,6 +2,7 @@ package org.infernalstudios.questlog;
 
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.commands.QuestlogCommands;
@@ -13,10 +14,12 @@ import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.packet.QuestCompletedPacket;
 import org.infernalstudios.questlog.network.packet.QuestTriggeredPacket;
 import org.infernalstudios.questlog.platform.Services;
+import org.infernalstudios.questlog.util.QuestlogMigrator;
 
 public class QuestlogEvents {
 
     public static void onServerStart(MinecraftServer server) {
+        QuestlogMigrator.attemptMigration(server);
         DefinitionUtil.loadFromConfig();
         ServerPlayerManager.INSTANCE = new ServerPlayerManager(server);
         ServerPlayerManager.INSTANCE.load();
@@ -40,6 +43,10 @@ public class QuestlogEvents {
         if (ServerPlayerManager.INSTANCE == null) return;
         QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
         ServerPlayerManager.INSTANCE.load(manager);
+
+        if (QuestlogMigrator.showDatapackWarning && player.hasPermissions(2)) {
+            player.sendSystemMessage(Component.literal("§e[Questlog] Warning: Quests are now loaded from the config folder. Datapacks are no longer supported! Your old datapack quests were automatically migrated."));
+        }
     }
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {
