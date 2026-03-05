@@ -106,7 +106,7 @@ public class QuestlogClientEvents {
             return;
         }
 
-        Quest quest = QuestToastState.queuedPopups.getFirst();
+        Quest quest = QuestToastState.queuedPopups.get(0);
         QuestToastState.queuedPopups.remove(quest);
 
         Minecraft.getInstance().setScreen(new QuestDetails(Minecraft.getInstance().screen, quest));

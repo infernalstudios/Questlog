@@ -1,26 +1,20 @@
 package org.infernalstudios.questlog.network.packet;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.IPacketContext;
-import org.jetbrains.annotations.NotNull;
 
-public record QuestOpenPacket(String target) implements CustomPacketPayload {
-    public static final Type<QuestOpenPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "open_ui"));
+public record QuestOpenPacket(String target) {
+    public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, QuestOpenPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, QuestOpenPacket::target,
-            QuestOpenPacket::new
-    );
+    public static QuestOpenPacket decode(FriendlyByteBuf buf) {
+        return new QuestOpenPacket(buf.readUtf());
+    }
 
     public static void handle(QuestOpenPacket packet, IPacketContext ctx) {
         Minecraft mc = Minecraft.getInstance();
@@ -41,8 +35,7 @@ public record QuestOpenPacket(String target) implements CustomPacketPayload {
         mc.setScreen(new QuestlogScreen(mc.screen));
     }
 
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeUtf(this.target);
     }
 }

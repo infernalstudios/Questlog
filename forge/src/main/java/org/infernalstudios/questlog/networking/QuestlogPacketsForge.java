@@ -36,10 +36,6 @@ public class QuestlogPacketsForge {
                         if (!context.getDirection().getReceptionSide().isServer()) {
                             throw new IllegalStateException("Received a client to server packet on the wrong side " + context.getDirection() + ": " + registered.id());
                         }
-
-                        if (contextSupplier.get().getSender() == null) {
-                            throw new IllegalStateException("Received a client to server packet with a null sender: " + registered.id());
-                        }
                     }
 
                     if (registered.direction() == IPacketContext.Direction.SERVER_TO_CLIENT) {
@@ -51,7 +47,7 @@ public class QuestlogPacketsForge {
                     registered.handler().accept(packet, new IPacketContext() {
                         @Override
                         public ServerPlayer getSender() {
-                            return contextSupplier.get().getSender();
+                            return context.getSender();
                         }
 
                         @Override
@@ -59,6 +55,8 @@ public class QuestlogPacketsForge {
                             return registered.direction();
                         }
                     });
+
+                    context.setPacketHandled(true);
                 })
                 .add();
     }

@@ -114,7 +114,7 @@ public class DefinitionUtil {
                             JsonObject json = GSON.fromJson(reader, JsonObject.class);
                             Path relative = dir.relativize(path);
                             String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
-                            ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, resourcePath);
+                            ResourceLocation id = new ResourceLocation(Questlog.MODID, resourcePath);
                             cache.put(id, json);
                         } catch (Exception e) {
                             Questlog.LOGGER.error("Failed to parse file: {}", path, e);

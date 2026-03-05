@@ -1,46 +1,40 @@
 package org.infernalstudios.questlog.networking;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.network.IPacketContext;
-import org.infernalstudios.questlog.network.packet.*;
+import org.infernalstudios.questlog.network.QuestlogPackets;
 
 public class QuestlogPacketsFabric {
     public static void registerCommon() {
-        // Register S2C Payloads
-        PayloadTypeRegistry.playS2C().register(QuestSyncPacket.TYPE, QuestSyncPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestDataPacket.TYPE, QuestDataPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestDefinitionPacket.TYPE, QuestDefinitionPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestRemovePacket.TYPE, QuestRemovePacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestTriggeredPacket.TYPE, QuestTriggeredPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestCompletedPacket.TYPE, QuestCompletedPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestOpenPacket.TYPE, QuestOpenPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playS2C().register(QuestEditModePacket.TYPE, QuestEditModePacket.STREAM_CODEC);
-
-        // Register C2S Payloads
-        PayloadTypeRegistry.playC2S().register(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC);
-        PayloadTypeRegistry.playC2S().register(QuestReadPacket.TYPE, QuestReadPacket.STREAM_CODEC);
-
-        // Register Server Receivers
-        registerServerReceivers();
+        for (QuestlogPackets.RegisteredPacket<?> packet : QuestlogPackets.PACKETS) {
+            if (packet.direction() == IPacketContext.Direction.CLIENT_TO_SERVER) {
+                registerC2S(packet);
+            }
+        }
     }
 
     public static void registerClient() {
-        ClientPlayNetworking.registerGlobalReceiver(QuestSyncPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestSyncPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestDataPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDataPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestDefinitionPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDefinitionPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestRemovePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestRemovePacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestTriggeredPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestTriggeredPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestCompletedPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestCompletedPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestOpenPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestOpenPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestEditModePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestEditModePacket.handle(payload, createClientContext())));
+        for (QuestlogPackets.RegisteredPacket<?> packet : QuestlogPackets.PACKETS) {
+            if (packet.direction() == IPacketContext.Direction.SERVER_TO_CLIENT) {
+                registerS2C(packet);
+            }
+        }
     }
 
-    private static void registerServerReceivers() {
-        ServerPlayNetworking.registerGlobalReceiver(QuestRewardCollectPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestRewardCollectPacket.handle(payload, createServerContext(context.player()))));
-        ServerPlayNetworking.registerGlobalReceiver(QuestReadPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestReadPacket.handle(payload, createServerContext(context.player()))));
+    private static <T> void registerC2S(QuestlogPackets.RegisteredPacket<T> packet) {
+        ServerPlayNetworking.registerGlobalReceiver(packet.id(), (server, player, handler, buf, responseSender) -> {
+            T decoded = packet.decoder().apply(buf);
+            server.execute(() -> packet.handler().accept(decoded, createServerContext(player)));
+        });
+    }
+
+    private static <T> void registerS2C(QuestlogPackets.RegisteredPacket<T> packet) {
+        ClientPlayNetworking.registerGlobalReceiver(packet.id(), (client, handler, buf, responseSender) -> {
+            T decoded = packet.decoder().apply(buf);
+            client.execute(() -> packet.handler().accept(decoded, createClientContext()));
+        });
     }
 
     private static IPacketContext createClientContext() {

@@ -1,7 +1,7 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
 import com.google.gson.JsonObject;
-import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
@@ -16,7 +16,7 @@ public class AdvancementObjective extends Objective {
 
     public AdvancementObjective(JsonObject definition) {
         super(definition);
-        this.advancement = ResourceLocation.parse(JsonUtils.getString(definition, "advancement"));
+        this.advancement = new ResourceLocation(JsonUtils.getString(definition, "advancement"));
     }
 
     @Override
@@ -30,7 +30,7 @@ public class AdvancementObjective extends Objective {
 
         // Check once per second (20 ticks) to maintain performance
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
-            AdvancementHolder advancementNode = player.getServer().getAdvancements().get(this.advancement);
+            Advancement advancementNode = player.getServer().getAdvancements().getAdvancement(this.advancement);
 
             if (advancementNode != null && player.getAdvancements().getOrStartProgress(advancementNode).isDone()) {
                 this.setUnits(this.getUnits() + 1);

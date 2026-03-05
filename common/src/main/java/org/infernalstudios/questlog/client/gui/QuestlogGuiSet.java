@@ -10,8 +10,8 @@ import org.infernalstudios.questlog.util.texture.Texture;
 public class QuestlogGuiSet {
 
     public static final QuestlogGuiSet DEFAULT = new QuestlogGuiSet(
-            ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/quest_page.png"),
-            ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/quest_peripherals.png"),
+            new ResourceLocation(Questlog.MODID, "textures/gui/quest_page.png"),
+            new ResourceLocation(Questlog.MODID, "textures/gui/quest_peripherals.png"),
             275, 170, 166
     );
 
@@ -53,7 +53,7 @@ public class QuestlogGuiSet {
     public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation peripheralLoc, int leftPanelWidth, int rightPanelWidth, int panelHeight) {
         this.backgroundLoc = backgroundLoc;
         this.peripheralLoc = peripheralLoc;
-        this.searchTabButtonsLoc = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/questlog_search_tab_buttons.png");
+        this.searchTabButtonsLoc = new ResourceLocation(Questlog.MODID, "textures/gui/questlog_search_tab_buttons.png");
 
         this.detailBackgroundLeft = new NineSliceTexture(backgroundLoc, leftPanelWidth, panelHeight, 375, 174, 275, 166, 1024, 512, 16, 16);
         this.detailBackgroundRight = new NineSliceTexture(backgroundLoc, rightPanelWidth, panelHeight, 700, 174, 170, 166, 1024, 512, 16, 16);

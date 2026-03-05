@@ -5,31 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.IPacketContext;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class QuestDefinitionPacket implements CustomPacketPayload {
-    public static final CustomPacketPayload.Type<QuestDefinitionPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "definition"));
+public class QuestDefinitionPacket {
+    public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
     private static final Gson GSON = new GsonBuilder().create();
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, QuestDefinitionPacket> STREAM_CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, QuestDefinitionPacket::id,
-            ByteBufCodecs.STRING_UTF8, QuestDefinitionPacket::getJsonString,
-            QuestDefinitionPacket::new
-    );
     private static final List<QuestDefinitionPacket> DEFERRED = new CopyOnWriteArrayList<>();
     private final ResourceLocation id;
     private final JsonObject definition;
@@ -41,6 +32,10 @@ public class QuestDefinitionPacket implements CustomPacketPayload {
     public QuestDefinitionPacket(ResourceLocation id, JsonObject definition) {
         this.id = id;
         this.definition = definition;
+    }
+
+    public static QuestDefinitionPacket decode(FriendlyByteBuf buf) {
+        return new QuestDefinitionPacket(buf.readResourceLocation(), buf.readUtf());
     }
 
     public static void handle(QuestDefinitionPacket packet, IPacketContext ctx) {
@@ -77,16 +72,16 @@ public class QuestDefinitionPacket implements CustomPacketPayload {
         DEFERRED.clear();
     }
 
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(this.id);
+        buf.writeUtf(this.getJsonString());
+    }
+
     public ResourceLocation id() {
         return id;
     }
 
     public String getJsonString() {
         return GSON.toJson(this.definition);
-    }
-
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
     }
 }

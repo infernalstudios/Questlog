@@ -2,7 +2,6 @@ package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -62,11 +61,11 @@ public class QuestDisplayData {
         if (descriptionElement != null) {
             try {
                 if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
-                    parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
+                    parsedDescription = Component.Serializer.fromJson(descriptionElement);
                 } else if (descriptionElement.isJsonPrimitive()) {
                     String rawStr = descriptionElement.getAsString();
                     if (rawStr.startsWith("[") || rawStr.startsWith("{")) {
-                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                        parsedDescription = Component.Serializer.fromJson(rawStr);
                     } else {
                         parsedDescription = translatable ? Component.translatable(rawStr) : Component.literal(rawStr);
                     }

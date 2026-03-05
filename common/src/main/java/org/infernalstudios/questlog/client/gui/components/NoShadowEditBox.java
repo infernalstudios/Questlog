@@ -1,12 +1,12 @@
 package org.infernalstudios.questlog.client.gui.components;
 
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -15,12 +15,10 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.util.StringUtil;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -28,7 +26,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class NoShadowEditBox extends AbstractWidget implements Renderable {
-    private static final WidgetSprites SPRITES = new WidgetSprites(ResourceLocation.withDefaultNamespace("widget/text_field"), ResourceLocation.withDefaultNamespace("widget/text_field_highlighted"));
     private final Font font;
     private String value;
     private int maxLength;
@@ -118,7 +115,7 @@ public class NoShadowEditBox extends AbstractWidget implements Renderable {
         int j = Math.max(this.cursorPos, this.highlightPos);
         int k = this.maxLength - this.value.length() - (i - j);
         if (k > 0) {
-            String s = StringUtil.filterText(textToWrite);
+            String s = SharedConstants.filterText(textToWrite);
             int l = s.length();
             if (k < l) {
                 if (Character.isHighSurrogate(s.charAt(k - 1))) {
@@ -322,7 +319,7 @@ public class NoShadowEditBox extends AbstractWidget implements Renderable {
     public boolean charTyped(char codePoint, int modifiers) {
         if (!this.canConsumeInput()) {
             return false;
-        } else if (StringUtil.isAllowedChatCharacter(codePoint)) {
+        } else if (SharedConstants.isAllowedChatCharacter(codePoint)) {
             if (this.isEditable) {
                 this.insertText(Character.toString(codePoint));
             }
@@ -349,8 +346,8 @@ public class NoShadowEditBox extends AbstractWidget implements Renderable {
     public void renderWidget(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.isVisible()) {
             if (this.isBordered()) {
-                ResourceLocation resourcelocation = SPRITES.get(this.isActive(), this.isFocused());
-                guiGraphics.blitSprite(resourcelocation, this.getX(), this.getY(), this.getWidth(), this.getHeight());
+                guiGraphics.fill(this.getX() - 1, this.getY() - 1, this.getX() + this.width + 1, this.getY() + this.height + 1, this.isFocused() ? -1 : -6250336);
+                guiGraphics.fill(this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, -16777216);
             }
 
             int l1 = this.isEditable ? this.textColor : this.textColorUneditable;

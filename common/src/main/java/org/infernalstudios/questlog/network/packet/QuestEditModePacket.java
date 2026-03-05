@@ -1,29 +1,21 @@
 package org.infernalstudios.questlog.network.packet;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.network.IPacketContext;
-import org.jetbrains.annotations.NotNull;
 
-public record QuestEditModePacket(boolean enabled) implements CustomPacketPayload {
-    public static final Type<QuestEditModePacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "edit_mode"));
+public record QuestEditModePacket(boolean enabled) {
+    public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, QuestEditModePacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.BOOL, QuestEditModePacket::enabled,
-            QuestEditModePacket::new
-    );
+    public static QuestEditModePacket decode(FriendlyByteBuf buf) {
+        return new QuestEditModePacket(buf.readBoolean());
+    }
 
     public static void handle(QuestEditModePacket packet, IPacketContext ctx) {
-        // TODO: integrate with actual edit mode boolean
         Questlog.LOGGER.info("Questlog Edit Mode has been set to: {}", packet.enabled());
     }
 
-    @Override
-    public @NotNull Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeBoolean(this.enabled);
     }
 }

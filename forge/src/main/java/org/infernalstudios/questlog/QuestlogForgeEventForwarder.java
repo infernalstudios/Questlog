@@ -2,29 +2,28 @@ package org.infernalstudios.questlog;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
-import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.event.events.QLEntityEvent;
 import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 
-public class QuestlogNeoForgeEventForwarder {
+public class QuestlogForgeEventForwarder {
     @SubscribeEvent
     public static void onServerStart(ServerStartingEvent event) {
         QuestlogEvents.onServerStart(event.getServer());
@@ -52,8 +51,10 @@ public class QuestlogNeoForgeEventForwarder {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public static void onClientTick(ClientTickEvent.Post event) {
-        QuestlogClientEvents.onClientTick();
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            QuestlogClientEvents.onClientTick();
+        }
     }
 
     @SubscribeEvent
@@ -115,8 +116,8 @@ public class QuestlogNeoForgeEventForwarder {
     }
 
     @SubscribeEvent
-    public static void onItemPickup(ItemEntityPickupEvent.Post event) {
-        Questlog.EVENTS.post(new QLEntityEvent.PickupItem(event.getPlayer(), event.getOriginalStack()));
+    public static void onItemPickup(EntityItemPickupEvent event) {
+        Questlog.EVENTS.post(new QLEntityEvent.PickupItem(event.getEntity(), event.getItem().getItem()));
     }
 
     @SubscribeEvent
@@ -125,8 +126,10 @@ public class QuestlogNeoForgeEventForwarder {
     }
 
     @SubscribeEvent
-    public static void onPlayerTick(PlayerTickEvent.Post event) {
-        Questlog.EVENTS.post(new QLPlayerEvent.Tick(event.getEntity()));
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            Questlog.EVENTS.post(new QLPlayerEvent.Tick(event.player));
+        }
     }
 
     @SubscribeEvent

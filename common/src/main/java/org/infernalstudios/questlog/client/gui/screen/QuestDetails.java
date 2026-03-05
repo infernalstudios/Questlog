@@ -218,7 +218,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ps, mouseX, mouseY, partialTicks);
+        this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, partialTicks);
 
         this.renderTitle(ps);
@@ -229,6 +229,15 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         }
 
         this.handleMouseOverLinks(mouseX, mouseY, ps);
+    }
+
+    @Override
+    public void renderBackground(@NotNull GuiGraphics ps) {
+        super.renderBackground(ps);
+        this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.startY);
+        if (showDetails) {
+            this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.startY);
+        }
     }
 
     private void handleMouseOverLinks(int mouseX, int mouseY, GuiGraphics ps) {
@@ -273,7 +282,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
         if (parts.length == 5) {
-            ResourceLocation loc = ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]);
+            ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
             int w = Integer.parseInt(parts[3]);
             int h = Integer.parseInt(parts[4]);
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
@@ -290,7 +299,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-                    Quest target = QuestlogClient.getLocal().getQuest(ResourceLocation.parse(click.getValue()));
+                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;
@@ -299,15 +308,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             }
         }
         return super.mouseClicked(mouseX, mouseY, button);
-    }
-
-    @Override
-    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(ps, mouseX, mouseY, partialTick);
-        this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.startY);
-        if (showDetails) {
-            this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.startY);
-        }
     }
 
     private void renderTitle(GuiGraphics ps) {

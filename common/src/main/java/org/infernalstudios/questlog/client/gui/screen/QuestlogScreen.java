@@ -28,7 +28,7 @@ import java.util.*;
 public class QuestlogScreen extends Screen {
 
     private static final Texture BACKGROUND_TEXTURE = new Texture(
-            ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/questlog.png"),
+            new ResourceLocation(Questlog.MODID, "textures/gui/questlog.png"),
             1024,
             512,
             0,
@@ -42,7 +42,7 @@ public class QuestlogScreen extends Screen {
     private final Map<ResourceLocation, ChapterInfo> availableChapters = new LinkedHashMap<>();
     @Nullable
     private ScrollableComponent questList;
-    private ResourceLocation currentChapter = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "main");
+    private ResourceLocation currentChapter = new ResourceLocation(Questlog.MODID, "main");
     private String searchQuery = "";
     private NoShadowEditBox searchBox;
     private int tabOffset = 0;
@@ -234,7 +234,7 @@ public class QuestlogScreen extends Screen {
                     String chapterStr = quest.getDisplay().getChapter();
                     ResourceLocation questChapter = chapterStr.contains(":")
                             ? ResourceLocation.tryParse(chapterStr)
-                            : ResourceLocation.fromNamespaceAndPath(Questlog.MODID, chapterStr);
+                            : new ResourceLocation(Questlog.MODID, chapterStr);
 
                     ChapterInfo questChapterInfo = this.availableChapters.get(questChapter);
                     boolean shouldShowChapter = questChapterInfo != null && !questChapterInfo.hidden;
@@ -260,8 +260,8 @@ public class QuestlogScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTick) {
-        super.renderBackground(ps, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics ps) {
+        super.renderBackground(ps);
 
         int x = (this.width - BACKGROUND_TEXTURE.width()) / 2;
         int y = (this.height - BACKGROUND_TEXTURE.height()) / 2;
@@ -270,6 +270,7 @@ public class QuestlogScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
+        this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, delta);
 
         if (this.questList == null) {

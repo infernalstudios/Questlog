@@ -70,7 +70,7 @@ public class JsonUtils {
         JsonElement element = obj.get(key);
 
         if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
-            return new ItemRenderable(ResourceLocation.parse(element.getAsString()));
+            return new ItemRenderable(new ResourceLocation(element.getAsString()));
         }
 
         if (element.isJsonObject()) {
