@@ -13,6 +13,7 @@ public class ItemRenderable implements Blittable {
 
     private final ResourceLocation item;
     private ItemStack cachedStack;
+    private boolean isResolved = false;
 
     public ItemRenderable(ResourceLocation item) {
         this.item = item;
@@ -20,13 +21,14 @@ public class ItemRenderable implements Blittable {
 
     @Nullable
     private ItemStack getItem() {
-        if (this.cachedStack == null) {
+        if (!this.isResolved) {
             Item item = BuiltInRegistries.ITEM.get(this.item);
             if (item != Items.AIR) {
                 this.cachedStack = item.getDefaultInstance();
             } else {
                 Questlog.LOGGER.warn("Item {} not found", this.item);
             }
+            this.isResolved = true;
         }
 
         return this.cachedStack;

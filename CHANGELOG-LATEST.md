@@ -10,6 +10,7 @@
 - Added `ql open` command to force a player to open their questlog (optionally to a specific entry).
 - Added `ql progress` command.
 - Added `ql trigger` command.
+- Added automatic conversion from datapack to config format for quests.
 
 ### Removed
 
