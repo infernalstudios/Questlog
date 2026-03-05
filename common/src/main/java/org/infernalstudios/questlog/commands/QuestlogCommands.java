@@ -1,7 +1,6 @@
 package org.infernalstudios.questlog.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -125,6 +124,7 @@ public class QuestlogCommands {
                                 )
                         )
 
+                        /*
                         .then(Commands.literal("edit_mode")
                                 .then(Commands.argument("enabled", BoolArgumentType.bool())
                                         .executes(ctx -> setEditMode(ctx, BoolArgumentType.getBool(ctx, "enabled"), null))
@@ -133,6 +133,7 @@ public class QuestlogCommands {
                                         )
                                 )
                         )
+                         */
         );
 
         dispatcher.register(Commands.literal("ql").requires(stack -> stack.hasPermission(2)).redirect(root));
