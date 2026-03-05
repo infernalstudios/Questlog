@@ -9,13 +9,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
-import org.infernalstudios.questlog.mixin.MinecraftServerAccessor;
-import org.infernalstudios.questlog.mixin.PlayerDataStorageAccessor;
 import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 import org.infernalstudios.questlog.platform.Services;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -165,9 +164,7 @@ public class ServerPlayerManager {
     }
 
     private File getPlayerDataFile(Player player) {
-        return new File(
-                ((PlayerDataStorageAccessor) ((MinecraftServerAccessor) this.server).getPlayerDataStorage()).getPlayerDir(),
-                player.getUUID() + ".questlog.dat"
-        );
+        Path playerDataPath = this.server.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR);
+        return new File(playerDataPath.toFile(), player.getUUID() + ".questlog.dat");
     }
 }
