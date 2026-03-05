@@ -31,7 +31,7 @@ import org.lwjgl.glfw.GLFW;
 public class QuestDetails extends Screen implements NarrationSupplier {
 
     private static final int PANEL_SPACING = 6;
-    private static final int BUTTON_SPACING = -16;
+    private static final int BUTTON_SPACING = 6;
     private static final int TITLE_Y = 13;
     private static final int TITLE_WIDTH = 132;
     private static final int TITLE_HEIGHT = 16;
@@ -79,6 +79,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     protected void init() {
         super.init();
 
+        boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
+        if (!hasDetails) {
+            showDetails = false;
+        }
+
         int leftWidth = this.getDisplay().getLeftPanelWidth();
         int rightWidth = this.getDisplay().getRightPanelWidth();
         int height = this.getDisplay().getPanelHeight();
@@ -96,8 +101,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         int height = this.getDisplay().getPanelHeight();
         int leftWidth = this.getDisplay().getLeftPanelWidth();
 
-        int buttonY = this.startY + height - 8;
-        int rightBoundary = this.panel1X + leftWidth;
+        int buttonY = this.startY + height + 2;
+        int rightBoundary = this.panel1X + leftWidth - 12;
 
         this.backButton = new QuestlogButton(
                 0, buttonY,
@@ -108,26 +113,34 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.getGuiSet()
         );
 
-        this.objectivesButton = new QuestlogButton(
-                0, buttonY,
-                this.getPalette().textColor(),
-                this.getPalette().hoveredTextColor(),
-                Component.translatable("questlog.info.details"),
-                () -> {
-                    showDetails = !showDetails;
-                    this.rebuildWidgets();
-                },
-                this.getGuiSet()
-        );
+        boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
+
+        if (hasDetails) {
+            this.objectivesButton = new QuestlogButton(
+                    0, buttonY,
+                    this.getPalette().textColor(),
+                    this.getPalette().hoveredTextColor(),
+                    Component.translatable("questlog.info.details"),
+                    () -> {
+                        showDetails = !showDetails;
+                        this.rebuildWidgets();
+                    },
+                    this.getGuiSet()
+            );
+        } else {
+            this.objectivesButton = null;
+        }
 
         this.updateButtonLayout(rightBoundary);
 
         this.addRenderableWidget(this.backButton);
-        this.addRenderableWidget(this.objectivesButton);
+        if (this.objectivesButton != null) {
+            this.addRenderableWidget(this.objectivesButton);
+        }
     }
 
     private void updateButtonLayout(int rightBoundary) {
-        if (this.backButton == null || this.objectivesButton == null) return;
+        if (this.backButton == null) return;
 
         Component backText = this.getDisplay().getBackButtonText();
         if (this.quest.isCompleted() && !this.quest.isRewarded()) {
@@ -138,10 +151,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.backButton.setMessage(backText);
 
         int backWidth = this.backButton.getExpectedWidth();
-        int objWidth = this.objectivesButton.getExpectedWidth();
 
         this.backButton.setX(rightBoundary - backWidth);
-        this.objectivesButton.setX(this.backButton.getX() - objWidth - BUTTON_SPACING);
+
+        if (this.objectivesButton != null) {
+            int objWidth = this.objectivesButton.getExpectedWidth();
+            this.objectivesButton.setX(this.backButton.getX() - objWidth - BUTTON_SPACING);
+        }
     }
 
     private void handlePrimaryAction() {

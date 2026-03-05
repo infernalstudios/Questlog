@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.util;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.util.texture.Blittable;
@@ -62,14 +63,19 @@ public class JsonUtils {
 
     @Nullable
     public static Blittable getIcon(JsonObject obj, String key) {
-        if (obj == null) return null;
-        if (obj.has(key)) {
-            if (!obj.get(key).isJsonObject()) {
-                throw new IllegalArgumentException("Field " + key + " must be an object");
-            }
-            return getIcon(obj.getAsJsonObject(key));
+        if (obj == null || !obj.has(key)) return null;
+
+        JsonElement element = obj.get(key);
+
+        if (element.isJsonPrimitive() && element.getAsJsonPrimitive().isString()) {
+            return new ItemRenderable(ResourceLocation.parse(element.getAsString()));
         }
-        return null;
+
+        if (element.isJsonObject()) {
+            return getIcon(element.getAsJsonObject());
+        }
+
+        throw new IllegalArgumentException("Field " + key + " must be a string (item ID) or an icon object");
     }
 
     @Nullable

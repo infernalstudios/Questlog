@@ -26,6 +26,8 @@ import org.infernalstudios.questlog.network.packet.QuestOpenPacket;
 import org.infernalstudios.questlog.platform.Services;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class QuestlogCommands {
@@ -64,10 +66,13 @@ public class QuestlogCommands {
                         )
 
                         .then(Commands.literal("open")
-                                .executes(ctx -> open(ctx, null))
+                                .executes(ctx -> open(ctx, null, Collections.singletonList(ctx.getSource().getPlayerOrException())))
                                 .then(Commands.argument("target", ResourceLocationArgument.id())
                                         .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                        .executes(ctx -> open(ctx, ResourceLocationArgument.getId(ctx, "target").toString()))
+                                        .executes(ctx -> open(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                        .then(Commands.argument("players", EntityArgument.players())
+                                                .executes(ctx -> open(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), EntityArgument.getPlayers(ctx, "players")))
+                                        )
                                 )
                         )
 
@@ -75,30 +80,48 @@ public class QuestlogCommands {
                                 .then(Commands.literal("reset")
                                         .then(Commands.argument("target", ResourceLocationArgument.id())
                                                 .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), false))
+                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), false, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                                .then(Commands.argument("players", EntityArgument.players())
+                                                        .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), false, EntityArgument.getPlayers(ctx, "players")))
+                                                )
                                         )
                                         .then(Commands.literal("all")
-                                                .executes(QuestlogCommands::resetAllProgress)
+                                                .executes(ctx -> resetAllProgress(ctx, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                                .then(Commands.argument("players", EntityArgument.players())
+                                                        .executes(ctx -> resetAllProgress(ctx, EntityArgument.getPlayers(ctx, "players")))
+                                                )
                                         )
                                 )
                                 .then(Commands.literal("complete")
                                         .then(Commands.argument("target", ResourceLocationArgument.id())
                                                 .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), true))
+                                                .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), true, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                                .then(Commands.argument("players", EntityArgument.players())
+                                                        .executes(ctx -> modifyProgress(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), true, EntityArgument.getPlayers(ctx, "players")))
+                                                )
                                         )
                                         .then(Commands.literal("all")
-                                                .executes(QuestlogCommands::completeAllProgress)
+                                                .executes(ctx -> completeAllProgress(ctx, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                                .then(Commands.argument("players", EntityArgument.players())
+                                                        .executes(ctx -> completeAllProgress(ctx, EntityArgument.getPlayers(ctx, "players")))
+                                                )
                                         )
                                 )
                         )
 
                         .then(Commands.literal("trigger")
                                 .then(Commands.literal("all")
-                                        .executes(ctx -> trigger(ctx, "all"))
+                                        .executes(ctx -> trigger(ctx, "all", Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                        .then(Commands.argument("players", EntityArgument.players())
+                                                .executes(ctx -> trigger(ctx, "all", EntityArgument.getPlayers(ctx, "players")))
+                                        )
                                 )
                                 .then(Commands.argument("target", ResourceLocationArgument.id())
                                         .suggests(SUGGEST_QUEST_OR_CATEGORY)
-                                        .executes(ctx -> trigger(ctx, ResourceLocationArgument.getId(ctx, "target").toString()))
+                                        .executes(ctx -> trigger(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                        .then(Commands.argument("players", EntityArgument.players())
+                                                .executes(ctx -> trigger(ctx, ResourceLocationArgument.getId(ctx, "target").toString(), EntityArgument.getPlayers(ctx, "players")))
+                                        )
                                 )
                         )
 
@@ -132,11 +155,12 @@ public class QuestlogCommands {
         return questCount;
     }
 
-    private static int open(CommandContext<CommandSourceStack> ctx, String target) throws CommandSyntaxException {
-        ServerPlayer player = ctx.getSource().getPlayerOrException();
-        Services.PLATFORM.sendPacketToClient(player, new QuestOpenPacket(target == null ? "" : target));
-        ctx.getSource().sendSuccess(() -> Component.literal("Opened Questlog UI for " + player.getName().getString() + (target != null ? " targeting " + target : "")), false);
-        return 1;
+    private static int open(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {
+        for (ServerPlayer player : players) {
+            Services.PLATFORM.sendPacketToClient(player, new QuestOpenPacket(target == null ? "" : target));
+        }
+        ctx.getSource().sendSuccess(() -> Component.literal("Opened Questlog UI for " + players.size() + " player(s)" + (target != null ? " targeting " + target : "")), false);
+        return players.size();
     }
 
     private static int setEditMode(CommandContext<CommandSourceStack> ctx, boolean enabled, ServerPlayer target) throws CommandSyntaxException {
@@ -146,45 +170,66 @@ public class QuestlogCommands {
         return 1;
     }
 
-    private static int trigger(CommandContext<CommandSourceStack> ctx, String target) throws CommandSyntaxException {
-        ServerPlayer player = ctx.getSource().getPlayerOrException();
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
-
-        List<Quest> affectedQuests = "all".equalsIgnoreCase(target) ? manager.getAllQuests() : getTargetQuests(manager, target);
-
-        if (affectedQuests.isEmpty()) {
-            ctx.getSource().sendFailure(Component.literal("No quests found for target: " + target));
-            return 0;
-        }
-
+    private static int trigger(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {
         int count = 0;
-        for (Quest quest : affectedQuests) {
-            if (!quest.isTriggered()) {
-                quest.requirements.forEach(trigger -> trigger.setUnits(trigger.getRequiredAmount()));
-                count++;
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            List<Quest> affectedQuests = "all".equalsIgnoreCase(target) ? manager.getAllQuests() : getTargetQuests(manager, target);
+
+            for (Quest quest : affectedQuests) {
+                if (!quest.isTriggered()) {
+                    quest.requirements.forEach(trigger -> trigger.setUnits(trigger.getRequiredAmount()));
+                    count++;
+                }
             }
         }
 
+        if (count == 0) {
+            ctx.getSource().sendFailure(Component.literal("No quests found or able to be triggered for target: " + target));
+            return 0;
+        }
+
         final int finalCount = count;
-        ctx.getSource().sendSuccess(() -> Component.literal("Successfully triggered " + finalCount + " quests."), true);
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully triggered " + finalCount + " quests across " + players.size() + " player(s)."), true);
         return finalCount;
     }
 
-    private static int modifyProgress(CommandContext<CommandSourceStack> ctx, String target, boolean complete) throws CommandSyntaxException {
-        ServerPlayer player = ctx.getSource().getPlayerOrException();
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+    private static int modifyProgress(CommandContext<CommandSourceStack> ctx, String target, boolean complete, Collection<ServerPlayer> players) {
+        int modified = 0;
 
-        List<Quest> affectedQuests = getTargetQuests(manager, target);
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            List<Quest> affectedQuests = getTargetQuests(manager, target);
 
-        if (affectedQuests.isEmpty()) {
+            for (Quest quest : affectedQuests) {
+                if (complete) {
+                    quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
+                } else {
+                    quest.requirements.forEach(trigger -> trigger.setUnits(0));
+                    quest.objectives.forEach(obj -> obj.setUnits(0));
+                    quest.rewards.forEach(Reward::revokeReward);
+                    quest.hasSentTrigger = quest.requirements.isEmpty();
+                    quest.hasSentCompletion = false;
+                }
+            }
+            modified += affectedQuests.size();
+        }
+
+        if (modified == 0) {
             ctx.getSource().sendFailure(Component.literal("No quests found for target: " + target));
             return 0;
         }
 
-        for (Quest quest : affectedQuests) {
-            if (complete) {
-                quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-            } else {
+        String action = complete ? "Completed" : "Reset";
+        final int fModified = modified;
+        ctx.getSource().sendSuccess(() -> Component.literal(action + " progress for " + fModified + " quests across " + players.size() + " player(s)."), true);
+        return modified;
+    }
+
+    private static int resetAllProgress(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            for (Quest quest : manager.getAllQuests()) {
                 quest.requirements.forEach(trigger -> trigger.setUnits(0));
                 quest.objectives.forEach(obj -> obj.setUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
@@ -193,37 +238,20 @@ public class QuestlogCommands {
             }
         }
 
-        String action = complete ? "Completed" : "Reset";
-        ctx.getSource().sendSuccess(() -> Component.literal(action + " progress for " + affectedQuests.size() + " quests."), true);
-        return affectedQuests.size();
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully reset all quest progress for " + players.size() + " player(s)."), true);
+        return players.size();
     }
 
-    private static int resetAllProgress(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        ServerPlayer player = ctx.getSource().getPlayerOrException();
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
-
-        for (Quest quest : manager.getAllQuests()) {
-            quest.requirements.forEach(trigger -> trigger.setUnits(0));
-            quest.objectives.forEach(obj -> obj.setUnits(0));
-            quest.rewards.forEach(Reward::revokeReward);
-            quest.hasSentTrigger = quest.requirements.isEmpty();
-            quest.hasSentCompletion = false;
+    private static int completeAllProgress(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            for (Quest quest : manager.getAllQuests()) {
+                quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
+            }
         }
 
-        ctx.getSource().sendSuccess(() -> Component.literal("Successfully reset all quest progress."), true);
-        return 1;
-    }
-
-    private static int completeAllProgress(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
-        ServerPlayer player = ctx.getSource().getPlayerOrException();
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
-
-        for (Quest quest : manager.getAllQuests()) {
-            quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-        }
-
-        ctx.getSource().sendSuccess(() -> Component.literal("Successfully completed all quests."), true);
-        return 1;
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully completed all quests for " + players.size() + " player(s)."), true);
+        return players.size();
     }
 
     private static List<Quest> getTargetQuests(QuestManager manager, String target) {

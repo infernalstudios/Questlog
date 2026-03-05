@@ -58,10 +58,10 @@ public class QuestlogGuiSet {
         this.detailBackgroundLeft = new NineSliceTexture(backgroundLoc, leftPanelWidth, panelHeight, 375, 174, 275, 166, 1024, 512, 16, 16);
         this.detailBackgroundRight = new NineSliceTexture(backgroundLoc, rightPanelWidth, panelHeight, 700, 174, 170, 166, 1024, 512, 16, 16);
 
-        this.button = new Texture(peripheralLoc, 74, 38, 36, 55, 256, 256);
-        this.buttonHovered = new Texture(peripheralLoc, 74, 38, 112, 55, 256, 256);
-        this.buttonLong = new Texture(peripheralLoc, 108, 38, 2, 95, 256, 256);
-        this.buttonLongHovered = new Texture(peripheralLoc, 108, 38, 112, 95, 256, 256);
+        this.button = new Texture(peripheralLoc, 54, 18, 46, 65, 256, 256);
+        this.buttonHovered = new Texture(peripheralLoc, 54, 18, 122, 65, 256, 256);
+        this.buttonLong = new Texture(peripheralLoc, 88, 18, 12, 105, 256, 256);
+        this.buttonLongHovered = new Texture(peripheralLoc, 88, 18, 122, 105, 256, 256);
         this.toast = new Texture(peripheralLoc, 173, 51, 81, 2, 256, 256);
         this.important = new Texture(peripheralLoc, 28, 36, 2, 2, 256, 256);
         this.panelHR = new Texture(peripheralLoc, 140, 9, 2, 157, 256, 256);

@@ -3,13 +3,12 @@
 - Added `quest_read` objective.
 - Added `block_interact` objective.
 - Added `advancement` objective.
-- Added `trigger_all` command.
 - Added JSON fields for left panel width, right panel width, and panel height.
     - Works on a per-quest basis.
 - Added support for hot-reloading quests with `/ql reload`.
 - Added `ql open` command to force a player to open their questlog (optionally to a specific entry).
-- Added `ql progress` command.
-- Added `ql trigger` command.
+- Added `ql progress` command to reset and manage questlog progress. Supports target selectors (`@s`, `@a`, etc.)
+- Added `ql trigger` command to trigger quests/chapters. Supports target selectors.
 - Added automatic conversion from datapack to config format for quests.
 
 ### Removed
@@ -25,9 +24,14 @@
 - Fully reworked commands for better autofill and additional functionality.
 - Improved quest details page to a multipanel layout.
 - Added field for searching.
-- Added categories to the questlog.
-- Improved error logging.
+- Added categories to the questlog, which are defined in `config/questlog/chapters`.
+- Quests without rewards or objectives will only show the description.
+- Improved error logging to be more descriptive.
 - Switched from datapacks to a config folder.
 - Invalid quests no longer prevent you from loading worlds.
 - Simplified quest definitions to reduce nesting.
     - These will be automatically converted from the legacy format on first load.
+
+### Fixed
+
+- Fixed 
