@@ -15,8 +15,6 @@
     "questlog.reward.collected": "Collected",
     "questlog.reward.uncollected": "Uncollected",
     "questlog.gui.open": "Open Questlog",
-    "questlog.objective.default": "Unnamed Objective",
-    "questlog.reward.default": "Unnamed Reward",
     "questlog.no_quests": "No Quests Available",
 
     "questlog.info.objectives": "Objectives",
@@ -41,5 +39,35 @@
     "command.questlog.reward.collect_all": "Collected all rewards",
     "command.questlog.reward.uncollect": "Uncollected reward %s",
     "command.questlog.reward.success": "Collected reward %s",
-    "command.questlog.reward.already_collected": "Reward %s is already collected"
+    "command.questlog.reward.already_collected": "Reward %s is already collected",
+
+    "questlog.objective.default": "Unnamed Objective",
+    "questlog.objective.default.item_obtain": "Obtain %s",
+    "questlog.objective.default.item_craft": "Craft %s",
+    "questlog.objective.default.item_use": "Use %s",
+    "questlog.objective.default.item_equip": "Equip %s",
+    "questlog.objective.default.item_drop": "Drop %s",
+
+    "questlog.objective.default.block_mine": "Mine %s",
+    "questlog.objective.default.block_place": "Place %s",
+    "questlog.objective.default.block_interact": "Interact with %s",
+
+    "questlog.objective.default.entity_kill": "Kill %s",
+    "questlog.objective.default.entity_tame": "Tame %s",
+    "questlog.objective.default.entity_breed": "Breed %s",
+    "questlog.objective.default.entity_approach": "Approach %s",
+    "questlog.objective.default.entity_death": "Die to %s",
+
+    "questlog.objective.default.visit_biome": "Visit Biome",
+    "questlog.objective.default.visit_dimension": "Visit Dimension",
+    "questlog.objective.default.visit_structure": "Visit Structure",
+    "questlog.objective.default.visit_position": "Visit Position",
+    "questlog.objective.default.advancement": "Complete Advancement",
+    "questlog.objective.default.statistic": "Increase Statistic",
+
+    "questlog.reward.default": "Unnamed Reward",
+    "questlog.reward.default.experience.points": "%s Exp Points",
+    "questlog.reward.default.experience.levels": "%s Exp Levels",
+    "questlog.reward.default.command": "Run Command",
+    "questlog.reward.default.loot_table": "Loot Table"
 }

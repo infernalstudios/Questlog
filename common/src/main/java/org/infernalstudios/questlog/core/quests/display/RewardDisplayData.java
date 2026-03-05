@@ -8,8 +8,7 @@ import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class RewardDisplayData {
 
@@ -25,17 +24,54 @@ public class RewardDisplayData {
         String name = JsonUtils.getOrDefault(data, "name", (String) null);
 
         if (name == null) {
-            this.name = Component.translatable("questlog.reward.default");
+            this.name = this.generateSmartName(data);
         } else {
             this.name = JsonUtils.getOrDefault(data, "translatable", false) ? Component.translatable(name) : Component.literal(name);
         }
         this.icon = JsonUtils.getIcon(data, "icon");
 
         String sound = JsonUtils.getOrDefault(data, "claim_sound", (String) null);
-        this.claimSound = sound == null ? null : new ResourceLocation(sound);
+        this.claimSound = sound == null ? null : ResourceLocation.tryParse(sound);
     }
 
-    public void setReward(@org.jetbrains.annotations.Nullable Reward reward) {
+    private Component generateSmartName(JsonObject data) {
+        String typeStr = JsonUtils.getOrDefault(data, "type", "");
+        if (typeStr.isEmpty()) return Component.translatable("questlog.reward.default");
+
+        if (!typeStr.contains(":")) typeStr = "questlog:" + typeStr;
+        ResourceLocation type = ResourceLocation.tryParse(typeStr);
+
+        if (type != null) {
+            String path = type.getPath();
+
+            if (path.equals("item") && data.has("item") && data.get("item").isJsonPrimitive()) {
+                String itemStr = data.get("item").getAsString();
+                ResourceLocation itemId = ResourceLocation.tryParse(itemStr);
+                if (itemId != null && BuiltInRegistries.ITEM.containsKey(itemId)) {
+                    Component itemName = BuiltInRegistries.ITEM.get(itemId).getDescription();
+                    int count = JsonUtils.getOrDefault(data, "count", 1);
+                    if (count > 1) {
+                        return Component.literal(count + "x ").append(itemName);
+                    }
+                    return itemName;
+                }
+            } else if (path.equals("experience")) {
+                int amount = JsonUtils.getOrDefault(data, "experience", 0);
+                boolean levels = JsonUtils.getOrDefault(data, "levels", false);
+                if (levels) {
+                    return Component.translatable("questlog.reward.default.experience.levels", amount);
+                } else {
+                    return Component.translatable("questlog.reward.default.experience.points", amount);
+                }
+            }
+
+            return Component.translatable("questlog.reward.default." + type.getNamespace() + "." + path);
+        }
+
+        return Component.translatable("questlog.reward.default");
+    }
+
+    public void setReward(@Nullable Reward reward) {
         this.reward = reward;
     }
 

@@ -26,12 +26,12 @@
 - Added field for searching.
 - Added categories to the questlog, which are defined in `config/questlog/chapters`.
 - Quests without rewards or objectives will only show the description.
+- Improved default objective and reward names to be more context-aware than "Unnamed Objective".
 - Improved error logging to be more descriptive.
 - Switched from datapacks to a config folder.
-- Invalid quests no longer prevent you from loading worlds.
 - Simplified quest definitions to reduce nesting.
     - These will be automatically converted from the legacy format on first load.
 
 ### Fixed
 
-- Fixed 
+- Fixed invalid quests causing player data to not save, resulting in being kicked from worlds.
