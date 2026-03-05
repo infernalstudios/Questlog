@@ -7,8 +7,6 @@
   "mixins": [
     "EnchantedItemTriggerMixin",
     "ItemUsedOnLocationTriggerMixin",
-    "MinecraftServerAccessor",
-    "PlayerDataStorageAccessor",
     "ServerPlayerMixin",
     "TameAnimalTriggerMixin"
   ],

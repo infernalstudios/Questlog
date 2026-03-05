@@ -36,10 +36,11 @@ public class VisitStructureObjective extends Objective {
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
             ticksUntilCheck = 20;
             if (!player.serverLevel().isLoaded(player.blockPosition())) return;
-            if (!player.serverLevel().structureManager().getStructureWithPieceAt(player.blockPosition(), this.structure).isValid())
-                return;
 
-            this.setUnits(this.getUnits() + 1);
+            Structure struct = player.serverLevel().registryAccess().registryOrThrow(Registries.STRUCTURE).get(this.structure);
+            if (struct != null && player.serverLevel().structureManager().getStructureWithPieceAt(player.blockPosition(), struct).isValid()) {
+                this.setUnits(this.getUnits() + 1);
+            }
         }
     }
 }

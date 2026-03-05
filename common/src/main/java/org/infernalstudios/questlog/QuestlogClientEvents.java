@@ -33,10 +33,12 @@ public class QuestlogClientEvents {
 
         Minecraft minecraft = Minecraft.getInstance();
 
-        if (QuestlogClient.OPEN_SCREEN_KEY.consumeClick() && minecraft.isWindowActive()) {
-            LocalPlayer player = minecraft.player;
-            if (player != null) {
-                minecraft.setScreen(new QuestlogScreen(minecraft.screen));
+        while (QuestlogClient.OPEN_SCREEN_KEY.consumeClick()) {
+            if (minecraft.isWindowActive()) {
+                LocalPlayer player = minecraft.player;
+                if (player != null) {
+                    minecraft.setScreen(new QuestlogScreen(minecraft.screen));
+                }
             }
         }
     }
@@ -50,6 +52,9 @@ public class QuestlogClientEvents {
     public static void onClientPlayerLogout() {
         QuestlogClient.destroyLocal();
         Questlog.EVENTS.removeAllListeners();
+        QuestToastState.addedToasts.clear();
+        QuestToastState.completedToasts.clear();
+        QuestToastState.queuedPopups.clear();
     }
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {

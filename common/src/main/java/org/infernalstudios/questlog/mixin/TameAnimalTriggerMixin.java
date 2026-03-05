@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TameAnimalTrigger.class)
 public class TameAnimalTriggerMixin {
     @Inject(method = "trigger(Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/world/entity/animal/Animal;)V", at = @At("HEAD"))
-    public void onEnchanted(ServerPlayer player, Animal animal, CallbackInfo ci) {
+    public void onTamed(ServerPlayer player, Animal animal, CallbackInfo ci) {
         Questlog.EVENTS.post(new QLEntityEvent.TameAnimal(player, animal));
     }
 }

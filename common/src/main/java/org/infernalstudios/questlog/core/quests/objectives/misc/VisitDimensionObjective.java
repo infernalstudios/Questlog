@@ -27,7 +27,7 @@ public class VisitDimensionObjective extends Objective {
     private void onPlayerMove(QLPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
-            if (player.level().dimensionTypeId().location().equals(this.dimension)) {
+            if (player.level().dimension().location().equals(this.dimension)) {
                 this.setUnits(this.getUnits() + 1);
             }
             ticksUntilCheck = 20;
