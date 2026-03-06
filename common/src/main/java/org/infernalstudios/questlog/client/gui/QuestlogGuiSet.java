@@ -56,7 +56,7 @@ public class QuestlogGuiSet {
         this.searchTabButtonsLoc = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/questlog_search_tab_buttons.png");
 
         this.detailBackgroundLeft = new NineSliceTexture(backgroundLoc, leftPanelWidth, panelHeight, 375, 174, 275, 166, 1024, 512, 16, 16);
-        this.detailBackgroundRight = new NineSliceTexture(backgroundLoc, rightPanelWidth, panelHeight, 700, 174, 170, 166, 1024, 512, 16, 16);
+        this.detailBackgroundRight = new NineSliceTexture(backgroundLoc, rightPanelWidth, panelHeight, 375, 174, 275, 166, 1024, 512, 16, 16);
 
         this.button = new Texture(peripheralLoc, 54, 18, 46, 65, 256, 256);
         this.buttonHovered = new Texture(peripheralLoc, 54, 18, 122, 65, 256, 256);

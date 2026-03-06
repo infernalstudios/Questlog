@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 public class QuestlogMigrator {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static boolean showDatapackWarning = false;
 
     public static void attemptMigration(MinecraftServer server) {
@@ -100,7 +100,7 @@ public class QuestlogMigrator {
             stream.filter(path -> path.toString().endsWith(".questlog.dat")).forEach(path -> {
                 try {
                     File file = path.toFile();
-                    CompoundTag oldData = NbtIo.readCompressed(file);
+                    CompoundTag oldData = NbtIo.readCompressed(path, net.minecraft.nbt.NbtAccounter.unlimitedHeap());
                     CompoundTag newData = new CompoundTag();
                     boolean migratedAny = false;
 
@@ -149,7 +149,7 @@ public class QuestlogMigrator {
 
                     if (migratedAny) {
                         Questlog.LOGGER.info("Successfully migrated old Questlog player data for {}", file.getName());
-                        NbtIo.writeCompressed(newData, file);
+                        NbtIo.writeCompressed(newData, path);
                     }
                 } catch (Exception e) {
                     Questlog.LOGGER.error("Failed to migrate player data: {}", path.getFileName(), e);
