@@ -46,7 +46,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private int panel1X;
     private int panel2X;
-    private int startY;
+    private int panel1Y;
+    private int panel2Y;
 
     @Nullable
     private QuestlogButton backButton;
@@ -89,9 +90,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         int height = this.getDisplay().getPanelHeight();
 
         int totalWidth = showDetails ? (leftWidth + rightWidth + PANEL_SPACING) : leftWidth;
-        this.panel1X = (this.width - totalWidth) / 2;
-        this.panel2X = this.panel1X + leftWidth + PANEL_SPACING;
-        this.startY = (this.height - height) / 2;
+        int baseX = (this.width - totalWidth) / 2;
+        int baseY = (this.height - height) / 2;
+
+        this.panel1X = baseX + this.getDisplay().getLeftPanelXOffset();
+        this.panel1Y = baseY + this.getDisplay().getLeftPanelYOffset();
+        this.panel2X = baseX + leftWidth + PANEL_SPACING + this.getDisplay().getRightPanelXOffset();
+        this.panel2Y = baseY + this.getDisplay().getRightPanelYOffset();
 
         this.setupButtons();
         this.setupContent();
@@ -101,7 +106,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         int height = this.getDisplay().getPanelHeight();
         int leftWidth = this.getDisplay().getLeftPanelWidth();
 
-        int buttonY = this.startY + height + 2;
+        int buttonY = this.panel1Y + height + 2;
         int rightBoundary = this.panel1X + leftWidth - 12;
 
         this.backButton = new QuestlogButton(
@@ -195,7 +200,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         this.description = new ScrollableComponent(
                 this.panel1X + CONTENT_X,
-                this.startY + CONTENT_Y,
+                this.panel1Y + CONTENT_Y,
                 leftWidth - 38,
                 height - 68,
                 new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor())
@@ -205,7 +210,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         if (showDetails) {
             this.info = new ScrollableComponent(
                     this.panel2X + CONTENT_X,
-                    this.startY + CONTENT_Y,
+                    this.panel2Y + CONTENT_Y,
                     rightWidth - 36,
                     height - 68,
                     new ScrollableInfo(this, this.getDisplay())
@@ -234,9 +239,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     public void renderBackground(@NotNull GuiGraphics ps) {
         super.renderBackground(ps);
-        this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.startY);
+        this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.panel1Y);
         if (showDetails) {
-            this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.startY);
+            this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.panel2Y);
+        }
+
+        ResourceLocation overlay = this.getDisplay().getOverlayTexture();
+        if (overlay != null) {
+            ps.blit(overlay, this.panel1X, this.panel1Y, 0, 0, this.getDisplay().getLeftPanelWidth(), this.getDisplay().getPanelHeight(), this.getDisplay().getLeftPanelWidth(), this.getDisplay().getPanelHeight());
         }
     }
 
@@ -281,12 +291,20 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
-        if (parts.length == 5) {
+        if (parts.length >= 5) {
             ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
             int w = Integer.parseInt(parts[3]);
             int h = Integer.parseInt(parts[4]);
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
-            ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
+
+            if (parts.length >= 7) {
+                int frames = Integer.parseInt(parts[5]);
+                int frameTime = Integer.parseInt(parts[6]);
+                int currentFrame = (int) ((net.minecraft.Util.getMillis() / frameTime) % frames);
+                ps.blit(loc, mouseX + 10, mouseY - 6, 0, currentFrame * h, w, h, w, h * frames);
+            } else {
+                ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
+            }
         }
     }
 
@@ -314,23 +332,22 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         QuestDisplayData display = this.getDisplay();
         int leftWidth = display.getLeftPanelWidth();
 
-        // Title Area is roughly 132 wide, but we calculate centering based on the actual panel
         int titleAreaX = (leftWidth - TITLE_WIDTH) / 2;
 
         int iconWidth = display.getIcon() != null ? display.getIcon().width() + 4 : 0;
         float totalTitleWidth = this.font.width(display.getTitle()) + iconWidth;
 
         float x = this.panel1X + titleAreaX + (TITLE_WIDTH - totalTitleWidth) / 2;
-        float y = this.startY + TITLE_Y;
+        float y = this.panel1Y + TITLE_Y;
 
         if (display.getIcon() != null) {
-            display.getIcon().blit(ps, (int) x, this.startY + TITLE_Y);
+            display.getIcon().blit(ps, (int) x, this.panel1Y + TITLE_Y);
             x += iconWidth;
         }
 
         y += (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
         ps.drawString(font, display.getTitle(), (int) x, (int) y, this.getPalette().titleColor(), false);
-        this.getGuiSet().smallHR.blit(ps, this.panel1X + titleAreaX - 60, this.startY + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
+        this.getGuiSet().smallHR.blit(ps, this.panel1X + titleAreaX - 60, this.panel1Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
     }
 
     private void renderInfo(GuiGraphics ps) {
@@ -339,10 +356,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         int rightWidth = this.getDisplay().getRightPanelWidth();
         Component title = this.quest.isCompleted() ? Component.translatable("questlog.info.rewards") : Component.translatable("questlog.info.objectives");
         float x = this.panel2X + (rightWidth - this.font.width(title)) / 2f;
-        float y = this.startY + TITLE_Y + (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
+        float y = this.panel2Y + TITLE_Y + (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;
 
         ps.drawString(font, title, (int) x, (int) y, this.getPalette().titleColor(), false);
-        this.getGuiSet().panelHR.blit(ps, this.panel2X + (rightWidth - 140) / 2, this.startY + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
+        this.getGuiSet().panelHR.blit(ps, this.panel2X + (rightWidth - 140) / 2, this.panel2Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
         this.info.render(ps, 0, 0, 0);
     }
 

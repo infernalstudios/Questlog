@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 
 public class QuestlogMigrator {
 
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
     public static boolean showDatapackWarning = false;
 
     public static void attemptMigration(MinecraftServer server) {

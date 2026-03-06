@@ -33,6 +33,10 @@ public class QuestDisplayData {
     private final boolean includeInMain;
     private final ResourceLocation bgTexture;
     private final ResourceLocation peripheralTexture;
+
+    @Nullable
+    private final ResourceLocation overlayTexture;
+
     private final Component backButtonText;
     private final Component collectButtonText;
     private final Component collectedText;
@@ -44,6 +48,11 @@ public class QuestDisplayData {
     private final int leftPanelWidth;
     private final int rightPanelWidth;
     private final int panelHeight;
+
+    private final int leftPanelXOffset;
+    private final int leftPanelYOffset;
+    private final int rightPanelXOffset;
+    private final int rightPanelYOffset;
 
     @Nullable
     private List<ObjectiveDisplayData> objectiveDisplay = null;
@@ -96,6 +105,9 @@ public class QuestDisplayData {
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
 
+        String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
+        this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
+
         this.bgTexture = new ResourceLocation(backgroundLoc);
         this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
@@ -121,6 +133,11 @@ public class QuestDisplayData {
         this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
         this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
         this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
+
+        this.leftPanelXOffset = JsonUtils.getOrDefault(data, "left_panel_x_offset", 0);
+        this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
+        this.rightPanelXOffset = JsonUtils.getOrDefault(data, "right_panel_x_offset", 0);
+        this.rightPanelYOffset = JsonUtils.getOrDefault(data, "right_panel_y_offset", 0);
     }
 
     private Component parseComponent(JsonObject style, String key, String defaultKey, boolean translatable) {
@@ -195,6 +212,11 @@ public class QuestDisplayData {
         return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
     }
 
+    @Nullable
+    public ResourceLocation getOverlayTexture() {
+        return this.overlayTexture;
+    }
+
     public int getLeftPanelWidth() {
         return this.leftPanelWidth;
     }
@@ -205,6 +227,22 @@ public class QuestDisplayData {
 
     public int getPanelHeight() {
         return this.panelHeight;
+    }
+
+    public int getLeftPanelXOffset() {
+        return this.leftPanelXOffset;
+    }
+
+    public int getLeftPanelYOffset() {
+        return this.leftPanelYOffset;
+    }
+
+    public int getRightPanelXOffset() {
+        return this.rightPanelXOffset;
+    }
+
+    public int getRightPanelYOffset() {
+        return this.rightPanelYOffset;
     }
 
     public QuestlogGuiSet getGuiSet() {

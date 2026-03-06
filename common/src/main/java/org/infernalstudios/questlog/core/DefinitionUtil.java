@@ -10,8 +10,9 @@ import org.infernalstudios.questlog.platform.Services;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
 public class DefinitionUtil {
     private static final Map<ResourceLocation, JsonObject> QUEST_DEFINITION_CACHE = new Object2ObjectOpenHashMap<>();
     private static final Map<ResourceLocation, JsonObject> CHAPTER_DEFINITION_CACHE = new Object2ObjectOpenHashMap<>();
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static List<ResourceLocation> getCachedQuestKeys() {
         return new ArrayList<>(QUEST_DEFINITION_CACHE.keySet());
@@ -110,7 +111,7 @@ public class DefinitionUtil {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".json"))
                     .forEach(path -> {
-                        try (FileReader reader = new FileReader(path.toFile())) {
+                        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
                             JsonObject json = GSON.fromJson(reader, JsonObject.class);
                             Path relative = dir.relativize(path);
                             String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
