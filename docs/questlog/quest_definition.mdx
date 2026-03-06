@@ -53,14 +53,19 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   "toast_on_complete": true,
   "show_popup_on_unlock": false,
 
-  // --- STYLE & TEXTURE OPTIONS ---
-  "background_texture": "questlog:textures/gui/quest_page.png",
-  "peripheral_texture": "questlog:textures/gui/quest_peripherals.png",
-  
+  // An optional texture that is overlaid on top of the main (left) panel.
+  "overlay": "ResourceLocation (optional)",
+
   // --- UI SIZING OPTIONS ---
   "left_panel_width": 275,
   "right_panel_width": 170,
   "panel_height": 166,
+
+  // Position offsets for the panels. Defaults to 0.
+  "left_panel_x_offset": 0,
+  "left_panel_y_offset": 0,
+  "right_panel_x_offset": 0,
+  "right_panel_y_offset": 0,
 
   // --- TEXT CUSTOMIZATION ---
   "back_button_text": "gui.back",
@@ -170,3 +175,36 @@ Example:
   "item": "minecraft:grass_block" 
 }
 ```
+
+## Hover Image Effects
+
+The quest `description` supports special hover effects that can display static images or animations. This is achieved by using a JSON text component with a `show_text` hover event where the text value starts with the `image:` prefix.
+
+### Static Image
+
+**Format:** `image:namespace:path:width:height`
+
+* **namespace:path**: The ResourceLocation of the texture.
+* **width/height**: The dimensions (in pixels) to render the image.
+
+### Animated GIF (Spritesheet)
+
+**Format:** `image:namespace:path:width:height:frames:frame_time`
+
+* **frames**: The total number of frames in a **vertical** spritesheet.
+* **frame_time**: The duration each frame is shown in milliseconds.
+
+**Example JSON Description:**
+
+```json
+{
+  "text": "Hover over me to see an animation!",
+  "hoverEvent": {
+    "action": "show_text",
+    "contents": "image:questlog:textures/gui/tutorial_animation:16:16:8:100"
+  }
+}
+
+```
+
+*In this example, the mod will look for a vertical strip of 8 frames, each 16x16, and cycle through them every 100ms.*
