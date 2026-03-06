@@ -1,6 +1,9 @@
 package org.infernalstudios.questlog.util;
 
 import com.google.gson.*;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.Resource;
@@ -8,6 +11,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.platform.Services;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -19,6 +23,11 @@ public class QuestlogMigrator {
     public static boolean showDatapackWarning = false;
 
     public static void attemptMigration(MinecraftServer server) {
+        attemptDatapackMigration(server);
+        attemptPlayerDataMigration(server);
+    }
+
+    private static void attemptDatapackMigration(MinecraftServer server) {
         Path configDir = Services.PLATFORM.getConfigDirectory().resolve("questlog");
         Path questsDir = configDir.resolve("quests");
 
@@ -80,6 +89,74 @@ public class QuestlogMigrator {
 
         } catch (Exception e) {
             Questlog.LOGGER.error("An error occurred during Questlog migration", e);
+        }
+    }
+
+    private static void attemptPlayerDataMigration(MinecraftServer server) {
+        Path playerDataDir = server.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR);
+        if (!Files.exists(playerDataDir)) return;
+
+        try (Stream<Path> stream = Files.list(playerDataDir)) {
+            stream.filter(path -> path.toString().endsWith(".questlog.dat")).forEach(path -> {
+                try {
+                    File file = path.toFile();
+                    CompoundTag oldData = NbtIo.readCompressed(file);
+                    CompoundTag newData = new CompoundTag();
+                    boolean migratedAny = false;
+
+                    for (String key : oldData.getAllKeys()) {
+                        String newKey = key;
+                        boolean migratedThisQuest = false;
+
+                        // Migrate key names (remove "quests/" folder prefix from the path)
+                        if (key.startsWith(Questlog.MODID + ":quests/")) {
+                            newKey = key.replaceFirst(":quests/", ":");
+                            migratedThisQuest = true;
+                        }
+
+                        CompoundTag oldQuestData = oldData.getCompound(key);
+                        CompoundTag newQuestData = new CompoundTag();
+
+                        if (oldQuestData.contains("triggered")) {
+                            newQuestData.putBoolean("triggered", oldQuestData.getBoolean("triggered"));
+                        }
+                        if (oldQuestData.contains("completed")) {
+                            newQuestData.putBoolean("completed", oldQuestData.getBoolean("completed"));
+                        }
+
+                        // Migrate "triggers" -> "requirements"
+                        if (oldQuestData.contains("triggers", Tag.TAG_LIST)) {
+                            newQuestData.put("requirements", oldQuestData.getList("triggers", Tag.TAG_COMPOUND).copy());
+                            migratedThisQuest = true;
+                        } else if (oldQuestData.contains("requirements", Tag.TAG_LIST)) {
+                            newQuestData.put("requirements", oldQuestData.getList("requirements", Tag.TAG_COMPOUND).copy());
+                        }
+
+                        // Copy remaining unchanged lists
+                        if (oldQuestData.contains("objectives", Tag.TAG_LIST)) {
+                            newQuestData.put("objectives", oldQuestData.getList("objectives", Tag.TAG_COMPOUND).copy());
+                        }
+                        if (oldQuestData.contains("rewards", Tag.TAG_LIST)) {
+                            newQuestData.put("rewards", oldQuestData.getList("rewards", Tag.TAG_COMPOUND).copy());
+                        }
+
+                        if (migratedThisQuest) {
+                            migratedAny = true;
+                        }
+
+                        newData.put(newKey, newQuestData);
+                    }
+
+                    if (migratedAny) {
+                        Questlog.LOGGER.info("Successfully migrated old Questlog player data for {}", file.getName());
+                        NbtIo.writeCompressed(newData, file);
+                    }
+                } catch (Exception e) {
+                    Questlog.LOGGER.error("Failed to migrate player data: {}", path.getFileName(), e);
+                }
+            });
+        } catch (Exception e) {
+            Questlog.LOGGER.error("An error occurred during Questlog player data migration", e);
         }
     }
 
