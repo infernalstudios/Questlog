@@ -3,77 +3,31 @@ title: Commands
 hide_meta: true
 ---
 
-Questlog has debug / development commands to ease quest creation.
-All `/questlog` commands can also start with `/ql` as a shorthand
-
-## Arguments
-Arguments written within `<>` are required, where as within `[]` are not.<br />
-`<quest>` - the quest ID (this is the thing you write in `quests.json`).
-Autocompleted.<br />
-`<objective>`, `<trigger>`, `<reward>` - the index of the entry. Starts at 0, and is in the order they're specified in the quest definition.
-
-## Caveat
-Triggers and Objectives of type `questlog:quest_complete` do not change their values when a quest is synthetically reset/uncompleted using commands.
+Questlog has debug / development commands to ease quest creation and manage player progress.
+All `/questlog` commands can also start with `/ql` as a shorthand.
 
 ## Permissions
-The player executing (or the command block or whatever) these commands must have a permission level of at least 2 (`/op` and `/deop` commands).<br />
-Note: due to an oversight, until and including Questlog 1.0.3, the commands could be executed by any player.
+The player executing (or the command block) these commands must have a permission level of at least 2 (`/op` and `/deop` commands).
+
+## Arguments
+Arguments written within `<>` are required, whereas within `[]` are optional.
+* `<target>` - Can be a specific **Quest ID** (e.g., `my_pack:my_quest`), a **Chapter ID** (e.g., `questlog:main`), or `all`. This is autocompleted.
+* `[players]` - Standard entity selectors for players (e.g., `@a`, `PlayerName`). Defaults to the command executor if omitted.
 
 ## Commands
 
-### `/questlog <quest>`
-Lists information about a quest.
+### `/questlog reload`
+Reloads all quests and chapters from the config without needing to restart the game or completely reload data packs. Automatically syncs the new data to all online players.
 
-### `/questlog <quest> reset`
-Resets a quest to its default state.<br />
-Equivalent to running `/questlog <quest> trigger reset`, `/questlog <quest> objective reset`, and `/questlog <quest> reward uncollect`
+### `/questlog open [target] [players]`
+Opens the Questlog UI for the specified player(s). 
+* If `[target]` is provided, it attempts to open directly to that quest or chapter.
 
-### `/questlog <quest> trigger <trigger> set [amount]`
-If an amount is specified, sets the trigger's completion value to the amount.<br />
-Otherwise, completes the trigger.
+### `/questlog progress reset <target|all> [players]`
+Resets the progress of the targeted quest(s) back to zero. This un-completes objectives, un-triggers requirements, and revokes rewards.
 
-### `/questlog <quest> trigger set`
-Completes all quest's triggers.<br />
-Equivalent to running `/questlog <quest> trigger <trigger> set` for every trigger.<br />
-Cannot specify the amount, since triggers' total value can vary.
+### `/questlog progress complete <target|all> [players]`
+Instantly completes all objectives for the targeted quest(s). 
 
-### `/questlog <quest> trigger <trigger> reset`
-Resets the given quest's trigger.<br />
-Equivalent to `/questlog <quest> trigger <trigger> set 0`.
-
-### `/questlog <quest> trigger reset`
-Resets all quest's triggers<br />
-Equivalent to running `/questlog <quest> trigger <trigger> reset` for every trigger.
-
-### `/questlog <quest> objective <objective> set [amount]`
-If an amount is specified, sets the objective's completion value to the amount.<br />
-Otherwise, completes the objective.
-
-### `/questlog <quest> objective set`
-Completes all quest's objectives.<br />
-Equivalent to running `/questlog <quest> objective <objective> set` for every objective.<br />
-Cannot specify the amount, since objectives' total value can vary.
-
-### `/questlog <quest> objective <objective> reset`
-Resets a given quest's objective.<br />
-Equivalent to `/questlog <quest> objective <objective> set 0`.
-
-### `/questlog <quest> objective reset`
-Resets all quest's objectives.<br />
-Equivalent to running `/questlog <quest> objective <objective> reset` for every objective.
-
-### `/questlog <quest> reward <reward> collect`
-Collects the specific reward (along with it's specific effect), regardless of the quest's completion/trigger state.<br />
-If a reward is already collected, will not collect it again.<br />
-Does not play the reward sound if it's specified, as the command is ran server-side and sounds are client-side.
-
-### `/questlog <quest> reward collect`
-Collects all quest's rewards.<br />
-Equivalent to running `/questlog <quest> reward <reward> collect` for every reward.
-
-### `/questlog <quest> reward <reward> uncollect`
-Uncollects the specific reward if it has already been collected. Does not revert it's effect.
-
-### `/questlog <quest> reward uncollect`
-Uncollects all quest's rewards. Does not revert their effects.<br />
-Equivalent to running `/questlog <quest> reward <reward> uncollect` for every reward.
+### `/questlog trigger <target|all> [players]`
+Instantly fulfills the requirements (formerly triggers) of the targeted quest(s), allowing the quest to appear and start tracking.

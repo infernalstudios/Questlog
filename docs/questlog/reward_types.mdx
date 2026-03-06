@@ -35,3 +35,8 @@ Gives the player loot from a loot table. The loot context is set as such:
 
 #### Properties
 - `loot_table`: The loot table to give the player. If the table does not exist, it will log an error in the log.
+
+### Base Reward Properties
+All reward types support the following optional properties:
+
+- `auto_claim` (optional, default: false): If set to `true`, the reward will be given to the player automatically once the quest is completed, without them needing to manually click to collect it.

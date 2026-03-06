@@ -3,17 +3,17 @@ title: Quest Definition
 hide_meta: true
 ---
 
-## Quest
+## Quests
 
 To add quest definitions, you need to create a JSON file for each quest.
 These JSON files should be placed in the `quests` directory of your datapack.
-Note: There are no defaults for `triggers`, `objectives`, and `rewards`, they are always required, even if it's an empty array.
+Note: There are no defaults for `requirements`, `objectives`, and `rewards`, they are always required, even if it's an empty array.
 
 ```jsonc
 {
-  // A list of objectives that will trigger the quest to appear and start tracking the quest's objective goals.
+  // A list of objectives that will trigger the quest to appear and start tracking.
   // If the array is empty, the quest will be available to start immediately.
-  "triggers": "Objective[]",
+  "requirements": "Objective[]",
 
   // A list of objectives that the player must complete to finish the quest.
   // If the array is empty, the quest will be completed immediately.
@@ -23,125 +23,59 @@ Note: There are no defaults for `triggers`, `objectives`, and `rewards`, they ar
   // If the array is empty, the player will receive no rewards.
   "rewards": "Reward[]",
 
-  // The display information for the quest.
-  "display": "QuestDisplay"
-}
-```
-
-Example:
-
-```json
-{
-  "triggers": [],
-  "objectives": [
-    {
-      "type": "questlog:block_mine",
-      "total": 100
-    }
-  ],
-  "rewards": [
-    {
-      "type": "questlog:experience",
-      "amount": 100,
-      "levels": false,
-      "instant": true,
-      "display": {
-        "name": "100 Experience",
-        "icon": { "item": "minecraft:experience_bottle" }
-      }
-    }
-  ],
-  "display": {
-    "title": "Mine 100 Stone",
-    "description": "Mine 100 stone blocks.",
-    "icon": "minecraft:textures/item/stone.png"
-  }
-}
-```
-
-## Objective
-
-An objective is a task that the player must complete to finish a quest.
-Objectives can be anything from killing a mob to crafting an item.
-
-```jsonc
-{
-  // The type of objective.
-  // Some types of objectives may require additional properties, for example, a block mining quest
-  // requires a "block" field to specify the block type to mine.
-  //
-  // See Objective Types for a list of built-in objective types.
-  "type": "ResourceLocation",
-
-  // The total number of times the player must complete the set task to finish the objective.
-  // For example, if the objective is to mine 100 stone blocks, the total would be `100`.
-  "total": 0,
-
-  // The display information for the objective.
-  // If not provided, the objective will use the default display information for its type.
-  //
-  // If this objective is a trigger, this will be disregarded.
-  "display": "ObjectiveDisplay (optional)"
-}
-```
-
-## Reward
-
-Rewards are items or other benefits that the player receives upon completing a quest.
-They only show up in the quest details after the quest is completed.
-
-```jsonc
-{
-  // The type of reward. Some types of rewards may require additional properties.
-  // See Reward Types for a list of built-in reward types.
-  "type": "ResourceLocation",
-
-  // Determines if the player will receive the reward instantly upon completing the quest or if
-  // they will have to claim it manually.
-  // Defaults to: false
-  "instant": false,
-
-  // The display information for the reward.
-  // If not provided, the reward will use the default display information for its type.
-  "display": "RewardDisplay (optional)"
-}
-```
-
-## QuestDisplay
-
-```jsonc
-{
   // The title of the quest.
-  // Example: "Mine 100 Stone"
   "title": "string",
 
-  // The description of the quest.
-  // May contain line breaks (`\n`), or formatting codes using `§`.
-  // Example: "Mine 100 stone blocks."
-  "description": "string",
+  // The description of the quest. Can be a raw string, or a JSON text component.
+  "description": "string | object | array",
 
   // The icon to display for the quest.
-  // This is used in the quest log and in the quest start toast.
-  // If not provided, no icon will be displayed.
   "icon": "Renderable (optional)",
 
-  // Whether the title and description are translatable strings.
-  // If true, the title and description will be treated as translation keys,
-  // and the client will attempt to translate them using the player's language settings.
-  // Defaults to: false
+  // Whether the title and descriptions are translatable string keys. Defaults to false.
   "translatable": false,
 
-  // The sound to play when the quest is completed or triggered.
-  "sound": "QuestSoundOptions (optional)",
-  "style": "StyleOptions (optional)",
+  // The chapter this quest belongs to. Defaults to "questlog:main".
+  "chapter": "string (optional)",
+  
+  // Whether this quest should also be included in the main chapter.
+  "include_in_main": "boolean (optional)",
 
-  // Notification options for the quest.
-  "notification": "NotificationOptions (optional)",
+  // Hides the quest from the quest log entirely.
+  "hidden": false,
 
-  // Hides the quest from the quest log.
-  // This is useful for quests that should only show a popup.
-  "hidden": false
+  // --- SOUND OPTIONS ---
+  "completed_sound": "ResourceLocation (optional)",
+  "triggered_sound": "ResourceLocation (optional)",
+
+  // --- NOTIFICATION OPTIONS ---
+  "toast_on_unlock": true,
+  "toast_on_complete": true,
+  "show_popup_on_unlock": false,
+
+  // --- STYLE & TEXTURE OPTIONS ---
+  "background_texture": "questlog:textures/gui/quest_page.png",
+  "peripheral_texture": "questlog:textures/gui/quest_peripherals.png",
+  
+  // --- UI SIZING OPTIONS ---
+  "left_panel_width": 275,
+  "right_panel_width": 170,
+  "panel_height": 166,
+
+  // --- TEXT CUSTOMIZATION ---
+  "back_button_text": "gui.back",
+  "collect_button_text": "questlog.reward.collect",
+  "uncollected_text": "questlog.reward.uncollected",
+  "collected_text": "questlog.reward.collected",
+
+  // --- PALETTE OPTIONS ---
+  "text_color": "#4C381B",
+  "completed_text_color": "#529E52",
+  "hovered_text_color": "#FFFFFF",
+  "title_color": "#4C381B",
+  "progress_text_color": "#9E7852"
 }
+
 ```
 
 ## ObjectiveDisplay
@@ -189,82 +123,6 @@ They only show up in the quest details after the quest is completed.
 }
 ```
 
-## StyleOptions
-
-```jsonc
-{
-  // The texture to use for the quest details and toasts.
-  // Defaults to: { "texture": "questlog:textures/gui/quest_peripherals.png" }
-  "peripheral": "Texture (optional)",
-
-  // The texture to use for the quest page background.
-  // Defaults to: { "texture": "questlog:textures/gui/quest_page.png" }
-  "background": "Texture (optional)",
-
-  // The text to use for the "Back" button in the quest details screen.
-  // This is affected by the `translatable` option.
-  // Defaults to: "gui.back" translation
-  "buttonText": "string (optional)",
-
-  // The text color to use for the description, objective, reward, and button text.
-  // Defaults to: "#4C381B"
-  "textColor": "#4C381B",
-
-  // The color to use for the "Completed" and "Collected" text for objectives and rewards.
-  // Defaults to: "#529E52"
-  "completedTextColor": "#529E52",
-
-  // The color to use for the button text when the button is hovered over.
-  // Defaults to: "#FFFFFF"
-  "hoveredTextColor": "#FFFFFF",
-
-  // The color to use for the quest title.
-  // Defaults to: "#4C381B"
-  "titleColor": "#4C381B",
-
-  // The color to use for the progress text for objectives and rewards when they're unclaimed.
-  // Defaults to: "#9E7852"
-  "progressTextColor": "#9E7852"
-}
-```
-
-## QuestSoundOptions
-
-```jsonc
-{
-  // The sound to play when a quest is completed.
-  "completed": "ResourceLocation (optional)",
-
-  // The sound to play when a quest is triggered.
-  "triggered": "ResourceLocation (optional)"
-}
-```
-
-## RewardSoundOptions
-
-```jsonc
-{
-  // The sound to play when a reward is claimed.
-  "claimed": "ResourceLocation (optional)"
-}
-```
-
-## NotificationOptions
-
-```jsonc
-{
-  // Enables the toast notification when the quest is triggered.
-  "toastOnTrigger": false,
-
-  // Enables the toast notification when the quest is completed.
-  "toastOnComplete": false,
-
-  // Determines whether to show a popup on trigger instead of a toast.
-  // Read more in Popup.
-  "popup": false
-}
-```
-
 ## ResourceLocation
 
 A resource location is a string that identifies a resource in the game.
@@ -308,5 +166,7 @@ This mod respects item models, so you can use any item ID here, not just regular
 Example:
 
 ```json
-{ "item": "minecraft:grass_block" }
+{ 
+  "item": "minecraft:grass_block" 
+}
 ```

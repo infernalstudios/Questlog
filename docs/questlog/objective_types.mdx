@@ -9,7 +9,7 @@ Every time the server updates the specified statistic, the completion amount goe
 Additional definition fields:
 
 - `stat`: The stat to track. See below for a list of valid stats.
-- `trackSinceStart` (optional, default: true):<br />
+- `retroactive` (optional, default: true):<br />
       By default (true), value will be tracked and incremented since the creation of the quest.<br />
       If set to false, the completion value will be the player's total stat value.
 This may be useful for something that may want to check a global statistic amount instead of the change of that statistic since the start of the quest.
@@ -244,3 +244,34 @@ This is primarily useful in **triggers** to start a quest only if a player has *
 Additional definition fields:
 
 - `objective`: The single objective definition to invert.
+
+### `questlog:block_interact`
+Tracks the number of times the player interacts with a block.
+
+Additional definition fields:
+- `block`: The block to track. May be the block itself or a tag prefixed with `#`.
+- `item` (optional): The item the player must be holding when interacting. May be the item itself or a tag prefixed with `#`.
+
+### `questlog:entity_approach`
+Tracks when a player approaches an entity.
+
+Additional definition fields:
+- `entity`: The entity to track. Does not support tags yet.
+- `range`: The radius (in blocks) the player must be within to trigger the approach.
+
+### `questlog:quest_complete`
+Tracks the completion of another quest. Very useful as a requirement to create quest lines/trees!
+
+Additional definition fields:
+- `quest`: The resource location ID of the quest that needs to be completed (e.g., `"questlog:my_other_quest"`).
+
+### `questlog:read`
+Completes when the player reads a specific quest (opening the quest details in the GUI). 
+
+*(No additional fields required)*
+
+### `questlog:advancement`
+Tracks the player granting/completing a vanilla or modded advancement.
+
+Additional definition fields:
+- `advancement`: The resource location ID of the advancement to track (e.g., `"minecraft:story/mine_diamond"`).

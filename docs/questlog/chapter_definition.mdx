@@ -1,0 +1,27 @@
+---
+title: Chapter Definition
+hide_meta: true
+---
+
+## Chapters
+
+To create a new chapter, you need to create a JSON file for each chapter in the `chapters` directory of your config (`config/questlog/chapters/`).
+
+```jsonc
+{
+  // The icon to display for the chapter tab in the Questlog UI.
+  // Uses standard Renderable formatting (Texture or Item).
+  "icon": {
+    "item": "minecraft:knowledge_book"
+  },
+
+  // Specifies the display order of the chapter tabs.
+  // Lower numbers appear first. Defaults to 0 if not provided.
+  "order": 0,
+
+  // Whether this chapter should be treated as the default main chapter.
+  "default_chapter": true,
+
+  // Completely hides the chapter from the UI.
+  "hidden": false
+}
