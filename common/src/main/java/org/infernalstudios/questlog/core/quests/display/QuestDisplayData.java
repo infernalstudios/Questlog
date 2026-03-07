@@ -3,7 +3,11 @@ package org.infernalstudios.questlog.core.quests.display;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.Questlog;
@@ -15,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QuestDisplayData {
 
@@ -32,6 +38,7 @@ public class QuestDisplayData {
     private final boolean hidden;
     private final boolean includeInMain;
     private final ResourceLocation bgTexture;
+    private final ResourceLocation rightPanelTexture;
     private final ResourceLocation peripheralTexture;
 
     @Nullable
@@ -44,6 +51,7 @@ public class QuestDisplayData {
     private final Palette palette;
 
     private final String chapter;
+    private final int sortOrder;
 
     private final int leftPanelWidth;
     private final int rightPanelWidth;
@@ -64,6 +72,8 @@ public class QuestDisplayData {
         String title = JsonUtils.getString(data, "title");
         this.title = translatable ? Component.translatable(title) : Component.literal(title);
 
+        this.sortOrder = JsonUtils.getOrDefault(data, "sort_order", 0);
+
         JsonElement descriptionElement = data.get("description");
         Component parsedDescription = null;
 
@@ -73,10 +83,12 @@ public class QuestDisplayData {
                     parsedDescription = Component.Serializer.fromJson(descriptionElement);
                 } else if (descriptionElement.isJsonPrimitive()) {
                     String rawStr = descriptionElement.getAsString();
-                    if (rawStr.startsWith("[") || rawStr.startsWith("{")) {
+                    if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
+                        parsedDescription = Component.Serializer.fromJson(rawStr);
+                    } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
                         parsedDescription = Component.Serializer.fromJson(rawStr);
                     } else {
-                        parsedDescription = translatable ? Component.translatable(rawStr) : Component.literal(rawStr);
+                        parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
                     }
                 }
             } catch (Exception e) {
@@ -86,7 +98,7 @@ public class QuestDisplayData {
 
         if (parsedDescription == null) {
             String rawStr = JsonUtils.getOrDefault(data, "description", "");
-            parsedDescription = translatable ? Component.translatable(rawStr) : Component.literal(rawStr);
+            parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
         }
 
         this.description = parsedDescription;
@@ -103,12 +115,14 @@ public class QuestDisplayData {
         this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
+        String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
 
         String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
         this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
 
         this.bgTexture = new ResourceLocation(backgroundLoc);
+        this.rightPanelTexture = new ResourceLocation(rightPanelLoc);
         this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
         this.palette = new Palette(
@@ -138,6 +152,32 @@ public class QuestDisplayData {
         this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
         this.rightPanelXOffset = JsonUtils.getOrDefault(data, "right_panel_x_offset", 0);
         this.rightPanelYOffset = JsonUtils.getOrDefault(data, "right_panel_y_offset", 0);
+    }
+
+    private Component parseInlineRichText(String text) {
+        Pattern pattern = Pattern.compile("\\[([^\\]]+)\\]\\(([^)]+)\\)");
+        Matcher matcher = pattern.matcher(text);
+        MutableComponent component = Component.empty();
+        int lastEnd = 0;
+
+        while (matcher.find()) {
+            component.append(Component.literal(text.substring(lastEnd, matcher.start())));
+            String display = matcher.group(1);
+            String action = matcher.group(2);
+
+            MutableComponent part = Component.literal(display);
+            Style style = Style.EMPTY.withUnderlined(true);
+
+            if (action.startsWith("quest:")) {
+                style = style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, action.substring(6)));
+            } else if (action.startsWith("image:")) {
+                style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(action)));
+            }
+            component.append(part.withStyle(style));
+            lastEnd = matcher.end();
+        }
+        component.append(Component.literal(text.substring(lastEnd)));
+        return component;
     }
 
     private Component parseComponent(JsonObject style, String key, String defaultKey, boolean translatable) {
@@ -175,6 +215,10 @@ public class QuestDisplayData {
 
     public String getChapter() {
         return this.chapter;
+    }
+
+    public int getSortOrder() {
+        return this.sortOrder;
     }
 
     public Component getTitle() {
@@ -247,12 +291,13 @@ public class QuestDisplayData {
 
     public QuestlogGuiSet getGuiSet() {
         return (this.bgTexture.equals(QuestlogGuiSet.DEFAULT.backgroundLoc) &&
+                this.rightPanelTexture.equals(QuestlogGuiSet.DEFAULT.rightPanelLoc) &&
                 this.peripheralTexture.equals(QuestlogGuiSet.DEFAULT.peripheralLoc) &&
                 this.leftPanelWidth == 275 &&
                 this.rightPanelWidth == 170 &&
                 this.panelHeight == 166)
                 ? QuestlogGuiSet.DEFAULT
-                : new QuestlogGuiSet(this.bgTexture, this.peripheralTexture, this.leftPanelWidth, this.rightPanelWidth, this.panelHeight);
+                : new QuestlogGuiSet(this.bgTexture, this.rightPanelTexture, this.peripheralTexture, this.leftPanelWidth, this.rightPanelWidth, this.panelHeight);
     }
 
     public boolean shouldToastOnUnlock() {

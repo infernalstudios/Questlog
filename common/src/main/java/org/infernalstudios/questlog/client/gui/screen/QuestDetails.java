@@ -291,10 +291,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
-        if (parts.length >= 5) {
+        if (parts.length >= 3) {
             ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
-            int w = Integer.parseInt(parts[3]);
-            int h = Integer.parseInt(parts[4]);
+            int w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
+            int h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
+
+            ps.pose().pushPose();
+            ps.pose().translate(0.0F, 0.0F, 400.0F);
+
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
 
             if (parts.length >= 7) {
@@ -305,6 +309,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             } else {
                 ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
             }
+
+            ps.pose().popPose();
         }
     }
 

@@ -42,7 +42,6 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
             this.children.add(new QuestListEntry(this, quest));
         }
 
-        // Uncompleted first, then uncollected rewards first
         this.children.sort((a, b) -> {
             Quest qa = a.quest;
             Quest qb = b.quest;
@@ -55,7 +54,12 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
             } else if (qa.isRewarded() && !qb.isRewarded()) {
                 return 1;
             } else {
-                return 0;
+                int orderA = qa.getDisplay().getSortOrder();
+                int orderB = qb.getDisplay().getSortOrder();
+                if (orderA != orderB) {
+                    return Integer.compare(orderA, orderB);
+                }
+                return qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
             }
         });
     }

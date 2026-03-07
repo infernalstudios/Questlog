@@ -26,8 +26,13 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   // The title of the quest.
   "title": "string",
 
-  // The description of the quest. Can be a raw string, or a JSON text component.
+  // The description of the quest.
+  // Can be a string using inline rich text, or a JSON text component.
   "description": "string | object | array",
+
+  // The sort order of the quest in the list. Quests evaluate this before alphabetical sorting.
+  // Defaults to 0.
+  "sort_order": "integer (optional)",
 
   // The icon to display for the quest.
   "icon": "Renderable (optional)",
@@ -37,7 +42,7 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
 
   // The chapter this quest belongs to. Defaults to "questlog:main".
   "chapter": "string (optional)",
-  
+
   // Whether this quest should also be included in the main chapter.
   "include_in_main": "boolean (optional)",
 
@@ -52,6 +57,13 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   "toast_on_unlock": true,
   "toast_on_complete": true,
   "show_popup_on_unlock": false,
+
+  // --- UI CUSTOMIZATION ---
+  // The background texture of the main (left) panel.
+  "background_texture": "ResourceLocation (optional)",
+
+  // A separate 9-sliced texture for the right panel. Defaults to the background_texture.
+  "right_panel_texture": "ResourceLocation (optional)",
 
   // An optional texture that is overlaid on top of the main (left) panel.
   "overlay": "ResourceLocation (optional)",
@@ -102,6 +114,7 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   // Defaults to: false
   "translatable": false
 }
+
 ```
 
 ## RewardDisplay
@@ -126,6 +139,7 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   // The sound to play when a reward is claimed.
   "sound": "RewardSoundOptions (optional)"
 }
+
 ```
 
 ## ResourceLocation
@@ -149,12 +163,14 @@ This texture should always be a 16x16 image.
 {
   "texture": "ResourceLocation"
 }
+
 ```
 
 Example:
 
 ```json
 { "texture": "minecraft:textures/mob_effect/luck.png" }
+
 ```
 
 ## Item
@@ -166,45 +182,45 @@ This mod respects item models, so you can use any item ID here, not just regular
 {
   "item": "ResourceLocation"
 }
+
 ```
 
 Example:
 
 ```json
-{ 
-  "item": "minecraft:grass_block" 
+{
+  "item": "minecraft:grass_block"
 }
+
 ```
 
-## Hover Image Effects
+## Inline Rich Text
 
-The quest `description` supports special hover effects that can display static images or animations. This is achieved by using a JSON text component with a `show_text` hover event where the text value starts with the `image:` prefix.
+The quest `description` supports a simplified Markdown-style formatting for adding interactive elements.
 
-### Static Image
+### Quest Links
 
-**Format:** `image:namespace:path:width:height`
+You can create clickable text that automatically redirects to another quest.
 
-* **namespace:path**: The ResourceLocation of the texture.
+**Format:** `[Display Text](quest:quest_id)`
+**Example:** `[Click here to view the next quest!](quest:my_quests:next_quest)`
+
+### Hover Images
+
+You can create text that displays an image when hovered over.
+
+**Format:** `[Hover Text](image:namespace:path)`
+**Example:** `[Hover to see the map!](image:questlog:textures/gui/secret_map.png)`
+
+### Advanced Hover Images & Animations
+
+If you need to manually specify the rendering bounds or use an animated vertical spritesheet, you can provide extra parameters.
+
+**Format (Static):** `[Hover Text](image:namespace:path:width:height)`
+**Format (Animated):** `[Hover Text](image:namespace:path:width:height:frames:frame_time)`
+
 * **width/height**: The dimensions (in pixels) to render the image.
-
-### Animated GIF (Spritesheet)
-
-**Format:** `image:namespace:path:width:height:frames:frame_time`
-
 * **frames**: The total number of frames in a **vertical** spritesheet.
 * **frame_time**: The duration each frame is shown in milliseconds.
 
-**Example JSON Description:**
-
-```json
-{
-  "text": "Hover over me to see an animation!",
-  "hoverEvent": {
-    "action": "show_text",
-    "contents": "image:questlog:textures/gui/tutorial_animation:16:16:8:100"
-  }
-}
-
-```
-
-*In this example, the mod will look for a vertical strip of 8 frames, each 16x16, and cycle through them every 100ms.*
+**Example:** `[Look at this animation!](image:questlog:textures/gui/tutorial_animation.png:16:16:8:100)`
