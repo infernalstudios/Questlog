@@ -223,7 +223,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ps, mouseX, mouseY, partialTicks);
+        this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, partialTicks);
 
         this.renderTitle(ps);
@@ -237,8 +237,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        super.renderBackground(ps, mouseX, mouseY, partialTicks);
+    public void renderBackground(@NotNull GuiGraphics ps) {
+        super.renderBackground(ps);
         this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.panel1Y);
         if (showDetails) {
             this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.panel2Y);
@@ -291,10 +291,14 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
-        if (parts.length >= 5) {
-            ResourceLocation loc = ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]);
-            int w = Integer.parseInt(parts[3]);
-            int h = Integer.parseInt(parts[4]);
+        if (parts.length >= 3) {
+            ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
+            int w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
+            int h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
+
+            ps.pose().pushPose();
+            ps.pose().translate(0.0F, 0.0F, 400.0F);
+
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
 
             if (parts.length >= 7) {
@@ -305,6 +309,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             } else {
                 ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
             }
+
+            ps.pose().popPose();
         }
     }
 
@@ -317,7 +323,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-                    Quest target = QuestlogClient.getLocal().getQuest(ResourceLocation.parse(click.getValue()));
+                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;

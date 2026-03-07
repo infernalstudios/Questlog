@@ -13,6 +13,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.*;
+import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -98,12 +99,12 @@ public class QuestlogScreen extends Screen {
     private void buildSearch() {
         int listWidth = 245;
         int listHeight = 136;
-        int listX = (this.width - listWidth) / 2 + 1;
-        int listY = (this.height - listHeight) / 2 + 1;
+        int listX = (this.width - listWidth) / 2 + 1 + QuestlogConfig.Gui.mainPanelX;
+        int listY = (this.height - listHeight) / 2 + 1 + QuestlogConfig.Gui.mainPanelY;
 
-        int searchY = listY - 32;
+        int searchY = listY - 32 + QuestlogConfig.Gui.searchBarY;
         int searchWidth = this.searchExpanded ? 193 : 28;
-        int searchX = listX + listWidth - searchWidth + 12;
+        int searchX = listX + listWidth - searchWidth + 12 + QuestlogConfig.Gui.searchBarX;
 
         this.addRenderableWidget(new AbstractButton(searchX, searchY, searchWidth, 18, Component.empty()) {
             @Override
@@ -189,10 +190,10 @@ public class QuestlogScreen extends Screen {
         }
         int listWidth = 245;
         int listHeight = 136;
-        int listX = (this.width - listWidth) / 2 + 1;
-        int listY = (this.height - listHeight) / 2 + 1;
+        int listX = (this.width - listWidth) / 2 + 1 + QuestlogConfig.Gui.mainPanelX;
+        int listY = (this.height - listHeight) / 2 + 1 + QuestlogConfig.Gui.mainPanelY;
 
-        int tabY = listY + listHeight + 15;
+        int tabY = listY + listHeight + 15 + QuestlogConfig.Gui.chapterButtonsY;
         int arrowY = tabY + 5;
 
         if (this.tabOffset > 0) {
@@ -225,8 +226,8 @@ public class QuestlogScreen extends Screen {
     private ScrollableComponent getList() {
         int width = 245;
         int height = 136;
-        int x = (this.width - width) / 2 + 1;
-        int y = (this.height - height) / 2 + 1;
+        int x = (this.width - width) / 2 + 1 + QuestlogConfig.Gui.mainPanelX;
+        int y = (this.height - height) / 2 + 1 + QuestlogConfig.Gui.mainPanelY;
 
         List<Quest> quests = this.manager.getAllQuests().stream()
                 .filter(quest -> quest.isTriggered() && !quest.getDisplay().isHidden())
