@@ -5,8 +5,8 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.components.QuestlogOpenButton;
-import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +21,7 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
 
     @Inject(method = "init", at = @At("TAIL"))
     private void injectQuestlogButton(CallbackInfo info) {
-        if (QuestlogConfig.Button.enabled) {
+        if (Questlog.getConfig().button.enabled) {
             InventoryScreen self = (InventoryScreen) (Object) this;
             this.addRenderableWidget(new QuestlogOpenButton(self));
         }

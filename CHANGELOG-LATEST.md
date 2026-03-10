@@ -18,6 +18,9 @@
 - Added support for clickable links in quest descriptions.
 - Added support for configurable tooltips and hover effects in quest descriptions.
     - Also supports animated textures.
+- Added option for explicit quest sorting order.
+- Added offset options for positioning all UI elements.
+- Added an in-game config screen using Cloth Config.
 
 ### Removed
 
@@ -36,6 +39,7 @@
 - Improved error logging to be more descriptive.
 - Switched from datapacks to a config folder.
 - Simplified quest definitions to reduce nesting.
+- Quests are now sorted alphabetically by default.
 
 ### Fixed
 

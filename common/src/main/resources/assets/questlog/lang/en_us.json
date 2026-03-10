@@ -15,6 +15,7 @@
     "questlog.reward.collected": "Collected",
     "questlog.reward.uncollected": "Uncollected",
     "questlog.gui.open": "Open Questlog",
+    "questlog.gui.open_notification": "Open Questlog (%s)",
     "questlog.no_quests": "No Quests Available",
 
     "questlog.info.objectives": "Objectives",
@@ -71,5 +72,37 @@
     "questlog.reward.default.experience.levels": "%s Exp Levels",
     "questlog.reward.default.command": "Run Command",
     "questlog.reward.default.item": "Item Reward",
-    "questlog.reward.default.loot_table": "Loot Table"
+    "questlog.reward.default.loot_table": "Loot Table",
+
+    "text.autoconfig.questlog-client.title": "Questlog Client Config",
+
+    "text.autoconfig.questlog-client.category.button": "Inventory Button",
+    "text.autoconfig.questlog-client.option.button.enabled": "Enable Button",
+    "text.autoconfig.questlog-client.option.button.enabled.@Tooltip": "Whether the GUI button should be displayed in the inventory screen",
+    "text.autoconfig.questlog-client.option.button.relativeToInventory": "Relative to Inventory",
+    "text.autoconfig.questlog-client.option.button.relativeToInventory.@Tooltip": "Whether the GUI button should be positioned relative to the inventory screen",
+    "text.autoconfig.questlog-client.option.button.x": "Button X Position",
+    "text.autoconfig.questlog-client.option.button.x.@Tooltip": "The X position of the button",
+    "text.autoconfig.questlog-client.option.button.y": "Button Y Position",
+    "text.autoconfig.questlog-client.option.button.y.@Tooltip": "The Y position of the button",
+    "text.autoconfig.questlog-client.option.button.badgeX": "Badge X Offset",
+    "text.autoconfig.questlog-client.option.button.badgeX.@Tooltip": "The X offset of the notification badge relative to the button",
+    "text.autoconfig.questlog-client.option.button.badgeY": "Badge Y Offset",
+    "text.autoconfig.questlog-client.option.button.badgeY.@Tooltip": "The Y offset of the notification badge relative to the button",
+    "text.autoconfig.questlog-client.option.button.bobbingBadge": "Bobbing Notification Badge",
+    "text.autoconfig.questlog-client.option.button.bobbingBadge.@Tooltip": "Makes the quest notification badge bob up and down when active.",
+
+    "text.autoconfig.questlog-client.category.gui": "GUI Offsets",
+    "text.autoconfig.questlog-client.option.gui.mainPanelX": "Main Panel X Offset",
+    "text.autoconfig.questlog-client.option.gui.mainPanelX.@Tooltip": "X offset for the main quest list panel",
+    "text.autoconfig.questlog-client.option.gui.mainPanelY": "Main Panel Y Offset",
+    "text.autoconfig.questlog-client.option.gui.mainPanelY.@Tooltip": "Y offset for the main quest list panel",
+    "text.autoconfig.questlog-client.option.gui.searchBarX": "Search Bar X Offset",
+    "text.autoconfig.questlog-client.option.gui.searchBarX.@Tooltip": "X offset for the search bar",
+    "text.autoconfig.questlog-client.option.gui.searchBarY": "Search Bar Y Offset",
+    "text.autoconfig.questlog-client.option.gui.searchBarY.@Tooltip": "Y offset for the search bar",
+    "text.autoconfig.questlog-client.option.gui.chapterButtonsX": "Chapter Tabs X Offset",
+    "text.autoconfig.questlog-client.option.gui.chapterButtonsX.@Tooltip": "X offset for the chapter tabs",
+    "text.autoconfig.questlog-client.option.gui.chapterButtonsY": "Chapter Tabs Y Offset",
+    "text.autoconfig.questlog-client.option.gui.chapterButtonsY.@Tooltip": "Y offset for the chapter tabs"
 }

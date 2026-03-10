@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestlogClientEvents {
+    public static Quest mostRecentNotificationQuest = null;
+
     public static void onClientTick() {
         if (QuestToastState.tickDelayForCheck >= 0) {
             QuestToastState.tickDelayForCheck--;
@@ -55,13 +57,14 @@ public class QuestlogClientEvents {
         QuestToastState.addedToasts.clear();
         QuestToastState.completedToasts.clear();
         QuestToastState.queuedPopups.clear();
+        mostRecentNotificationQuest = null;
     }
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {
-        if (
-                event.quest.getDisplay().shouldShowPopupOnUnlock() &&
-                        Minecraft.getInstance().hasSingleplayerServer() &&
-                        !Minecraft.getInstance().getSingleplayerServer().isPublished()
+        mostRecentNotificationQuest = event.quest;
+        if (event.quest.getDisplay().shouldShowPopupOnUnlock() &&
+                Minecraft.getInstance().hasSingleplayerServer() &&
+                !Minecraft.getInstance().getSingleplayerServer().isPublished()
         ) {
             QuestToastState.resetCheckDelay();
             QuestToastState.queuedPopups.add(event.quest);
@@ -77,6 +80,7 @@ public class QuestlogClientEvents {
     }
 
     public static void onQuestCompleted(QuestEvent.Completed event) {
+        mostRecentNotificationQuest = event.quest;
         if (event.quest.getDisplay().shouldToastOnComplete()) {
             QuestToastState.resetCheckDelay();
             QuestToastState.completedToasts.add(new QuestCompletedToast(event.quest.getDisplay()));

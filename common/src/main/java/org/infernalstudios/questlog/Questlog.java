@@ -1,13 +1,12 @@
 package org.infernalstudios.questlog;
 
+import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.serializer.Toml4jConfigSerializer;
+import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.infernalstudios.config.Config;
 import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.platform.Services;
-
-import java.io.IOException;
 
 public class Questlog {
     public static final String MODID = "questlog";
@@ -19,19 +18,18 @@ public class Questlog {
     }
 
     public static void initClient() {
-        try {
-            QuestlogConfig.CONFIG = Config
-                    .builder(Services.PLATFORM.getConfigDirectory().resolve("questlog-client.toml"))
-                    .loadClass(QuestlogConfig.class, true)
-                    .build();
-        } catch (IllegalStateException | IllegalArgumentException | IOException e) {
-            throw new RuntimeException("Failed to load Questlog config", e);
-        }
+        AutoConfig.register(QuestlogConfig.class, Toml4jConfigSerializer::new);
 
-        QuestlogConfig.CONFIG.onReload(stage -> {
-            if (stage == Config.ReloadStage.PRE) {
-                Questlog.LOGGER.debug("Reloading Questlog config");
-            }
+        AutoConfig.getConfigHolder(QuestlogConfig.class).registerSaveListener((manager, newData) -> {
+            Questlog.LOGGER.debug("Reloading/Saving Questlog config");
+            return InteractionResult.PASS;
         });
+    }
+
+    /**
+     * Helper method to easily access the config instance from anywhere in your mod.
+     */
+    public static QuestlogConfig getConfig() {
+        return AutoConfig.getConfigHolder(QuestlogConfig.class).getConfig();
     }
 }

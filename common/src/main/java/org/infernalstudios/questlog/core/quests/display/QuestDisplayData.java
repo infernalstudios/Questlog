@@ -2,19 +2,18 @@ package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
+import org.infernalstudios.questlog.util.texture.AnimatedTexture;
 import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -43,6 +42,9 @@ public class QuestDisplayData {
 
     @Nullable
     private final ResourceLocation overlayTexture;
+
+    @Nullable
+    private final Blittable badge;
 
     private final Component backButtonText;
     private final Component collectButtonText;
@@ -80,13 +82,11 @@ public class QuestDisplayData {
         if (descriptionElement != null) {
             try {
                 if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
-                    parsedDescription = Component.Serializer.fromJson(descriptionElement);
+                    parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
                 } else if (descriptionElement.isJsonPrimitive()) {
                     String rawStr = descriptionElement.getAsString();
-                    if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
-                        parsedDescription = Component.Serializer.fromJson(rawStr);
-                    } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
-                        parsedDescription = Component.Serializer.fromJson(rawStr);
+                    if (rawStr.startsWith("[") || rawStr.startsWith("{")) {
+                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
                     } else {
                         parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
                     }
@@ -97,8 +97,28 @@ public class QuestDisplayData {
         }
 
         if (parsedDescription == null) {
-            String rawStr = JsonUtils.getOrDefault(data, "description", "");
-            parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
+            parsedDescription = Component.empty();
+        }
+
+        if (data.has("badge") && data.get("badge").isJsonObject()) {
+            JsonObject badgeObj = data.getAsJsonObject("badge");
+            String texture = JsonUtils.getString(badgeObj, "texture");
+            int u = JsonUtils.getOrDefault(badgeObj, "u", 0);
+            int v = JsonUtils.getOrDefault(badgeObj, "v", 0);
+            int w = JsonUtils.getOrDefault(badgeObj, "width", 16);
+            int h = JsonUtils.getOrDefault(badgeObj, "height", 16);
+            int tw = JsonUtils.getOrDefault(badgeObj, "texture_width", 256);
+            int th = JsonUtils.getOrDefault(badgeObj, "texture_height", 256);
+            int frames = JsonUtils.getOrDefault(badgeObj, "frames", 1);
+            int frameTime = JsonUtils.getOrDefault(badgeObj, "frame_time", 100);
+
+            if (frames > 1) {
+                this.badge = new AnimatedTexture(ResourceLocation.parse(texture), w, h, u, v, tw, th, frames, frameTime);
+            } else {
+                this.badge = new Texture(ResourceLocation.parse(texture), w, h, u, v, tw, th);
+            }
+        } else {
+            this.badge = null;
         }
 
         this.description = parsedDescription;
@@ -109,21 +129,21 @@ public class QuestDisplayData {
         this.includeInMain = JsonUtils.getOrDefault(data, "include_in_main", isMainChapter);
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
-        this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
+        this.completedSound = completedSoundLoc == null ? null : ResourceLocation.parse(completedSoundLoc);
 
         String triggeredSoundLoc = JsonUtils.getOrDefault(data, "triggered_sound", (String) null);
-        this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
+        this.triggeredSound = triggeredSoundLoc == null ? null : ResourceLocation.parse(triggeredSoundLoc);
 
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
 
         String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
-        this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
+        this.overlayTexture = overlayLoc == null ? null : ResourceLocation.parse(overlayLoc);
 
-        this.bgTexture = new ResourceLocation(backgroundLoc);
-        this.rightPanelTexture = new ResourceLocation(rightPanelLoc);
-        this.peripheralTexture = new ResourceLocation(peripheralLoc);
+        this.bgTexture = ResourceLocation.parse(backgroundLoc);
+        this.rightPanelTexture = ResourceLocation.parse(rightPanelLoc);
+        this.peripheralTexture = ResourceLocation.parse(peripheralLoc);
 
         this.palette = new Palette(
                 JsonUtils.getOrDefault(data, "text_color", "#4C381B"),
@@ -155,7 +175,7 @@ public class QuestDisplayData {
     }
 
     private Component parseInlineRichText(String text) {
-        Pattern pattern = Pattern.compile("\\[([^\\]]+)\\]\\(([^)]+)\\)");
+        Pattern pattern = Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)");
         Matcher matcher = pattern.matcher(text);
         MutableComponent component = Component.empty();
         int lastEnd = 0;
@@ -239,6 +259,11 @@ public class QuestDisplayData {
         if (this.rewardDisplay == null)
             throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
         return this.rewardDisplay;
+    }
+
+    @Nullable
+    public Blittable getBadge() {
+        return this.badge;
     }
 
     @Nullable

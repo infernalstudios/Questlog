@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.QuestlogClient;
+import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
@@ -24,6 +25,9 @@ import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.packet.QuestReadPacket;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.platform.Services;
+import org.infernalstudios.questlog.util.texture.AnimatedTexture;
+import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -79,6 +83,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     protected void init() {
         super.init();
+        QuestlogClientEvents.mostRecentNotificationQuest = null;
 
         boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
         if (!hasDetails) {
@@ -223,7 +228,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ps);
+        this.renderBackground(ps, mouseX, mouseY, partialTicks);
         super.render(ps, mouseX, mouseY, partialTicks);
 
         this.renderTitle(ps);
@@ -237,8 +242,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics ps) {
-        super.renderBackground(ps);
+    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+        super.renderBackground(ps, mouseX, mouseY, partialTicks);
         this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.panel1Y);
         if (showDetails) {
             this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.panel2Y);
@@ -292,7 +297,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
         if (parts.length >= 3) {
-            ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
+            ResourceLocation loc = ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]);
             int w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
             int h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
 
@@ -300,16 +305,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             ps.pose().translate(0.0F, 0.0F, 400.0F);
 
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
+            Blittable textureToRender;
 
             if (parts.length >= 7) {
                 int frames = Integer.parseInt(parts[5]);
                 int frameTime = Integer.parseInt(parts[6]);
-                int currentFrame = (int) ((net.minecraft.Util.getMillis() / frameTime) % frames);
-                ps.blit(loc, mouseX + 10, mouseY - 6, 0, currentFrame * h, w, h, w, h * frames);
+
+                textureToRender = new AnimatedTexture(loc, w, h, 0, 0, w, h * frames, frames, frameTime);
             } else {
-                ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
+                textureToRender = new Texture(loc, w, h, 0, 0, w, h);
             }
 
+            textureToRender.blit(ps, mouseX + 10, mouseY - 6);
             ps.pose().popPose();
         }
     }
@@ -323,7 +330,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
+                    Quest target = QuestlogClient.getLocal().getQuest(ResourceLocation.parse(click.getValue()));
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;

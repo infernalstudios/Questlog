@@ -21,6 +21,9 @@
         ],
         "client": [
             "org.infernalstudios.questlog.QuestlogFabric"
+        ],
+        "modmenu": [
+            "org.infernalstudios.questlog.compat.modmenu.QuestlogModMenuIntegration"
         ]
     },
     "mixins": [
