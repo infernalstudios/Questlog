@@ -58,42 +58,45 @@ public class QuestlogOpenButton implements Renderable, GuiEventListener, Narrata
 
         TEXTURE.blit(ps, this.getX(), this.getY());
 
-        Quest notifyQuest = QuestlogClientEvents.mostRecentNotificationQuest;
-        Blittable badgeToRender;
+        Quest notifyQuest = null;
 
-        if (notifyQuest == null && Minecraft.getInstance().player != null) {
-            QuestManager manager = QuestlogClient.getLocal();
-            if (manager != null) {
-                for (Quest quest : manager.getAllQuests()) {
-                    if (quest.isCompleted() && !quest.isRewarded()) {
-                        notifyQuest = quest;
-                        break;
+        if (Questlog.getConfig().button.showBadge) {
+            notifyQuest = QuestlogClientEvents.mostRecentNotificationQuest;
+
+            if (notifyQuest == null && Minecraft.getInstance().player != null) {
+                QuestManager manager = QuestlogClient.getLocal();
+                if (manager != null) {
+                    for (Quest quest : manager.getAllQuests()) {
+                        if (quest.isCompleted() && !quest.isRewarded()) {
+                            notifyQuest = quest;
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        if (notifyQuest != null) {
-            badgeToRender = notifyQuest.getDisplay().getBadge();
-            if (badgeToRender == null) {
-                badgeToRender = DEFAULT_BADGE;
+            if (notifyQuest != null) {
+                Blittable badgeToRender = notifyQuest.getDisplay().getBadge();
+                if (badgeToRender == null) {
+                    badgeToRender = DEFAULT_BADGE;
+                }
+
+                float bobOffset = 0;
+                if (Questlog.getConfig().button.bobbingBadge) {
+                    float time = (Minecraft.getInstance().level != null ?
+                            Minecraft.getInstance().level.getGameTime() + partialTicks :
+                            System.currentTimeMillis() / 50.0F);
+
+                    bobOffset = (float) Math.sin(time * 0.2F) * 1.5F;
+                }
+
+                ps.pose().pushPose();
+                ps.pose().translate(0, bobOffset, 0);
+
+                badgeToRender.blit(ps, this.getX() + Questlog.getConfig().button.badgeX, this.getY() + Questlog.getConfig().button.badgeY);
+
+                ps.pose().popPose();
             }
-
-            float bobOffset = 0;
-            if (Questlog.getConfig().button.bobbingBadge) {
-                float time = (Minecraft.getInstance().level != null ?
-                        Minecraft.getInstance().level.getGameTime() + partialTicks :
-                        System.currentTimeMillis() / 50.0F);
-
-                bobOffset = (float) Math.sin(time * 0.2F) * 1.5F;
-            }
-
-            ps.pose().pushPose();
-            ps.pose().translate(0, bobOffset, 0);
-
-            badgeToRender.blit(ps, this.getX() + Questlog.getConfig().button.badgeX, this.getY() + Questlog.getConfig().button.badgeY);
-
-            ps.pose().popPose();
         }
 
         if (this.isMouseOver(mouseX, mouseY)) {

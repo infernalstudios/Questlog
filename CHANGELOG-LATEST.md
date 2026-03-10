@@ -19,6 +19,7 @@
 - Added support for configurable tooltips and hover effects in quest descriptions.
     - Also supports animated textures.
 - Added option for explicit quest sorting order.
+- Added a notification badge to the quest button for when you get a new quest.
 - Added offset options for positioning all UI elements.
 - Added an in-game config screen using Cloth Config.
 
