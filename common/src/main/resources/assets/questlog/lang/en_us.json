@@ -89,8 +89,10 @@
     "text.autoconfig.questlog-client.option.button.badgeX.@Tooltip": "The X offset of the notification badge relative to the button",
     "text.autoconfig.questlog-client.option.button.badgeY": "Badge Y Offset",
     "text.autoconfig.questlog-client.option.button.badgeY.@Tooltip": "The Y offset of the notification badge relative to the button",
+    "text.autoconfig.questlog-client.option.button.showBadge": "Show Notification Badge",
+    "text.autoconfig.questlog-client.option.button.showBadge.@Tooltip": "Adds a quest notification badge for when you get a new quest.",
     "text.autoconfig.questlog-client.option.button.bobbingBadge": "Bobbing Notification Badge",
-    "text.autoconfig.questlog-client.option.button.bobbingBadge.@Tooltip": "Makes the quest notification badge bob up and down when active.",
+    "text.autoconfig.questlog-client.option.button.bobbingBadge.@Tooltip": "Makes the quest notification badge bob up and down.",
 
     "text.autoconfig.questlog-client.category.gui": "GUI Offsets",
     "text.autoconfig.questlog-client.option.gui.mainPanelX": "Main Panel X Offset",

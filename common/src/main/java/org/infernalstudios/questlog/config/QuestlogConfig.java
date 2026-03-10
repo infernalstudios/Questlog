@@ -20,6 +20,9 @@ public class QuestlogConfig implements ConfigData {
         public boolean enabled = true;
 
         @ConfigEntry.Gui.Tooltip()
+        public boolean showBadge = true;
+
+        @ConfigEntry.Gui.Tooltip()
         public boolean relativeToInventory = true;
 
         @ConfigEntry.Gui.Tooltip()
