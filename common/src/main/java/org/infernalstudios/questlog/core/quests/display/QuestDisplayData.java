@@ -3,18 +3,16 @@ package org.infernalstudios.questlog.core.quests.display;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.util.JsonUtils;
+import org.infernalstudios.questlog.util.texture.AnimatedTexture;
 import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -43,6 +41,9 @@ public class QuestDisplayData {
 
     @Nullable
     private final ResourceLocation overlayTexture;
+
+    @Nullable
+    private final Blittable badge;
 
     private final Component backButtonText;
     private final Component collectButtonText;
@@ -99,6 +100,27 @@ public class QuestDisplayData {
         if (parsedDescription == null) {
             String rawStr = JsonUtils.getOrDefault(data, "description", "");
             parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
+        }
+
+        if (data.has("badge") && data.get("badge").isJsonObject()) {
+            JsonObject badgeObj = data.getAsJsonObject("badge");
+            String texture = JsonUtils.getString(badgeObj, "texture");
+            int u = JsonUtils.getOrDefault(badgeObj, "u", 0);
+            int v = JsonUtils.getOrDefault(badgeObj, "v", 0);
+            int w = JsonUtils.getOrDefault(badgeObj, "width", 16);
+            int h = JsonUtils.getOrDefault(badgeObj, "height", 16);
+            int tw = JsonUtils.getOrDefault(badgeObj, "texture_width", 256);
+            int th = JsonUtils.getOrDefault(badgeObj, "texture_height", 256);
+            int frames = JsonUtils.getOrDefault(badgeObj, "frames", 1);
+            int frameTime = JsonUtils.getOrDefault(badgeObj, "frame_time", 100);
+
+            if (frames > 1) {
+                this.badge = new AnimatedTexture(new ResourceLocation(texture), w, h, u, v, tw, th, frames, frameTime);
+            } else {
+                this.badge = new Texture(new ResourceLocation(texture), w, h, u, v, tw, th);
+            }
+        } else {
+            this.badge = null;
         }
 
         this.description = parsedDescription;
@@ -239,6 +261,11 @@ public class QuestDisplayData {
         if (this.rewardDisplay == null)
             throw new IllegalStateException("QuestDisplayData has not been assigned a quest");
         return this.rewardDisplay;
+    }
+
+    @Nullable
+    public Blittable getBadge() {
+        return this.badge;
     }
 
     @Nullable

@@ -12,13 +12,14 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    implementation 'org.infernalstudios:config:4.0.3'
-    include 'org.infernalstudios:config:4.0.3'
-    implementation 'net.jodah:typetools:0.6.3'
-    include 'net.jodah:typetools:0.6.3'
-    include 'com.electronwill.night-config:core:3.6.4'
-    include 'com.electronwill.night-config:toml:3.6.4'
+    // EMI
+    modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"
 
+    // Cloth Config
+    modImplementation "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"
+    modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
+
+    implementation 'net.jodah:typetools:0.6.3'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
 }

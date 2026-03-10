@@ -1,14 +1,19 @@
 package org.infernalstudios.questlog;
 
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.infernalstudios.questlog.networking.QuestlogPacketsForge;
 
 @Mod(Questlog.MODID)
@@ -17,6 +22,15 @@ public class QuestlogForge {
         Questlog.init();
         FMLJavaModLoadingContext.get().getModEventBus().register(QuestlogForge.class);
         MinecraftForge.EVENT_BUS.register(QuestlogForgeEventForwarder.class);
+
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            ModLoadingContext.get().registerExtensionPoint(
+                    ConfigScreenHandler.ConfigScreenFactory.class,
+                    () -> new ConfigScreenHandler.ConfigScreenFactory(
+                            (minecraft, parentScreen) -> AutoConfig.getConfigScreen(QuestlogConfig.class, parentScreen).get()
+                    )
+            );
+        }
     }
 
     @SubscribeEvent

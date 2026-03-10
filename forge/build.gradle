@@ -43,12 +43,15 @@ legacyForge {
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    implementation("org.infernalstudios:config:4.0.3")
-    jarJar("org.infernalstudios:config:4.0.3")
+    // EMI
+    modRuntimeOnly "dev.emi:emi-forge:${emi_version}"
+
+    // Cloth Config
+    modImplementation "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
 
     compileOnly project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
     compileOnly 'org.jetbrains:annotations:26.0.2-1'
+    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
 }
 
 jar {

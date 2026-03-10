@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.QuestlogClient;
+import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
@@ -24,6 +25,9 @@ import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.packet.QuestReadPacket;
 import org.infernalstudios.questlog.network.packet.QuestRewardCollectPacket;
 import org.infernalstudios.questlog.platform.Services;
+import org.infernalstudios.questlog.util.texture.AnimatedTexture;
+import org.infernalstudios.questlog.util.texture.Blittable;
+import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -79,6 +83,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     protected void init() {
         super.init();
+        QuestlogClientEvents.mostRecentNotificationQuest = null;
 
         boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
         if (!hasDetails) {
@@ -300,16 +305,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             ps.pose().translate(0.0F, 0.0F, 400.0F);
 
             ps.fill(mouseX + 8, mouseY - 8, mouseX + 8 + w + 4, mouseY - 8 + h + 4, 0xDD000000);
+            Blittable textureToRender;
 
             if (parts.length >= 7) {
                 int frames = Integer.parseInt(parts[5]);
                 int frameTime = Integer.parseInt(parts[6]);
-                int currentFrame = (int) ((net.minecraft.Util.getMillis() / frameTime) % frames);
-                ps.blit(loc, mouseX + 10, mouseY - 6, 0, currentFrame * h, w, h, w, h * frames);
+
+                textureToRender = new AnimatedTexture(loc, w, h, 0, 0, w, h * frames, frames, frameTime);
             } else {
-                ps.blit(loc, mouseX + 10, mouseY - 6, 0, 0, w, h, w, h);
+                textureToRender = new Texture(loc, w, h, 0, 0, w, h);
             }
 
+            textureToRender.blit(ps, mouseX + 10, mouseY - 6);
             ps.pose().popPose();
         }
     }

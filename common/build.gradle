@@ -15,7 +15,9 @@ legacyForge {
 }
 
 dependencies {
-    implementation "org.infernalstudios:config:4.0.3"
+    // Cloth Config
+    compileOnly "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
+
     implementation 'net.jodah:typetools:0.6.3'
     compileOnly 'org.jetbrains:annotations:26.0.2-1'
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
