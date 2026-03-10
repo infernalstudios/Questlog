@@ -224,3 +224,43 @@ If you need to manually specify the rendering bounds or use an animated vertical
 * **frame_time**: The duration each frame is shown in milliseconds.
 
 **Example:** `[Look at this animation!](image:questlog:textures/gui/tutorial_animation.png:16:16:8:100)`
+
+## Notification Badges
+
+When a quest triggers a notification (like when it is completed but the reward hasn't been claimed yet), a small badge appears on the Questlog open button in the inventory. By default, this uses an exclamation mark icon, but you can override it on a per-quest basis.
+
+You can add a `badge` object to your quest definition JSON to define a custom badge. It supports both static images and animated spritesheets.
+
+```jsonc
+{
+  // ... other quest properties ...
+
+  "badge": {
+    // The path to your custom texture
+    "texture": "namespace:textures/gui/custom_badge.png",
+
+    // The X and Y coordinates on the texture sheet to start rendering from (Defaults to 0)
+    "u": 0,
+    "v": 0,
+
+    // The dimensions of the badge to render (Defaults to 16x16)
+    "width": 16,
+    "height": 16,
+
+    // The total size of your texture file (Defaults to 256x256)
+    "texture_width": 256,
+    "texture_height": 256,
+
+    // --- ANIMATION PROPERTIES (Optional) ---
+    // The number of frames in your vertical spritesheet.
+    // If greater than 1, the badge will be animated! (Defaults to 1)
+    "frames": 4,
+
+    // The duration (in milliseconds) each frame should be displayed (Defaults to 100)
+    "frame_time": 150
+  }
+}
+
+```
+
+**Note for Animated Badges:** If you want the badge to animate, your `texture` image must be a vertical spritesheet where each frame is stacked on top of one another. The game will automatically read the `height` value and shift the rendering down for each frame based on the `frame_time` you set.
