@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.client.gui.components;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
@@ -17,13 +18,14 @@ public class ChapterTabButton extends AbstractButton {
     private final boolean isPrimary;
     private final Runnable onPress;
 
-    public ChapterTabButton(int x, int y, @Nullable Blittable icon, boolean isSelected, boolean isPrimary, Runnable onPress, QuestlogGuiSet guiSet) {
-        super(x, y, 28, isSelected ? 29 : 23, Component.empty());
+    public ChapterTabButton(int x, int y, @Nullable Blittable icon, boolean isSelected, boolean isPrimary, Runnable onPress, QuestlogGuiSet guiSet, Component name) {
+        super(x, y, 28, isSelected ? 29 : 23, name);
         this.icon = icon;
         this.isSelected = isSelected;
         this.isPrimary = isPrimary;
         this.onPress = onPress;
         this.guiSet = guiSet;
+        this.setTooltip(Tooltip.create(name));
     }
 
     @Override

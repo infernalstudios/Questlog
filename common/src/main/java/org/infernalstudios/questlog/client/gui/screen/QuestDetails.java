@@ -251,7 +251,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         ResourceLocation overlay = this.getDisplay().getOverlayTexture();
         if (overlay != null) {
-            ps.blit(overlay, this.panel1X, this.panel1Y, 0, 0, this.getDisplay().getLeftPanelWidth(), this.getDisplay().getPanelHeight(), this.getDisplay().getLeftPanelWidth(), this.getDisplay().getPanelHeight());
+            int overlayX = this.panel1X + this.getDisplay().getOverlayXOffset();
+            int overlayY = this.panel1Y + this.getDisplay().getOverlayYOffset();
+            int overlayWidth = this.getDisplay().getOverlayWidth();
+            int overlayHeight = this.getDisplay().getOverlayHeight();
+
+            ps.blit(overlay, overlayX, overlayY, 0, 0, overlayWidth, overlayHeight, overlayWidth, overlayHeight);
         }
     }
 

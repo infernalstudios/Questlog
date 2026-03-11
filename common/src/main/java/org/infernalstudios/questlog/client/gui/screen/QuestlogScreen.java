@@ -73,7 +73,16 @@ public class QuestlogScreen extends Screen {
             boolean isPrimary = JsonUtils.getOrDefault(chapterDef, "default_chapter", false);
             boolean hidden = JsonUtils.getOrDefault(chapterDef, "hidden", false);
 
-            this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, hidden));
+            String nameStr = JsonUtils.getOrDefault(chapterDef, "name", (String) null);
+            boolean translatable = JsonUtils.getOrDefault(chapterDef, "translatable", false);
+            Component name;
+            if (nameStr != null) {
+                name = translatable ? Component.translatable(nameStr) : Component.literal(nameStr);
+            } else {
+                name = Component.translatable("questlog.chapter." + chapterId.getNamespace() + "." + chapterId.getPath());
+            }
+
+            this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, hidden, name));
         }
 
         this.refreshList();
@@ -212,7 +221,7 @@ public class QuestlogScreen extends Screen {
             this.addRenderableWidget(new ChapterTabButton(listX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
                 this.currentChapter = chap;
                 this.refreshList();
-            }, QuestlogGuiSet.DEFAULT));
+            }, QuestlogGuiSet.DEFAULT, info.name));
         }
 
         if (this.tabOffset + MAX_TABS < chapterKeys.size()) {
@@ -262,7 +271,7 @@ public class QuestlogScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(GuiGraphics ps) {
+    public void renderBackground(@NotNull GuiGraphics ps) {
         super.renderBackground(ps);
 
         int x = (this.width - BACKGROUND_TEXTURE.width()) / 2;
@@ -324,11 +333,13 @@ public class QuestlogScreen extends Screen {
         Blittable icon;
         boolean isPrimary;
         boolean hidden;
+        Component name;
 
-        ChapterInfo(Blittable icon, boolean isPrimary, boolean hidden) {
+        ChapterInfo(Blittable icon, boolean isPrimary, boolean hidden, Component name) {
             this.icon = icon;
             this.isPrimary = isPrimary;
             this.hidden = hidden;
+            this.name = name;
         }
     }
 }

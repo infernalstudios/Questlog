@@ -42,6 +42,11 @@ public class QuestDisplayData {
     @Nullable
     private final ResourceLocation overlayTexture;
 
+    private final int overlayWidth;
+    private final int overlayHeight;
+    private final int overlayXOffset;
+    private final int overlayYOffset;
+
     @Nullable
     private final Blittable badge;
 
@@ -130,6 +135,18 @@ public class QuestDisplayData {
         boolean isMainChapter = this.chapter.equals("questlog:main") || this.chapter.equals("main");
         this.includeInMain = JsonUtils.getOrDefault(data, "include_in_main", isMainChapter);
 
+        this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
+        this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
+        this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
+
+        String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
+        this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
+
+        this.overlayWidth = JsonUtils.getOrDefault(data, "overlay_width", this.leftPanelWidth);
+        this.overlayHeight = JsonUtils.getOrDefault(data, "overlay_height", this.panelHeight);
+        this.overlayXOffset = JsonUtils.getOrDefault(data, "overlay_x_offset", 0);
+        this.overlayYOffset = JsonUtils.getOrDefault(data, "overlay_y_offset", 0);
+
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
 
@@ -139,9 +156,6 @@ public class QuestDisplayData {
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
-
-        String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
-        this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
 
         this.bgTexture = new ResourceLocation(backgroundLoc);
         this.rightPanelTexture = new ResourceLocation(rightPanelLoc);
@@ -166,10 +180,6 @@ public class QuestDisplayData {
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
 
-        this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
-        this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
-        this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
-
         this.leftPanelXOffset = JsonUtils.getOrDefault(data, "left_panel_x_offset", 0);
         this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
         this.rightPanelXOffset = JsonUtils.getOrDefault(data, "right_panel_x_offset", 0);
@@ -177,7 +187,7 @@ public class QuestDisplayData {
     }
 
     private Component parseInlineRichText(String text) {
-        Pattern pattern = Pattern.compile("\\[([^\\]]+)\\]\\(([^)]+)\\)");
+        Pattern pattern = Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)");
         Matcher matcher = pattern.matcher(text);
         MutableComponent component = Component.empty();
         int lastEnd = 0;
@@ -283,11 +293,6 @@ public class QuestDisplayData {
         return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
     }
 
-    @Nullable
-    public ResourceLocation getOverlayTexture() {
-        return this.overlayTexture;
-    }
-
     public int getLeftPanelWidth() {
         return this.leftPanelWidth;
     }
@@ -365,5 +370,26 @@ public class QuestDisplayData {
 
     public Component getUncollectedText() {
         return this.uncollectedText;
+    }
+
+    @Nullable
+    public ResourceLocation getOverlayTexture() {
+        return this.overlayTexture;
+    }
+
+    public int getOverlayWidth() {
+        return this.overlayWidth;
+    }
+
+    public int getOverlayHeight() {
+        return this.overlayHeight;
+    }
+
+    public int getOverlayXOffset() {
+        return this.overlayXOffset;
+    }
+
+    public int getOverlayYOffset() {
+        return this.overlayYOffset;
     }
 }
