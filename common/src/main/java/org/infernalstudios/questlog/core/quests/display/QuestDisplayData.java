@@ -43,6 +43,11 @@ public class QuestDisplayData {
     @Nullable
     private final ResourceLocation overlayTexture;
 
+    private final int overlayWidth;
+    private final int overlayHeight;
+    private final int overlayXOffset;
+    private final int overlayYOffset;
+
     @Nullable
     private final Blittable badge;
 
@@ -85,7 +90,9 @@ public class QuestDisplayData {
                     parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
                 } else if (descriptionElement.isJsonPrimitive()) {
                     String rawStr = descriptionElement.getAsString();
-                    if (rawStr.startsWith("[") || rawStr.startsWith("{")) {
+                    if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
+                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                    } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
                         parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
                     } else {
                         parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
@@ -97,7 +104,8 @@ public class QuestDisplayData {
         }
 
         if (parsedDescription == null) {
-            parsedDescription = Component.empty();
+            String rawStr = JsonUtils.getOrDefault(data, "description", "");
+            parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
         }
 
         if (data.has("badge") && data.get("badge").isJsonObject()) {
@@ -128,6 +136,18 @@ public class QuestDisplayData {
         boolean isMainChapter = this.chapter.equals("questlog:main") || this.chapter.equals("main");
         this.includeInMain = JsonUtils.getOrDefault(data, "include_in_main", isMainChapter);
 
+        this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
+        this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
+        this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
+
+        String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
+        this.overlayTexture = overlayLoc == null ? null : ResourceLocation.parse(overlayLoc);
+
+        this.overlayWidth = JsonUtils.getOrDefault(data, "overlay_width", this.leftPanelWidth);
+        this.overlayHeight = JsonUtils.getOrDefault(data, "overlay_height", this.panelHeight);
+        this.overlayXOffset = JsonUtils.getOrDefault(data, "overlay_x_offset", 0);
+        this.overlayYOffset = JsonUtils.getOrDefault(data, "overlay_y_offset", 0);
+
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : ResourceLocation.parse(completedSoundLoc);
 
@@ -137,9 +157,6 @@ public class QuestDisplayData {
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
-
-        String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
-        this.overlayTexture = overlayLoc == null ? null : ResourceLocation.parse(overlayLoc);
 
         this.bgTexture = ResourceLocation.parse(backgroundLoc);
         this.rightPanelTexture = ResourceLocation.parse(rightPanelLoc);
@@ -163,10 +180,6 @@ public class QuestDisplayData {
         this.showPopupOnUnlock = JsonUtils.getOrDefault(data, "show_popup_on_unlock", false);
 
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
-
-        this.leftPanelWidth = JsonUtils.getOrDefault(data, "left_panel_width", 275);
-        this.rightPanelWidth = JsonUtils.getOrDefault(data, "right_panel_width", 170);
-        this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
 
         this.leftPanelXOffset = JsonUtils.getOrDefault(data, "left_panel_x_offset", 0);
         this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
@@ -281,11 +294,6 @@ public class QuestDisplayData {
         return BuiltInRegistries.SOUND_EVENT.get(this.triggeredSound);
     }
 
-    @Nullable
-    public ResourceLocation getOverlayTexture() {
-        return this.overlayTexture;
-    }
-
     public int getLeftPanelWidth() {
         return this.leftPanelWidth;
     }
@@ -363,5 +371,26 @@ public class QuestDisplayData {
 
     public Component getUncollectedText() {
         return this.uncollectedText;
+    }
+
+    @Nullable
+    public ResourceLocation getOverlayTexture() {
+        return this.overlayTexture;
+    }
+
+    public int getOverlayWidth() {
+        return this.overlayWidth;
+    }
+
+    public int getOverlayHeight() {
+        return this.overlayHeight;
+    }
+
+    public int getOverlayXOffset() {
+        return this.overlayXOffset;
+    }
+
+    public int getOverlayYOffset() {
+        return this.overlayYOffset;
     }
 }

@@ -65,6 +65,7 @@
     "questlog.objective.default.visit_position": "Visit Position",
     "questlog.objective.default.advancement": "Complete Advancement",
     "questlog.objective.default.statistic": "Increase Statistic",
+    "questlog.objective.default.read": "Read Description",
 
     "questlog.reward.default": "Unnamed Reward",
     "questlog.reward.default.experience": "Experience",
@@ -73,6 +74,8 @@
     "questlog.reward.default.command": "Run Command",
     "questlog.reward.default.item": "Item Reward",
     "questlog.reward.default.loot_table": "Loot Table",
+
+    "questlog.chapter.questlog.main": "Main Quests",
 
     "text.autoconfig.questlog-client.title": "Questlog Client Config",
 
