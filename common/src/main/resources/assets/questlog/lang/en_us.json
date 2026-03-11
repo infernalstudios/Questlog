@@ -65,7 +65,7 @@
     "questlog.objective.default.visit_position": "Visit Position",
     "questlog.objective.default.advancement": "Complete Advancement",
     "questlog.objective.default.statistic": "Increase Statistic",
-    "questlog.objective.default.read": "Read Description",
+    "questlog.objective.default.questlog.read": "Read Description",
 
     "questlog.reward.default": "Unnamed Reward",
     "questlog.reward.default.experience": "Experience",
