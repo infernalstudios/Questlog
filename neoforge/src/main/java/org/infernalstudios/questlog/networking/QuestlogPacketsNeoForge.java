@@ -4,6 +4,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.packet.*;
 
@@ -22,28 +23,28 @@ public class QuestlogPacketsNeoForge {
 
         // Server to Client
         registrar.playToClient(QuestSyncPacket.TYPE, QuestSyncPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestSyncPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestDataPacket.TYPE, QuestDataPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestDataPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestDefinitionPacket.TYPE, QuestDefinitionPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestDefinitionPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestRemovePacket.TYPE, QuestRemovePacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestRemovePacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestTriggeredPacket.TYPE, QuestTriggeredPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestTriggeredPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestCompletedPacket.TYPE, QuestCompletedPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestCompletedPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestOpenPacket.TYPE, QuestOpenPacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestOpenPacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
         registrar.playToClient(QuestEditModePacket.TYPE, QuestEditModePacket.STREAM_CODEC, (payload, context) ->
-                context.enqueueWork(() -> QuestEditModePacket.handle(payload, createClientContext()))
+                context.enqueueWork(() -> ClientPacketHandler.handle(payload, createClientContext()))
         );
     }
 

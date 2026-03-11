@@ -1,9 +1,5 @@
 package org.infernalstudios.questlog.network.packet;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -11,11 +7,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
-import org.infernalstudios.questlog.QuestlogClient;
-import org.infernalstudios.questlog.core.DefinitionUtil;
-import org.infernalstudios.questlog.core.QuestManager;
-import org.infernalstudios.questlog.core.quests.Quest;
-import org.infernalstudios.questlog.network.IPacketContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -58,59 +49,6 @@ public record QuestSyncPacket(Map<ResourceLocation, String> definitions,
             }
         }
     };
-
-    private static final Gson GSON = new GsonBuilder().create();
-    private static QuestSyncPacket DEFERRED_PACKET = null;
-
-    public static void handle(QuestSyncPacket packet, IPacketContext ctx) {
-        if (Minecraft.getInstance().player == null) {
-            DEFERRED_PACKET = packet;
-            return;
-        }
-        process(packet);
-    }
-
-    public static void handleDeferred() {
-        if (DEFERRED_PACKET != null) {
-            process(DEFERRED_PACKET);
-            DEFERRED_PACKET = null;
-        }
-    }
-
-    private static void process(QuestSyncPacket packet) {
-        Questlog.LOGGER.info("Received quest & chapter sync from server.");
-
-        DefinitionUtil.getCachedChapterKeys().clear();
-        for (Map.Entry<ResourceLocation, String> entry : packet.chapterDefinitions().entrySet()) {
-            try {
-                JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
-                if (def != null) {
-                    DefinitionUtil.putCachedChapter(entry.getKey(), def);
-                }
-            } catch (Exception e) {
-                Questlog.LOGGER.error("Failed to parse synced chapter {}", entry.getKey(), e);
-            }
-        }
-        QuestManager manager = QuestlogClient.getLocal();
-        manager.clearQuests();
-
-        for (Map.Entry<ResourceLocation, String> entry : packet.definitions().entrySet()) {
-            try {
-                JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
-                Quest quest = Quest.create(def, entry.getKey(), manager);
-                manager.addQuest(quest);
-            } catch (Exception e) {
-                Questlog.LOGGER.error("Failed to parse synced quest {}", entry.getKey(), e);
-            }
-        }
-
-        for (Map.Entry<ResourceLocation, CompoundTag> entry : packet.data().entrySet()) {
-            Quest quest = manager.getQuest(entry.getKey());
-            if (quest != null) {
-                quest.deserialize(entry.getValue());
-            }
-        }
-    }
 
     @Override
     public @NotNull Type<? extends CustomPacketPayload> type() {

@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.world.entity.player.Player;
+import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 import org.infernalstudios.questlog.network.packet.*;
 
@@ -28,14 +29,14 @@ public class QuestlogPacketsFabric {
     }
 
     public static void registerClient() {
-        ClientPlayNetworking.registerGlobalReceiver(QuestSyncPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestSyncPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestDataPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDataPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestDefinitionPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestDefinitionPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestRemovePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestRemovePacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestTriggeredPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestTriggeredPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestCompletedPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestCompletedPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestOpenPacket.TYPE, (payload, context) -> context.client().execute(() -> QuestOpenPacket.handle(payload, createClientContext())));
-        ClientPlayNetworking.registerGlobalReceiver(QuestEditModePacket.TYPE, (payload, context) -> context.client().execute(() -> QuestEditModePacket.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestSyncPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestDataPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestDefinitionPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestRemovePacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestTriggeredPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestCompletedPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestOpenPacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
+        ClientPlayNetworking.registerGlobalReceiver(QuestEditModePacket.TYPE, (payload, context) -> context.client().execute(() -> ClientPacketHandler.handle(payload, createClientContext())));
     }
 
     private static void registerServerReceivers() {
