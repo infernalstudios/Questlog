@@ -236,6 +236,15 @@ public class QuestlogMigrator {
                     if (type.equals("questlog:item_pickup") || type.equals("item_pickup")) {
                         newObj.addProperty("type", "questlog:item_obtain");
                     }
+
+                    if (type.equals("questlog:quest_complete") || type.equals("quest_complete")) {
+                        if (newObj.has("quest")) {
+                            String oldQuestId = newObj.get("quest").getAsString();
+                            if (oldQuestId.contains(":quests/")) {
+                                newObj.addProperty("quest", oldQuestId.replaceFirst(":quests/", ":"));
+                            }
+                        }
+                    }
                 }
 
                 // Flatten display.name -> name
