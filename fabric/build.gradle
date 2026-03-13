@@ -34,6 +34,7 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
 
     implementation 'net.jodah:typetools:0.6.3'
+    include 'net.jodah:typetools:0.6.3'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 }
 
