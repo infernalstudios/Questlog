@@ -203,11 +203,12 @@ public class QuestlogScreen extends Screen {
         int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
         int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
+        int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
         int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
         int arrowY = tabY + 5;
 
         if (this.tabOffset > 0) {
-            this.addRenderableWidget(new ChapterArrowButton(listX - 12, arrowY, true, () -> {
+            this.addRenderableWidget(new ChapterArrowButton(tabX - 12, arrowY, true, () -> {
                 this.tabOffset--;
                 this.refreshList();
             }, QuestlogGuiSet.DEFAULT));
@@ -218,14 +219,14 @@ public class QuestlogScreen extends Screen {
             ChapterInfo info = this.availableChapters.get(chap);
             boolean isSelected = chap.equals(this.currentChapter);
 
-            this.addRenderableWidget(new ChapterTabButton(listX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
+            this.addRenderableWidget(new ChapterTabButton(tabX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
                 this.currentChapter = chap;
                 this.refreshList();
             }, QuestlogGuiSet.DEFAULT, info.name));
         }
 
         if (this.tabOffset + MAX_TABS < chapterKeys.size()) {
-            this.addRenderableWidget(new ChapterArrowButton(listX + (MAX_TABS * 30), arrowY, false, () -> {
+            this.addRenderableWidget(new ChapterArrowButton(tabX + (MAX_TABS * 30), arrowY, false, () -> {
                 this.tabOffset++;
                 this.refreshList();
             }, QuestlogGuiSet.DEFAULT));
