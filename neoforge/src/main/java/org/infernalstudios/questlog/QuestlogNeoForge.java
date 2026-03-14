@@ -2,7 +2,6 @@ package org.infernalstudios.questlog;
 
 import me.shedaniel.autoconfig.AutoConfig;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -16,27 +15,20 @@ import net.neoforged.neoforge.common.NeoForge;
 import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.infernalstudios.questlog.networking.QuestlogPacketsNeoForge;
 
-import static net.neoforged.api.distmarker.Dist.CLIENT;
-
 @Mod(Questlog.MODID)
 public class QuestlogNeoForge {
     public QuestlogNeoForge(IEventBus modEventBus, ModContainer modContainer) {
         Questlog.init();
+
         modEventBus.register(QuestlogNeoForge.class);
         modEventBus.addListener(QuestlogPacketsNeoForge::register);
         NeoForge.EVENT_BUS.register(QuestlogNeoForgeEventForwarder.class);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            modContainer.registerExtensionPoint(
-                    IConfigScreenFactory.class,
-                    (container, parentScreen) -> AutoConfig.getConfigScreen(QuestlogConfig.class, parentScreen).get()
-            );
+            modEventBus.register(ClientModEvents.class);
+            NeoForge.EVENT_BUS.register(QuestlogNeoForgeEventForwarder.ClientForgeEvents.class);
+            ClientModEvents.registerExtension(modContainer);
         }
-    }
-
-    @SubscribeEvent
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        Questlog.initClient();
     }
 
     @SubscribeEvent
@@ -44,9 +36,22 @@ public class QuestlogNeoForge {
         Questlog.LOGGER.debug("Common setup complete");
     }
 
-    @SubscribeEvent
-    @OnlyIn(CLIENT)
-    public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
-        event.register(QuestlogClient.OPEN_SCREEN_KEY);
+    public static class ClientModEvents {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            Questlog.initClient();
+        }
+
+        @SubscribeEvent
+        public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
+            event.register(QuestlogClient.OPEN_SCREEN_KEY);
+        }
+
+        public static void registerExtension(ModContainer modContainer) {
+            modContainer.registerExtensionPoint(
+                    IConfigScreenFactory.class,
+                    (container, parentScreen) -> AutoConfig.getConfigScreen(QuestlogConfig.class, parentScreen).get()
+            );
+        }
     }
 }

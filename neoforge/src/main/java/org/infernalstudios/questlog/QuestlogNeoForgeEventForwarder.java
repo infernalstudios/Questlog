@@ -2,8 +2,6 @@ package org.infernalstudios.questlog;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -48,24 +46,6 @@ public class QuestlogNeoForgeEventForwarder {
     @SubscribeEvent
     public static void registerCommands(RegisterCommandsEvent event) {
         QuestlogEvents.registerCommands(event.getDispatcher());
-    }
-
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void onClientTick(ClientTickEvent.Post event) {
-        QuestlogClientEvents.onClientTick();
-    }
-
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void onClientPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
-        QuestlogClientEvents.onClientPlayerLogin();
-    }
-
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void onClientPlayerLogout(ClientPlayerNetworkEvent.LoggingOut event) {
-        QuestlogClientEvents.onClientPlayerLogout();
     }
 
     @SubscribeEvent
@@ -137,5 +117,22 @@ public class QuestlogNeoForgeEventForwarder {
     @SubscribeEvent
     public static void onPlayerSmelt(PlayerEvent.ItemSmeltedEvent event) {
         Questlog.EVENTS.post(new QLPlayerEvent.Craft(event.getEntity(), event.getSmelting()));
+    }
+
+    public static class ClientForgeEvents {
+        @SubscribeEvent
+        public static void onClientTick(ClientTickEvent.Post event) {
+            QuestlogClientEvents.onClientTick();
+        }
+
+        @SubscribeEvent
+        public static void onClientPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
+            QuestlogClientEvents.onClientPlayerLogin();
+        }
+
+        @SubscribeEvent
+        public static void onClientPlayerLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+            QuestlogClientEvents.onClientPlayerLogout();
+        }
     }
 }
