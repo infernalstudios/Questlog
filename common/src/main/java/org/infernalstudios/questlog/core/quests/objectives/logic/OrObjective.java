@@ -60,6 +60,18 @@ public class OrObjective extends Objective {
     }
 
     @Override
+    public void setUnits(int units) {
+        super.setUnits(units);
+        if (units == 0) {
+            for (Objective child : this.children) {
+                child.setUnits(0);
+            }
+        } else if (!this.children.isEmpty()) {
+            this.children.getFirst().setUnits(this.children.getFirst().getRequiredAmount());
+        }
+    }
+
+    @Override
     public int getRequiredAmount() {
         return 1;
     }

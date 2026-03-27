@@ -39,6 +39,16 @@ public class NotObjective extends Objective {
     }
 
     @Override
+    public void setUnits(int units) {
+        super.setUnits(units);
+        if (units == 0) {
+            this.child.setUnits(this.child.getRequiredAmount());
+        } else {
+            this.child.setUnits(0);
+        }
+    }
+
+    @Override
     public int getRequiredAmount() {
         return 1;
     }

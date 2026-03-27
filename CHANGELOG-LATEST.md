@@ -1,3 +1,3 @@
 ### Fixed
 
-- Fixed dedicated server crash on NeoForge.
+- Fixed Not and Or objectives not triggering with commands.
