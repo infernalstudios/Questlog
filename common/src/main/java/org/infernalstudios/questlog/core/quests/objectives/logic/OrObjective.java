@@ -67,7 +67,7 @@ public class OrObjective extends Objective {
                 child.setUnits(0);
             }
         } else if (!this.children.isEmpty()) {
-            this.children.getFirst().setUnits(this.children.getFirst().getRequiredAmount());
+            this.children.get(0).setUnits(this.children.get(0).getRequiredAmount());
         }
     }
 
