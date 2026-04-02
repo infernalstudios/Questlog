@@ -246,7 +246,11 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                 Component title = this.quest.getDisplay().getTitle();
                 ps.drawString(font, title, currentX, y, 0x4C381B, false);
 
-                if (this.quest.isCompleted()) {
+                if (this.quest.isFailed()) {
+                    int titleWidth = font.width(title);
+                    int statusX = currentX + titleWidth + 8;
+                    ps.drawString(font, Component.translatable("questlog.quest.failed"), statusX, y, 0xAA0000, false);
+                } else if (this.quest.isCompleted()) {
                     int titleWidth = font.width(title);
                     int statusX = currentX + titleWidth + 8;
 
@@ -258,6 +262,26 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
                     ps.drawString(font, statusText, statusX, y, statusColor, false);
                 }
+            } else if (this.quest.isFailed()) {
+                int linesHeight = font.lineHeight * 2;
+                int dy = (height - linesHeight) / 2;
+
+                ps.drawString(
+                        font,
+                        this.quest.getDisplay().getTitle(),
+                        xPosition + (int) this.list.scroller.getXOffset() + dx,
+                        yPosition + dy + (int) this.list.scroller.getYOffset(),
+                        0x4C381B,
+                        false
+                );
+                ps.drawString(
+                        font,
+                        Component.translatable("questlog.quest.failed"),
+                        xPosition + (int) this.list.scroller.getXOffset() + dx,
+                        yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
+                        0xAA0000,
+                        false
+                );
             } else if (this.quest.isCompleted()) {
                 int linesHeight = font.lineHeight * 2;
                 int dy = (height - linesHeight) / 2;

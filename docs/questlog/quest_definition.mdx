@@ -7,21 +7,24 @@ hide_meta: true
 
 To add quest definitions, you need to create a JSON file for each quest.
 These JSON files should be placed in the `quests` directory of your config (`config/questlog/quests/`).
-Note: There are no defaults for `requirements`, `objectives`, and `rewards`, they are always required, even if it's an empty array.
 
 ```jsonc
 {
   // A list of objectives that will trigger the quest to appear and start tracking.
-  // If the array is empty, the quest will be available to start immediately.
-  "requirements": "Objective[]",
+  // If the array is empty or omitted, the quest will be available to start immediately.
+  "requirements": "Objective[] (optional)",
 
   // A list of objectives that the player must complete to finish the quest.
-  // If the array is empty, the quest will be completed immediately.
-  "objectives": "Objective[]",
+  // If the array is empty or omitted, the quest will be completed immediately.
+  "objectives": "Objective[] (optional)",
+
+  // A list of objectives that, if completed, will cause the quest to fail.
+  // When a quest fails, it will no longer track progress and must be reset.
+  "failures": "Objective[] (optional)",
 
   // A list of rewards that the player will receive upon completing the quest.
-  // If the array is empty, the player will receive no rewards.
-  "rewards": "Reward[]",
+  // If the array is empty or omitted, the player will receive no rewards.
+  "rewards": "Reward[] (optional)",
 
   // The title of the quest.
   "title": "string",
@@ -29,6 +32,12 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   // The description of the quest.
   // Can be a string using inline rich text, or a JSON text component.
   "description": "string | object | array",
+
+  // An alternative description shown only when the quest is completed.
+  "description_completed": "string | object | array (optional)",
+
+  // An alternative description shown only when the quest has failed.
+  "description_failed": "string | object | array (optional)",
 
   // The sort order of the quest in the list. Quests evaluate this before alphabetical sorting.
   // Defaults to 0.

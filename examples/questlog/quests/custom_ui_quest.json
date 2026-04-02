@@ -1,0 +1,24 @@
+{
+  "title": "Custom Experience",
+  "description": "This quest shows off some of the UI customization options. Different colors, panel sizes, and more!",
+  "icon": {
+    "item": "minecraft:painting"
+  },
+  "requirements": [],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:oak_log",
+      "required_amount": 1,
+      "name": "Chop one log"
+    }
+  ],
+  "rewards": [],
+  "text_color": "#FF0000",
+  "title_color": "#00FF00",
+  "progress_text_color": "#0000FF",
+  "left_panel_width": 300,
+  "right_panel_width": 200,
+  "panel_height": 180,
+  "background_texture": "minecraft:textures/block/dirt.png"
+}

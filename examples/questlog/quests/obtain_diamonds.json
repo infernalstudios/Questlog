@@ -1,0 +1,27 @@
+{
+  "title": "Diamond Miner",
+  "description": "DIAMONDS! Go find some deep underground, near lava.",
+  "icon": {
+    "item": "minecraft:diamond_ore"
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:diamond",
+      "required_amount": 5,
+      "name": "Find 5 Diamonds"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 300,
+      "levels": true
+    }
+  ],
+  "badge": {
+    "texture": "minecraft:textures/item/diamond.png",
+    "width": 16,
+    "height": 16
+  }
+}

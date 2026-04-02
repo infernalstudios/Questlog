@@ -208,7 +208,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.panel1Y + CONTENT_Y,
                 leftWidth - 38,
                 height - 68,
-                new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(), this.getPalette().textColor())
+                new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(this.quest), this.getPalette().textColor())
         );
         this.addWidget(this.description);
 

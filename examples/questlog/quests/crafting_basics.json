@@ -1,0 +1,29 @@
+{
+  "title": "Master of Tools",
+  "description": "Wooden tools only get you so far. Stone is better!",
+  "icon": {
+    "item": "minecraft:stone_pickaxe"
+  },
+  "requirements": [],
+  "objectives": [
+    {
+      "type": "questlog:item_craft",
+      "item": "minecraft:stone_pickaxe",
+      "required_amount": 1,
+      "name": "Craft a Stone Pickaxe"
+    },
+    {
+      "type": "questlog:item_craft",
+      "item": "minecraft:stone_axe",
+      "required_amount": 1,
+      "name": "Craft a Stone Axe"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:torch",
+      "count": 32
+    }
+  ]
+}

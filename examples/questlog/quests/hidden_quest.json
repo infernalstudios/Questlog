@@ -1,0 +1,37 @@
+{
+  "title": "Secret Discovery",
+  "description": "How did you find this? You must be very curious!",
+  "icon": {
+    "item": "minecraft:spyglass"
+  },
+  "hidden": true,
+  "requirements": [
+    {
+      "type": "questlog:visit_position",
+      "bounds": {
+        "minX": 100,
+        "maxX": 110,
+        "minY": 64,
+        "maxY": 70,
+        "minZ": 100,
+        "maxZ": 110
+      },
+      "name": "Find the secret coordinates"
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:totem_of_undying",
+      "required_amount": 1,
+      "name": "Collect the Secret Totem"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:emerald",
+      "count": 64
+    }
+  ]
+}

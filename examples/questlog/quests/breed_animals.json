@@ -1,0 +1,23 @@
+{
+  "title": "Animal Husbandry",
+  "description": "Farming isn't just about crops. You need some livestock too!",
+  "icon": {
+    "item": "minecraft:wheat"
+  },
+  "requirements": [],
+  "objectives": [
+    {
+      "type": "questlog:entity_breed",
+      "entity": "minecraft:cow",
+      "required_amount": 5,
+      "name": "Breed 5 Cows"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:leather",
+      "count": 10
+    }
+  ]
+}

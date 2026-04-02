@@ -1,0 +1,21 @@
+{
+  "title": "We Need To Go Deeper",
+  "description": "The Overworld is getting too cozy. It's time to go deeper!",
+  "icon": {
+    "item": "minecraft:flint_and_steel"
+  },
+  "objectives": [
+    {
+      "type": "questlog:visit_dimension",
+      "dimension": "minecraft:the_nether",
+      "required_amount": 1,
+      "name": "Visit the Nether"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 500
+    }
+  ]
+}
