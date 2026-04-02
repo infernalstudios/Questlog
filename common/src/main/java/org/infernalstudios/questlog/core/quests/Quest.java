@@ -23,6 +23,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
     public final List<Objective> requirements;
     public final List<Objective> objectives;
+    public final List<Objective> failureConditions;
     public final List<Reward> rewards;
     public final QuestManager manager;
     private final QuestDisplayData display;
@@ -34,6 +35,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
             QuestDisplayData display,
             List<Objective> requirements,
             List<Objective> objectives,
+            List<Objective> failureConditions,
             List<Reward> rewards,
             ResourceLocation id,
             QuestManager manager
@@ -41,6 +43,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         this.display = display;
         this.requirements = requirements;
         this.objectives = objectives;
+        this.failureConditions = failureConditions;
         this.rewards = rewards;
         this.id = id;
         this.manager = manager;
@@ -61,6 +64,12 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
                 objective.registerEventListeners(Questlog.EVENTS);
             }
         });
+        this.failureConditions.forEach(failureCondition -> {
+            failureCondition.setParent(this);
+            if (!this.manager.isClient()) {
+                failureCondition.registerEventListeners(Questlog.EVENTS);
+            }
+        });
         this.rewards.forEach(reward -> reward.setParent(this));
         display.setQuest(this);
     }
@@ -69,6 +78,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         QuestDisplayData display = new QuestDisplayData(definition);
         List<Objective> requirements = new ArrayList<>();
         List<Objective> objectives = new ArrayList<>();
+        List<Objective> failureConditions = new ArrayList<>();
         List<Reward> rewards = new ArrayList<>();
 
         for (JsonElement reqElement : JsonUtils.getOrDefault(definition, "requirements", new JsonArray())) {
@@ -83,13 +93,19 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
             }
         }
 
+        for (JsonElement failElement : JsonUtils.getOrDefault(definition, "failures", new JsonArray())) {
+            if (failElement.isJsonObject()) {
+                failureConditions.add(QuestObjectiveRegistry.create(failElement.getAsJsonObject()));
+            }
+        }
+
         for (JsonElement rewardElement : JsonUtils.getOrDefault(definition, "rewards", new JsonArray())) {
             if (rewardElement.isJsonObject()) {
                 rewards.add(QuestRewardRegistry.create(rewardElement.getAsJsonObject()));
             }
         }
 
-        return new Quest(display, requirements, objectives, rewards, id, manager);
+        return new Quest(display, requirements, objectives, failureConditions, rewards, id, manager);
     }
 
     public ResourceLocation getId() {
@@ -110,7 +126,13 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         return true;
     }
 
+    public boolean isFailed() {
+        return !this.failureConditions.isEmpty() && this.failureConditions.stream().anyMatch(Objective::isCompleted);
+    }
+
     public boolean isCompleted() {
+        if (this.isFailed()) return false;
+
         for (Objective objective : this.objectives) {
             if (!objective.isCompleted()) {
                 return false;
@@ -156,6 +178,15 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         );
 
         data.put(
+                "failures",
+                Util.toNbtList(this.failureConditions, condition -> {
+                    CompoundTag tag = new CompoundTag();
+                    condition.writeInitialData(tag);
+                    return tag;
+                })
+        );
+
+        data.put(
                 "rewards",
                 Util.toNbtList(this.rewards, reward -> {
                     CompoundTag tag = new CompoundTag();
@@ -184,6 +215,11 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
             this.objectives.get(i).deserialize((CompoundTag) objectiveData.get(i));
         }
 
+        List<Tag> failureData = data.getList("failures", Tag.TAG_COMPOUND);
+        for (int i = 0; i < Math.min(failureData.size(), this.failureConditions.size()); i++) {
+            this.failureConditions.get(i).deserialize((CompoundTag) failureData.get(i));
+        }
+
         List<Tag> rewardData = data.getList("rewards", Tag.TAG_COMPOUND);
         for (int i = 0; i < Math.min(rewardData.size(), this.rewards.size()); i++) {
             this.rewards.get(i).deserialize((CompoundTag) rewardData.get(i));
@@ -197,6 +233,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         tag.putBoolean("triggered", this.hasSentTrigger);
         tag.put("requirements", Util.toNbtList(this.requirements, Objective::serialize));
         tag.put("objectives", Util.toNbtList(this.objectives, Objective::serialize));
+        tag.put("failures", Util.toNbtList(this.failureConditions, Objective::serialize));
         tag.put("rewards", Util.toNbtList(this.rewards, Reward::serialize));
         return tag;
     }

@@ -1,0 +1,28 @@
+{
+  "title": "Final Step",
+  "description": "The end of the line! Complete this and you've mastered the basics.",
+  "icon": {
+    "item": "minecraft:diamond_pickaxe"
+  },
+  "requirements": [
+    {
+      "type": "questlog:quest_complete",
+      "quest": "questlog:linear_2_followup"
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:diamond",
+      "required_amount": 3,
+      "name": "Obtain 3 Diamonds"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:loot_table",
+      "loot_table": "minecraft:chests/end_city_treasure",
+      "name": "End City Treasure"
+    }
+  ]
+}

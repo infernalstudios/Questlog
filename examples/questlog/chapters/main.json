@@ -1,0 +1,10 @@
+{
+  "name": "The Beginning",
+  "translatable": false,
+  "icon": {
+    "item": "minecraft:grass_block"
+  },
+  "order": 1,
+  "default_chapter": true,
+  "hidden": false
+}

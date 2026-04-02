@@ -1,0 +1,34 @@
+{
+  "title": "Cooking with Gas",
+  "description": "Now that you have a furnace, it's time to smelt some iron. You'll need it for better tools!",
+  "icon": {
+    "item": "minecraft:iron_ingot"
+  },
+  "requirements": [
+    {
+      "type": "questlog:quest_complete",
+      "quest": "questlog:linear_1_start"
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:iron_ingot",
+      "required_amount": 8,
+      "name": "Obtain 8 Iron Ingots"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:bucket",
+      "count": 1,
+      "auto_claim": true
+    },
+    {
+      "type": "questlog:command",
+      "command": "/say @p has unlocked better gear!",
+      "permission_level": 2
+    }
+  ]
+}

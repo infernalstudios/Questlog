@@ -1,0 +1,42 @@
+---
+title: Commands
+hide_meta: true
+---
+
+Questlog has debug / development commands to ease quest creation and manage player progress.
+All `/questlog` commands can also start with `/ql` as a shorthand.
+
+## Permissions
+The player executing (or the command block) these commands must have a permission level of at least 2 (`/op` and `/deop` commands).
+
+## Arguments
+Arguments written within `<>` are required, whereas within `[]` are optional.
+* `<target>` - Can be a specific **Quest ID** (e.g., `my_pack:my_quest`), a **Chapter ID** (e.g., `questlog:main`), or `all`. This is autocompleted.
+* `[players]` - Standard entity selectors for players (e.g., `@a`, `PlayerName`). Defaults to the command executor if omitted.
+
+## Commands
+
+### `/questlog reload`
+Reloads all quests and chapters from the config without needing to restart the game or completely reload data packs. Automatically syncs the new data to all online players.
+
+### `/questlog open [target] [players]`
+Opens the Questlog UI for the specified player(s). 
+* If `[target]` is provided, it attempts to open directly to that quest or chapter.
+
+### `/questlog progress reset <target> [players]`
+Resets the progress of the targeted quest(s) back to zero. This un-completes objectives, un-triggers requirements, and revokes rewards.
+
+### `/questlog progress reset all [players]`
+Resets the progress of ALL quests for the specified player(s).
+
+### `/questlog progress complete <target> [players]`
+Instantly completes all objectives for the targeted quest(s). 
+
+### `/questlog progress complete all [players]`
+Instantly completes ALL quests for the specified player(s).
+
+### `/questlog trigger <target> [players]`
+Instantly fulfills the requirements (formerly triggers) of the targeted quest(s), allowing the quest to appear and start tracking.
+
+### `/questlog trigger all [players]`
+Instantly fulfills the requirements for ALL quests for the specified player(s).

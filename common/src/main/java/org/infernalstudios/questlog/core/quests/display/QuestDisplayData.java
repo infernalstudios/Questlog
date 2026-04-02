@@ -26,6 +26,10 @@ public class QuestDisplayData {
     private final Component title;
     private final Component description;
     @Nullable
+    private final Component descriptionCompleted;
+    @Nullable
+    private final Component descriptionFailed;
+    @Nullable
     private final Blittable icon;
     @Nullable
     private final ResourceLocation completedSound;
@@ -81,32 +85,14 @@ public class QuestDisplayData {
 
         this.sortOrder = JsonUtils.getOrDefault(data, "sort_order", 0);
 
-        JsonElement descriptionElement = data.get("description");
-        Component parsedDescription = null;
-
-        if (descriptionElement != null) {
-            try {
-                if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
-                    parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
-                } else if (descriptionElement.isJsonPrimitive()) {
-                    String rawStr = descriptionElement.getAsString();
-                    if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
-                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
-                    } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
-                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
-                    } else {
-                        parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
-                    }
-                }
-            } catch (Exception e) {
-                Questlog.LOGGER.error("Failed to parse description for quest", e);
-            }
-        }
-
+        Component parsedDescription = parseDescription(data.get("description"), translatable);
         if (parsedDescription == null) {
             String rawStr = JsonUtils.getOrDefault(data, "description", "");
             parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
         }
+        this.description = parsedDescription;
+        this.descriptionCompleted = parseDescription(data.get("description_completed"), translatable);
+        this.descriptionFailed = parseDescription(data.get("description_failed"), translatable);
 
         if (data.has("badge") && data.get("badge").isJsonObject()) {
             JsonObject badgeObj = data.getAsJsonObject("badge");
@@ -129,7 +115,6 @@ public class QuestDisplayData {
             this.badge = null;
         }
 
-        this.description = parsedDescription;
         this.icon = JsonUtils.getIcon(data, "icon");
 
         this.chapter = JsonUtils.getOrDefault(data, "chapter", "questlog:main");
@@ -187,6 +172,28 @@ public class QuestDisplayData {
         this.rightPanelYOffset = JsonUtils.getOrDefault(data, "right_panel_y_offset", 0);
     }
 
+    private Component parseDescription(JsonElement descriptionElement, boolean translatable) {
+        if (descriptionElement == null) return null;
+        Component parsedDescription = null;
+        try {
+            if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
+                parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
+            } else if (descriptionElement.isJsonPrimitive()) {
+                String rawStr = descriptionElement.getAsString();
+                if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
+                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
+                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                } else {
+                    parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
+                }
+            }
+        } catch (Exception e) {
+            Questlog.LOGGER.error("Failed to parse description for quest", e);
+        }
+        return parsedDescription;
+    }
+
     private Component parseInlineRichText(String text) {
         Pattern pattern = Pattern.compile("\\[([^]]+)]\\(([^)]+)\\)");
         Matcher matcher = pattern.matcher(text);
@@ -229,7 +236,11 @@ public class QuestDisplayData {
         String lowerQuery = query.toLowerCase();
 
         if (this.title.getString().toLowerCase().contains(lowerQuery)) return true;
-        if (this.description.getString().toLowerCase().contains(lowerQuery)) return true;
+        if (this.description != null && this.description.getString().toLowerCase().contains(lowerQuery)) return true;
+        if (this.descriptionCompleted != null && this.descriptionCompleted.getString().toLowerCase().contains(lowerQuery))
+            return true;
+        if (this.descriptionFailed != null && this.descriptionFailed.getString().toLowerCase().contains(lowerQuery))
+            return true;
 
         if (this.objectiveDisplay != null) {
             for (ObjectiveDisplayData obj : this.objectiveDisplay) {
@@ -244,6 +255,18 @@ public class QuestDisplayData {
         }
 
         return false;
+    }
+
+    public Component getDescription(Quest quest) {
+        if (quest != null) {
+            if (quest.isFailed() && this.descriptionFailed != null) {
+                return this.descriptionFailed;
+            }
+            if (quest.isCompleted() && this.descriptionCompleted != null) {
+                return this.descriptionCompleted;
+            }
+        }
+        return this.description;
     }
 
     public String getChapter() {

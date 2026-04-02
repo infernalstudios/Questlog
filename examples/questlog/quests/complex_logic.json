@@ -1,0 +1,35 @@
+{
+  "title": "A Choice of Skills",
+  "description": "Prove your worth through either farming or combat.",
+  "icon": {
+    "item": "minecraft:stone_hoe"
+  },
+  "requirements": [],
+  "objectives": [
+    {
+      "type": "questlog:or",
+      "name": "Complete either objective",
+      "objectives": [
+        {
+          "type": "questlog:item_obtain",
+          "item": "minecraft:wheat",
+          "required_amount": 64,
+          "name": "Harvest 64 Wheat"
+        },
+        {
+          "type": "questlog:entity_kill",
+          "entity": "minecraft:creeper",
+          "required_amount": 10,
+          "name": "Slay 10 Creepers"
+        }
+      ]
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:cake",
+      "count": 1
+    }
+  ]
+}

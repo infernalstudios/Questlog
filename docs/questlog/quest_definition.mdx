@@ -1,0 +1,281 @@
+---
+title: Quest Definition
+hide_meta: true
+---
+
+## Quests
+
+To add quest definitions, you need to create a JSON file for each quest.
+These JSON files should be placed in the `quests` directory of your config (`config/questlog/quests/`).
+
+```jsonc
+{
+  // A list of objectives that will trigger the quest to appear and start tracking.
+  // If the array is empty or omitted, the quest will be available to start immediately.
+  "requirements": "Objective[] (optional)",
+
+  // A list of objectives that the player must complete to finish the quest.
+  // If the array is empty or omitted, the quest will be completed immediately.
+  "objectives": "Objective[] (optional)",
+
+  // A list of objectives that, if completed, will cause the quest to fail.
+  // When a quest fails, it will no longer track progress and must be reset.
+  "failures": "Objective[] (optional)",
+
+  // A list of rewards that the player will receive upon completing the quest.
+  // If the array is empty or omitted, the player will receive no rewards.
+  "rewards": "Reward[] (optional)",
+
+  // The title of the quest.
+  "title": "string",
+
+  // The description of the quest.
+  // Can be a string using inline rich text, or a JSON text component.
+  "description": "string | object | array",
+
+  // An alternative description shown only when the quest is completed.
+  "description_completed": "string | object | array (optional)",
+
+  // An alternative description shown only when the quest has failed.
+  "description_failed": "string | object | array (optional)",
+
+  // The sort order of the quest in the list. Quests evaluate this before alphabetical sorting.
+  // Defaults to 0.
+  "sort_order": "integer (optional)",
+
+  // The icon to display for the quest.
+  "icon": "Renderable (optional)",
+
+  // Whether the title and descriptions are translatable string keys. Defaults to false.
+  "translatable": false,
+
+  // The chapter this quest belongs to. Defaults to "questlog:main".
+  "chapter": "string (optional)",
+
+  // Whether this quest should also be included in the main chapter.
+  "include_in_main": "boolean (optional)",
+
+  // Hides the quest from the quest log entirely.
+  "hidden": false,
+
+  // --- SOUND OPTIONS ---
+  "completed_sound": "ResourceLocation (optional)",
+  "triggered_sound": "ResourceLocation (optional)",
+
+  // --- NOTIFICATION OPTIONS ---
+  "toast_on_unlock": true,
+  "toast_on_complete": true,
+  "show_popup_on_unlock": false,
+
+  // --- UI CUSTOMIZATION ---
+  // The background texture of the main (left) panel.
+  "background_texture": "ResourceLocation (optional)",
+
+  // A separate 9-sliced texture for the right panel. Defaults to the background_texture.
+  "right_panel_texture": "ResourceLocation (optional)",
+
+  // An optional texture that is overlaid on top of the main (left) panel.
+  "overlay": "ResourceLocation (optional)",
+  "overlay_width": "integer (optional)",
+  "overlay_height": "integer (optional)",
+  "overlay_x_offset": "integer (optional)",
+  "overlay_y_offset": "integer (optional)",
+
+  // --- UI SIZING OPTIONS ---
+  "left_panel_width": 275,
+  "right_panel_width": 170,
+  "panel_height": 166,
+
+  // Position offsets for the panels. Defaults to 0.
+  "left_panel_x_offset": 0,
+  "left_panel_y_offset": 0,
+  "right_panel_x_offset": 0,
+  "right_panel_y_offset": 0,
+
+  // --- TEXT CUSTOMIZATION ---
+  "back_button_text": "gui.back",
+  "collect_button_text": "questlog.reward.collect",
+  "uncollected_text": "questlog.reward.uncollected",
+  "collected_text": "questlog.reward.collected",
+
+  // --- PALETTE OPTIONS ---
+  "text_color": "#4C381B",
+  "completed_text_color": "#529E52",
+  "hovered_text_color": "#FFFFFF",
+  "title_color": "#4C381B",
+  "progress_text_color": "#9E7852"
+}
+
+```
+
+## ObjectiveDisplay
+
+```jsonc
+{
+  // The name of the objective.
+  // Example: "Mine 100 Stone"
+  // If omitted, a name will be automatically generated based on the objective type.
+  "name": "string (optional)",
+
+  // The icon to display for the objective.
+  // This is used in the quest details screen.
+  // If not provided, no icon will be displayed.
+  "icon": "Renderable (optional)",
+
+  // Whether the name is a translatable string.
+  // If true, the name will be treated as a translation key,
+  // and the client will attempt to translate it using the player's language settings.
+  // Defaults to: false
+  "translatable": false
+}
+
+```
+
+## RewardDisplay
+
+```jsonc
+{
+  // The name of the reward.
+  // Example: "100 Experience"
+  // If omitted, a name will be automatically generated based on the reward type.
+  "name": "string (optional)",
+
+  // The icon to display for the reward.
+  // This is used in the quest details screen.
+  // If not provided, the reward will use the default icon for its type.
+  "icon": "Renderable (optional)",
+
+  // Whether the name is a translatable string.
+  // If true, the name will be treated as a translation key,
+  // and the client will attempt to translate them using the player's language settings.
+  // Defaults to: false
+  "translatable": false,
+
+  // The sound to play when a reward is claimed.
+  "claim_sound": "ResourceLocation (optional)"
+}
+
+```
+
+## ResourceLocation
+
+A resource location is a string that identifies a resource in the game.
+It is formatted as `namespace:path`.
+You may have seen this in Minecraft's item IDs, such as `minecraft:diamond_sword`.
+Type: string
+
+## Renderable
+
+This provides a way to specify a texture or item to be rendered as an icon in the game.
+Type: [Texture](#texture) | [Item](#item)
+
+## Texture
+
+The path to the texture file.
+This texture should always be a 16x16 image.
+
+```jsonc
+{
+  "texture": "ResourceLocation"
+}
+
+```
+
+Example:
+
+```json
+{ "texture": "minecraft:textures/mob_effect/luck.png" }
+
+```
+
+## Item
+
+Item ID to be used for rendering.
+This mod respects item models, so you can use any item ID here, not just regular 2d items.
+
+```jsonc
+{
+  "item": "ResourceLocation"
+}
+
+```
+
+Example:
+
+```json
+{
+  "item": "minecraft:grass_block"
+}
+
+```
+
+## Inline Rich Text
+
+The quest `description` supports a simplified Markdown-style formatting for adding interactive elements.
+
+### Quest Links
+
+You can create clickable text that automatically redirects to another quest.
+
+**Format:** `[Display Text](quest:quest_id)`
+**Example:** `[Click here to view the next quest!](quest:my_quests:next_quest)`
+
+### Hover Images
+
+You can create text that displays an image when hovered over.
+
+**Format:** `[Hover Text](image:namespace:path)`
+**Example:** `[Hover to see the map!](image:questlog:textures/gui/secret_map.png)`
+
+### Advanced Hover Images & Animations
+
+If you need to manually specify the rendering bounds or use an animated vertical spritesheet, you can provide extra parameters.
+
+**Format (Static):** `[Hover Text](image:namespace:path:width:height)`
+**Format (Animated):** `[Hover Text](image:namespace:path:width:height:frames:frame_time)`
+
+* **width/height**: The dimensions (in pixels) to render the image.
+* **frames**: The total number of frames in a **vertical** spritesheet.
+* **frame_time**: The duration each frame is shown in milliseconds.
+
+**Example:** `[Look at this animation!](image:questlog:textures/gui/tutorial_animation.png:16:16:8:100)`
+
+## Notification Badges
+
+When a quest triggers a notification (like when it is completed but the reward hasn't been claimed yet), a small badge appears on the Questlog open button in the inventory. By default, this uses an exclamation mark icon, but you can override it on a per-quest basis.
+
+You can add a `badge` object to your quest definition JSON to define a custom badge. It supports both static images and animated spritesheets.
+
+```jsonc
+{
+  // ... other quest properties ...
+
+  "badge": {
+    // The path to your custom texture
+    "texture": "namespace:textures/gui/custom_badge.png",
+
+    // The X and Y coordinates on the texture sheet to start rendering from (Defaults to 0)
+    "u": 0,
+    "v": 0,
+
+    // The dimensions of the badge to render (Defaults to 16x16)
+    "width": 16,
+    "height": 16,
+
+    // The total size of your texture file (Defaults to 256x256)
+    "texture_width": 256,
+    "texture_height": 256,
+
+    // --- ANIMATION PROPERTIES (Optional) ---
+    // The number of frames in your vertical spritesheet.
+    // If greater than 1, the badge will be animated! (Defaults to 1)
+    "frames": 4,
+
+    // The duration (in milliseconds) each frame should be displayed (Defaults to 100)
+    "frame_time": 150
+  }
+}
+
+```
+
+**Note for Animated Badges:** If you want the badge to animate, your `texture` image must be a vertical spritesheet where each frame is stacked on top of one another. The game will automatically read the `height` value and shift the rendering down for each frame based on the `frame_time` you set.

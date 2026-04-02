@@ -1,0 +1,10 @@
+{
+  "name": "Exploration & Discovery",
+  "translatable": false,
+  "icon": {
+    "item": "minecraft:compass"
+  },
+  "order": 2,
+  "default_chapter": false,
+  "hidden": false
+}

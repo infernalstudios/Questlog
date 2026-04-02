@@ -1,0 +1,22 @@
+{
+  "title": "Zombie Exterminator",
+  "description": "Zombies are cluttering up the place. Clear them out!",
+  "icon": {
+    "item": "minecraft:zombie_head"
+  },
+  "objectives": [
+    {
+      "type": "questlog:entity_kill",
+      "entity": "minecraft:zombie",
+      "required_amount": 25,
+      "name": "Kill 25 Zombies"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:rotten_flesh",
+      "count": 64
+    }
+  ]
+}

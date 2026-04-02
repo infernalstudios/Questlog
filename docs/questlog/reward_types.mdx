@@ -1,0 +1,46 @@
+---
+title: Reward Types
+hide_meta: true
+---
+
+Quest rewards are defined in the `rewards` property of a quest. They are a list of reward objects, each of which can be one of the following types:
+
+### `questlog:item`
+Gives the player an item
+
+#### Properties
+- `item`: The item to give the player
+- `count` (optional, default: 1): The amount of the item to give the player
+
+### `questlog:command`
+Runs a command as the player, at the player's position. If `permission_level` is specified, the command is run with that permission level.
+
+#### Properties
+- `command`: The command to run, must be prefixed with `/`.
+- `permission_level` (optional, default: 2): The command's permission level, when ran as the player (player needn't have this permission level). See: [Java Edition Commands - minecraft.wiki](https://minecraft.wiki/w/Commands#Available_in_Java_Edition)
+
+### `questlog:experience`
+Gives the player experience
+
+#### Properties
+- `experience`: The amount of experience to give the player
+- `level` (optional, default: false): Whether to give the player levels instead of points
+
+### `questlog:loot_table`
+Gives the player loot from a loot table. The loot context is set as such:
+ - This entity: player
+ - Origin: player's position
+ - Killer entity: player
+ - Level: the world the player is in
+
+#### Properties
+- `loot_table`: The loot table to give the player. If the table does not exist, it will log an error in the log.
+
+### Base Reward Properties
+All reward types support the following optional properties:
+
+- `auto_claim` (optional, default: false): If set to `true`, the reward will be given to the player automatically once the quest is completed, without them needing to manually click to collect it.
+- `claim_sound` (optional): The sound to play when the reward is claimed.
+- `name` (optional): The name of the reward. If omitted, a name will be automatically generated based on the reward type.
+- `icon` (optional): The icon to display for the reward.
+- `translatable` (optional, default: false): Whether the name is a translatable string.

@@ -205,9 +205,11 @@ public class QuestlogCommands {
             for (Quest quest : affectedQuests) {
                 if (complete) {
                     quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
+                    quest.failureConditions.forEach(obj -> obj.setUnits(0)); // clear fails if force completed
                 } else {
                     quest.requirements.forEach(trigger -> trigger.setUnits(0));
                     quest.objectives.forEach(obj -> obj.setUnits(0));
+                    quest.failureConditions.forEach(obj -> obj.setUnits(0));
                     quest.rewards.forEach(Reward::revokeReward);
                     quest.hasSentTrigger = quest.requirements.isEmpty();
                     quest.hasSentCompletion = false;
@@ -233,6 +235,7 @@ public class QuestlogCommands {
             for (Quest quest : manager.getAllQuests()) {
                 quest.requirements.forEach(trigger -> trigger.setUnits(0));
                 quest.objectives.forEach(obj -> obj.setUnits(0));
+                quest.failureConditions.forEach(obj -> obj.setUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
                 quest.hasSentTrigger = quest.requirements.isEmpty();
                 quest.hasSentCompletion = false;
@@ -248,6 +251,7 @@ public class QuestlogCommands {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
             for (Quest quest : manager.getAllQuests()) {
                 quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
+                quest.failureConditions.forEach(obj -> obj.setUnits(0));
             }
         }
 

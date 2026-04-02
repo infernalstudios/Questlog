@@ -1,0 +1,28 @@
+{
+  "title": "Welcome to the Journey!",
+  "description": "Your adventure begins here. Mine some stone to get started.",
+  "icon": {
+    "item": "minecraft:cobblestone"
+  },
+  "objectives": [
+    {
+      "type": "questlog:block_mine",
+      "block": "minecraft:stone",
+      "required_amount": 16,
+      "name": "Mine 16 Stone"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:furnace",
+      "count": 1
+    },
+    {
+      "type": "questlog:experience",
+      "experience": 50
+    }
+  ],
+  "toast_on_unlock": true,
+  "toast_on_complete": true
+}
