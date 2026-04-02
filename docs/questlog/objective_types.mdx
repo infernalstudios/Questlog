@@ -3,6 +3,11 @@ title: Objective Types
 hide_meta: true
 ---
 
+### Base Objective Properties
+All objective types support the following optional properties:
+
+- `required_amount` (optional, default: 1): The number of times the player must perform the action to complete the objective.
+
 ### `questlog:stat`
 Uses the player's statistics to track progress.
 Every time the server updates the specified statistic, the completion amount goes up by that value.
@@ -114,25 +119,28 @@ Tracks the number of times the player breeds entities.
 Additional definition fields:
 
 - `entity`: The entity to track.
-Does not support tags yet.
+May be the entity itself or a tag prefixed with `#`.
 
 ### `questlog:entity_death`
 Tracks the number of times the player dies to a specific entity.
 Additional definition fields:
 
-- `entity`: The entity to track. Does not support tags yet.
+- `entity`: The entity to track.
+May be the entity itself or a tag prefixed with `#`.
 
 ### `questlog:entity_kill`
 Tracks the number of a specific type of entity the player kills.
 Additional definition fields:
 
-- `entity`: The entity to track. Does not support tags yet.
+- `entity`: The entity to track.
+May be the entity itself or a tag prefixed with `#`.
 
 ### `questlog:entity_tame`
 Tracks the number of a specific type of entity the player tames.
 Additional definition fields:
 
-- `entity`: The entity to track. Does not support tags yet.
+- `entity`: The entity to track.
+May be the entity itself or a tag prefixed with `#`.
 
 ### `questlog:item_craft`
 Tracks the number of a specific item the player crafts. This also tracks smelting recipes.
@@ -210,7 +218,7 @@ Additional definition fields:
 
 - `enchantment` (optional): The enchantment to track.
 - `level` (optional, defaults to 1): The level of the enchantment to track.
-- `item` (optional): The item to track.
+- `item` (optional): The item to track. May be the item itself or a tag prefixed with `#`.
 
 If `enchantment` is not specified, the stat will track any enchantment.
 If `item` is not specified, the stat will track any item.
@@ -225,7 +233,7 @@ Additional definition fields:
 - `effect`: The effect to track.
 
 ### `questlog:visit_structure`
-Tracks the number of times the player is in a structure.
+Tracks the number of times the player is in a structure. Does not support tags yet.
 Additional definition fields:
 
 - `structure`: The structure to check.
@@ -256,7 +264,8 @@ Additional definition fields:
 Tracks when a player approaches an entity.
 
 Additional definition fields:
-- `entity`: The entity to track. Does not support tags yet.
+- `entity`: The entity to track.
+May be the entity itself or a tag prefixed with `#`.
 - `range`: The radius (in blocks) the player must be within to trigger the approach.
 
 ### `questlog:quest_complete`

@@ -23,11 +23,20 @@ Reloads all quests and chapters from the config without needing to restart the g
 Opens the Questlog UI for the specified player(s). 
 * If `[target]` is provided, it attempts to open directly to that quest or chapter.
 
-### `/questlog progress reset <target|all> [players]`
+### `/questlog progress reset <target> [players]`
 Resets the progress of the targeted quest(s) back to zero. This un-completes objectives, un-triggers requirements, and revokes rewards.
 
-### `/questlog progress complete <target|all> [players]`
+### `/questlog progress reset all [players]`
+Resets the progress of ALL quests for the specified player(s).
+
+### `/questlog progress complete <target> [players]`
 Instantly completes all objectives for the targeted quest(s). 
 
-### `/questlog trigger <target|all> [players]`
+### `/questlog progress complete all [players]`
+Instantly completes ALL quests for the specified player(s).
+
+### `/questlog trigger <target> [players]`
 Instantly fulfills the requirements (formerly triggers) of the targeted quest(s), allowing the quest to appear and start tracking.
+
+### `/questlog trigger all [players]`
+Instantly fulfills the requirements for ALL quests for the specified player(s).

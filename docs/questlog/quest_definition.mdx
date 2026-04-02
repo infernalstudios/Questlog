@@ -6,7 +6,7 @@ hide_meta: true
 ## Quests
 
 To add quest definitions, you need to create a JSON file for each quest.
-These JSON files should be placed in the `quests` directory of your datapack.
+These JSON files should be placed in the `quests` directory of your config (`config/questlog/quests/`).
 Note: There are no defaults for `requirements`, `objectives`, and `rewards`, they are always required, even if it's an empty array.
 
 ```jsonc
@@ -105,7 +105,8 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
 {
   // The name of the objective.
   // Example: "Mine 100 Stone"
-  "name": "string",
+  // If omitted, a name will be automatically generated based on the objective type.
+  "name": "string (optional)",
 
   // The icon to display for the objective.
   // This is used in the quest details screen.
@@ -127,7 +128,8 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
 {
   // The name of the reward.
   // Example: "100 Experience"
-  "name": "string",
+  // If omitted, a name will be automatically generated based on the reward type.
+  "name": "string (optional)",
 
   // The icon to display for the reward.
   // This is used in the quest details screen.
@@ -141,7 +143,7 @@ Note: There are no defaults for `requirements`, `objectives`, and `rewards`, the
   "translatable": false,
 
   // The sound to play when a reward is claimed.
-  "sound": "RewardSoundOptions (optional)"
+  "claim_sound": "ResourceLocation (optional)"
 }
 
 ```

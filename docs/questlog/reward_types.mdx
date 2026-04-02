@@ -40,3 +40,7 @@ Gives the player loot from a loot table. The loot context is set as such:
 All reward types support the following optional properties:
 
 - `auto_claim` (optional, default: false): If set to `true`, the reward will be given to the player automatically once the quest is completed, without them needing to manually click to collect it.
+- `claim_sound` (optional): The sound to play when the reward is claimed.
+- `name` (optional): The name of the reward. If omitted, a name will be automatically generated based on the reward type.
+- `icon` (optional): The icon to display for the reward.
+- `translatable` (optional, default: false): Whether the name is a translatable string.

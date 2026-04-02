@@ -9,6 +9,13 @@ To create a new chapter, you need to create a JSON file for each chapter in the 
 
 ```jsonc
 {
+  // The display name of the chapter.
+  // If omitted, it defaults to: questlog.chapter.<namespace>.<path>
+  "name": "string (optional)",
+
+  // Whether the name is a translatable string key.
+  "translatable": "boolean (optional, default: false)",
+
   // The icon to display for the chapter tab in the Questlog UI.
   // Uses standard Renderable formatting (Texture or Item).
   "icon": {
@@ -25,3 +32,4 @@ To create a new chapter, you need to create a JSON file for each chapter in the 
   // Completely hides the chapter from the UI.
   "hidden": false
 }
+```
