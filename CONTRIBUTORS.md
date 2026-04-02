@@ -1,6 +1,6 @@
 This file is to document any internal things Questlog does and how Questlog is built.
 
-Questlog is a Forge mod. To modify any dependency versions or mappings, refer to build.properties, don't change them in build.gradle.
+Questlog is a Forge/Fabric mod. To modify any dependency versions or mappings, refer to build.properties, don't change them in build.gradle.
 
 Quest syncing and managing is done on the server.
 Both the logical client and logical server keep a copy of QuestManager (server actually holds one for each player).
