@@ -9,7 +9,6 @@ import net.minecraft.nbt.Tag;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.QuestObjectiveRegistry;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 import java.util.ArrayList;
@@ -37,10 +36,10 @@ public class OrObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
+    public void registerEventListeners() {
+        super.registerEventListeners();
         for (Objective child : children) {
-            child.registerEventListeners(bus);
+            child.registerEventListeners();
         }
     }
 

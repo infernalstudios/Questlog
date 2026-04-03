@@ -19,6 +19,9 @@ dependencies {
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"
     modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
 
+    // Triggers
+    modImplementation files("libs/triggers-fabric-1.20.1-1.0.0.jar")
+
     implementation 'net.jodah:typetools:0.6.3'
     include 'net.jodah:typetools:0.6.3'
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
@@ -26,24 +29,23 @@ dependencies {
 }
 
 loom {
-    if (project(":common").file("src/main/resources/${mod_id}.accesswidener").exists()) {
-        accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
+    def aw = project(':common').file("src/main/resources/${mod_id}.accesswidener")
+    if (aw.exists()) {
+        accessWidenerPath.set(aw)
     }
-    mixin {
-        defaultRefmapName.set("${mod_id}.refmap.json")
-    }
+
     runs {
         client {
             client()
-            setConfigName("Fabric Client")
+            setConfigName('Fabric Client')
             ideConfigGenerated(true)
-            runDir("run")
+            runDir('runs/client')
         }
         server {
             server()
-            setConfigName("Fabric Server")
+            setConfigName('Fabric Server')
             ideConfigGenerated(true)
-            runDir("run")
+            runDir('runs/server')
         }
     }
 }

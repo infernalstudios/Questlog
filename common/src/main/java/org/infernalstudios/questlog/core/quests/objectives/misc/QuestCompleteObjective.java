@@ -2,8 +2,8 @@ package org.infernalstudios.questlog.core.quests.objectives.misc;
 
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 
@@ -16,9 +16,9 @@ public class QuestCompleteObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onQuestCompleted);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Questlog.EVENTS.addListener(this::onQuestCompleted);
     }
 
     private void onQuestCompleted(QuestEvent.Completed event) {

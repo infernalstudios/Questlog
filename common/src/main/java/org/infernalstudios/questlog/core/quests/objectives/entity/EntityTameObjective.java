@@ -1,9 +1,9 @@
 package org.infernalstudios.questlog.core.quests.objectives.entity;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerEntityEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLEntityEvent;
 
 public class EntityTameObjective extends AbstractEntityObjective {
 
@@ -12,12 +12,12 @@ public class EntityTameObjective extends AbstractEntityObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onAnimalTame);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onAnimalTame);
     }
 
-    private void onAnimalTame(QLEntityEvent.TameAnimal event) {
+    private void onAnimalTame(TriggerEntityEvent.TameAnimal event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (
                 event.causedByPlayer instanceof ServerPlayer player &&

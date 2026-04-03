@@ -5,7 +5,6 @@ import net.minecraft.nbt.CompoundTag;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +24,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
         this.display.setObjective(this);
     }
 
-    public void registerEventListeners(QuestlogEventBus bus) {
+    public void registerEventListeners() {
     }
 
     @Nullable

@@ -32,7 +32,6 @@ processResources {
     from(configurations.commonResources)
 }
 
-
 publishMods {
     changelog = rootProject.file("CHANGELOG-LATEST.md").text
     type = STABLE

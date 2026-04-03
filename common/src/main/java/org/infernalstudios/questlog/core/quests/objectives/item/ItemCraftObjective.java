@@ -1,9 +1,9 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 
 public class ItemCraftObjective extends AbstractItemObjective {
 
@@ -12,12 +12,12 @@ public class ItemCraftObjective extends AbstractItemObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onItemCraft);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onItemCraft);
     }
 
-    private void onItemCraft(QLPlayerEvent.Craft event) {
+    private void onItemCraft(TriggerPlayerEvent.Craft event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (
                 event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && this.test(event.outputItem)

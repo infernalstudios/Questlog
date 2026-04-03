@@ -10,12 +10,19 @@ mixin {
     config("${mod_id}.forge.mixins.json")
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 legacyForge {
     version = "${minecraft_version}-${forge_version}"
+    validateAccessTransformers = true
 
-    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.cfg')
+    def at = file('src/main/resources/META-INF/accesstransformer.cfg')
     if (at.exists()) {
-        accessTransformers.from(at)
+        accessTransformers = at
     }
 
     parchment {
@@ -48,6 +55,9 @@ dependencies {
 
     // Cloth Config
     modImplementation "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
+
+    // Triggers
+    modImplementation "local:triggers-forge:1.20.1-1.0.0"
 
     compileOnly project(":common")
     compileOnly 'org.jetbrains:annotations:26.0.2-1'

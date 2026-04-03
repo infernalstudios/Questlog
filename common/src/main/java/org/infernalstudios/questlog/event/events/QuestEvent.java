@@ -3,12 +3,13 @@ package org.infernalstudios.questlog.event.events;
 import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.core.quests.Quest;
 
-public class QuestEvent extends QLPlayerEvent {
+public class QuestEvent {
+    public final Player player;
     public final Quest quest;
     public final boolean isServer;
 
     public QuestEvent(Player player, Quest quest, boolean isServer) {
-        super(player);
+        this.player = player;
         this.quest = quest;
         this.isServer = isServer;
     }

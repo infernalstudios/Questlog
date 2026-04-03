@@ -23,9 +23,9 @@ public class NotObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        this.child.registerEventListeners(bus);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        this.child.registerEventListeners();
     }
 
     @Override
