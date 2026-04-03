@@ -1,5 +1,7 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -8,8 +10,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
@@ -33,12 +33,12 @@ public class StatisticObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onStatAward);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onStatAward);
     }
 
-    private void onStatAward(QLPlayerEvent.StatAward event) {
+    private void onStatAward(TriggerPlayerEvent.StatAward event) {
         if (this.isCompleted() || this.getParent() == null) return;
 
         if (event.player instanceof ServerPlayer player &&

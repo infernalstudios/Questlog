@@ -1,11 +1,11 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.Util;
 
@@ -20,12 +20,12 @@ public class VisitPositionObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onPlayerMove);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onPlayerMove);
     }
 
-    private void onPlayerMove(QLPlayerEvent.Tick event) {
+    private void onPlayerMove(TriggerPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
             if (this.bounds.isInside(event.player.blockPosition())) {

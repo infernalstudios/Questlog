@@ -1,11 +1,11 @@
 package org.infernalstudios.questlog.core.quests.objectives.block;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerBlockEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLBlockEvent;
 import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.jetbrains.annotations.Nullable;
@@ -32,12 +32,12 @@ public class BlockInteractObjective extends AbstractBlockObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onBlockInteract);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onBlockInteract);
     }
 
-    private void onBlockInteract(QLBlockEvent.Interact event) {
+    private void onBlockInteract(TriggerBlockEvent.Interact event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (
                 event.entity instanceof ServerPlayer player &&

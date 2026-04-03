@@ -4,16 +4,8 @@ plugins {
 }
 
 repositories {
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup "maven.modrinth"
-        }
-    }
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
+    flatDir {
+        dirs 'libs'
     }
 }
 
@@ -25,6 +17,9 @@ dependencies {
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+
+    // Triggers
+    modImplementation files("libs/triggers-fabric-1.21.1-1.0.0.jar")
 
     // EMI
     modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"

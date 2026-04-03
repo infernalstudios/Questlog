@@ -4,10 +4,6 @@
     "package": "org.infernalstudios.questlog.mixin.fabric",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
-        "BredAnimalsTriggerMixin",
-        "FarmBlockMixin",
-        "LivingEntityMixin",
-        "MixinItemStack",
         "ServerPlayerMixin",
         "ServerGamePacketListenerImplAccessor"
     ],
@@ -20,4 +16,3 @@
         "defaultRequire": 1
     }
   }
-  

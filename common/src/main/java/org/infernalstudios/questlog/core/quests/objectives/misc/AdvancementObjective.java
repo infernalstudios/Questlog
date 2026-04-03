@@ -1,12 +1,12 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 import org.infernalstudios.questlog.util.JsonUtils;
 
 public class AdvancementObjective extends Objective {
@@ -20,12 +20,12 @@ public class AdvancementObjective extends Objective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onPlayerTick);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onPlayerTick);
     }
 
-    private void onPlayerTick(QLPlayerEvent.Tick event) {
+    private void onPlayerTick(TriggerPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
 
         // Check once per second (20 ticks) to maintain performance

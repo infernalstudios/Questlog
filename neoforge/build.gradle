@@ -4,16 +4,8 @@ plugins {
 }
 
 repositories {
-    maven {
-        name = "Modrinth"
-        url = "https://api.modrinth.com/maven"
-        content {
-            includeGroup "maven.modrinth"
-        }
-    }
-    maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
+    flatDir {
+        dirs 'libs'
     }
 }
 
@@ -56,6 +48,9 @@ dependencies {
 
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
+
+    // Triggers
+    implementation "local:triggers-neoforge:1.21.1-1.0.0"
 
     implementation "net.neoforged:neoforge:${neoforge_version}"
 }

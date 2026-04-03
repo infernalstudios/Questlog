@@ -1,10 +1,10 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLPlayerEvent;
 
 public class ItemObtainObjective extends AbstractItemObjective {
 
@@ -15,12 +15,12 @@ public class ItemObtainObjective extends AbstractItemObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onPlayerTick);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        Triggers.EVENTS.addListener(this::onPlayerTick);
     }
 
-    private void onPlayerTick(QLPlayerEvent.Tick event) {
+    private void onPlayerTick(TriggerPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
 
         if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {

@@ -2,8 +2,7 @@ package org.infernalstudios.questlog.core.quests.objectives.entity;
 
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLEntityEvent;
+import com.evandev.triggers.event.events.TriggerEntityEvent;
 
 public class EntityBreedObjective extends AbstractEntityObjective {
 
@@ -12,12 +11,12 @@ public class EntityBreedObjective extends AbstractEntityObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onEntityBreed);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        com.evandev.triggers.Triggers.EVENTS.addListener(this::onEntityBreed);
     }
 
-    private void onEntityBreed(QLEntityEvent.Breed event) {
+    private void onEntityBreed(TriggerEntityEvent.Breed event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (event.causedByPlayer instanceof ServerPlayer player &&
                 this.getParent().manager.player.equals(player) &&

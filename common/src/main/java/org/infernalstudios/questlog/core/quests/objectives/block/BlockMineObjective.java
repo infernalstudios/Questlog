@@ -5,8 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
-import org.infernalstudios.questlog.event.events.QLBlockEvent;
+import com.evandev.triggers.event.events.TriggerBlockEvent;
 import org.infernalstudios.questlog.util.CachedRegistryPredicate;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.jetbrains.annotations.Nullable;
@@ -34,12 +33,12 @@ public class BlockMineObjective extends AbstractBlockObjective {
     }
 
     @Override
-    public void registerEventListeners(QuestlogEventBus bus) {
-        super.registerEventListeners(bus);
-        bus.addListener(this::onBlockDestroy);
+    public void registerEventListeners() {
+        super.registerEventListeners();
+        com.evandev.triggers.Triggers.EVENTS.addListener(this::onBlockDestroy);
     }
 
-    private void onBlockDestroy(QLBlockEvent.Break event) {
+    private void onBlockDestroy(TriggerBlockEvent.Break event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (
                 event.entity instanceof ServerPlayer player &&
