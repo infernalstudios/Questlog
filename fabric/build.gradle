@@ -20,6 +20,7 @@ dependencies {
 
     // Triggers
     modImplementation files("libs/triggers-fabric-1.21.1-1.0.0.jar")
+    include files("libs/triggers-fabric-1.21.1-1.0.0.jar")
 
     // EMI
     modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"

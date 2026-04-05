@@ -51,6 +51,7 @@ dependencies {
 
     // Triggers
     implementation "local:triggers-neoforge:1.21.1-1.0.0"
+    jarJar "local:triggers-neoforge:1.21.1-1.0.0"
 
     implementation "net.neoforged:neoforge:${neoforge_version}"
 }
