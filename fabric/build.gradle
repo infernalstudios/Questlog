@@ -21,6 +21,7 @@ dependencies {
 
     // Triggers
     modImplementation files("libs/triggers-fabric-1.20.1-1.0.0.jar")
+    include files("libs/triggers-fabric-1.20.1-1.0.0.jar")
 
     implementation 'net.jodah:typetools:0.6.3'
     include 'net.jodah:typetools:0.6.3'
