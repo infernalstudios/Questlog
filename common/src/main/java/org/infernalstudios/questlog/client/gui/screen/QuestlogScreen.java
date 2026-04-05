@@ -158,7 +158,7 @@ public class QuestlogScreen extends Screen {
             this.searchBox.setMaxLength(50);
             this.searchBox.setValue(this.searchQuery);
             this.searchBox.setBordered(false);
-            this.searchBox.setTextColor(0x4C381B);
+            this.searchBox.setTextColor(Questlog.getConfig().colors.searchTextColor);
             this.searchBox.setResponder(query -> {
                 this.searchQuery = query;
                 this.refreshQuestListOnly();
@@ -251,7 +251,7 @@ public class QuestlogScreen extends Screen {
                     ChapterInfo questChapterInfo = this.availableChapters.get(questChapter);
                     boolean shouldShowChapter = questChapterInfo != null && !questChapterInfo.hidden;
 
-                    return questChapter.equals(this.currentChapter) ||
+                    return Objects.requireNonNull(questChapter).equals(this.currentChapter) ||
                             (this.currentChapter.getPath().equals("main") && quest.getDisplay().shouldIncludeInMain() && shouldShowChapter);
                 })
                 .filter(quest -> quest.getDisplay().matchesSearch(this.searchQuery))
@@ -298,7 +298,7 @@ public class QuestlogScreen extends Screen {
                         text,
                         (int) (((this.width - (font.width(text) * scale)) / 2) / scale),
                         (int) (((this.height - (font.lineHeight * scale)) / 2) / scale),
-                        0xFF4C381B,
+                        Questlog.getConfig().colors.noQuestsColor | 0xFF000000,
                         false
                 );
                 ps.pose().popPose();

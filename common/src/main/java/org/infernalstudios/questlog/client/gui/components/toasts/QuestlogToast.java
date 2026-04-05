@@ -9,14 +9,4 @@ public abstract class QuestlogToast extends AbstractToast {
     protected Texture getBackground() {
         return QuestlogGuiSet.DEFAULT.toast;
     }
-
-    @Override
-    protected int titleColor() {
-        return 0x9E6632;
-    }
-
-    @Override
-    protected int descriptionColor() {
-        return 0x4C381B;
-    }
 }

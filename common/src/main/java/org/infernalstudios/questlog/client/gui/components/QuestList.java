@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -203,7 +204,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     }
 
     @Override
-    public List<QuestListEntry> children() {
+    public @NotNull List<QuestListEntry> children() {
         return this.children;
     }
 
@@ -244,12 +245,12 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                 int currentX = xPosition + (int) this.list.scroller.getXOffset() + dx;
 
                 Component title = this.quest.getDisplay().getTitle();
-                ps.drawString(font, title, currentX, y, 0x4C381B, false);
+                ps.drawString(font, title, currentX, y, Questlog.getConfig().colors.textColor, false);
 
                 if (this.quest.isFailed()) {
                     int titleWidth = font.width(title);
                     int statusX = currentX + titleWidth + 8;
-                    ps.drawString(font, Component.translatable("questlog.quest.failed"), statusX, y, 0xAA0000, false);
+                    ps.drawString(font, Component.translatable("questlog.quest.failed"), statusX, y, Questlog.getConfig().colors.failedTextColor, false);
                 } else if (this.quest.isCompleted()) {
                     int titleWidth = font.width(title);
                     int statusX = currentX + titleWidth + 8;
@@ -258,7 +259,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                             ? Component.translatable("questlog.quest.completed")
                             : Component.translatable("questlog.quest.uncollected");
 
-                    int statusColor = this.quest.isRewarded() ? 0x529E52 : 0x9e6632;
+                    int statusColor = this.quest.isRewarded() ? Questlog.getConfig().colors.completedTextColor : Questlog.getConfig().colors.uncollectedTextColor;
 
                     ps.drawString(font, statusText, statusX, y, statusColor, false);
                 }
@@ -271,7 +272,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                         this.quest.getDisplay().getTitle(),
                         xPosition + (int) this.list.scroller.getXOffset() + dx,
                         yPosition + dy + (int) this.list.scroller.getYOffset(),
-                        0x4C381B,
+                        Questlog.getConfig().colors.textColor,
                         false
                 );
                 ps.drawString(
@@ -279,7 +280,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                         Component.translatable("questlog.quest.failed"),
                         xPosition + (int) this.list.scroller.getXOffset() + dx,
                         yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
-                        0xAA0000,
+                        Questlog.getConfig().colors.failedTextColor,
                         false
                 );
             } else if (this.quest.isCompleted()) {
@@ -291,7 +292,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                         this.quest.getDisplay().getTitle(),
                         xPosition + (int) this.list.scroller.getXOffset() + dx,
                         yPosition + dy + (int) this.list.scroller.getYOffset(),
-                        0x4C381B,
+                        Questlog.getConfig().colors.textColor,
                         false
                 );
                 if (!this.quest.isRewarded()) {
@@ -300,7 +301,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                             Component.translatable("questlog.quest.uncollected"),
                             xPosition + (int) this.list.scroller.getXOffset() + dx,
                             yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
-                            0x9e6632,
+                            Questlog.getConfig().colors.uncollectedTextColor,
                             false
                     );
                 } else {
@@ -309,13 +310,13 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                             Component.translatable("questlog.quest.completed"),
                             xPosition + (int) this.list.scroller.getXOffset() + dx,
                             yPosition + (int) this.list.scroller.getYOffset() + dy + font.lineHeight,
-                            0x529E52,
+                            Questlog.getConfig().colors.completedTextColor,
                             false
                     );
                 }
             } else {
                 int y = yPosition + (int) this.list.scroller.getYOffset() + (height - font.lineHeight) / 2;
-                ps.drawString(font, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, y, 0x4C381B, false);
+                ps.drawString(font, this.quest.getDisplay().getTitle(), xPosition + (int) this.list.scroller.getXOffset() + dx, y, Questlog.getConfig().colors.textColor, false);
             }
 
             if (this.hasNext()) {
@@ -335,7 +336,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                                 width -
                                 (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0),
                         yPosition + (int) this.list.scroller.getYOffset() + height,
-                        0x80FFFFFF
+                        Questlog.getConfig().colors.hoverFillColor
                 );
             }
         }
