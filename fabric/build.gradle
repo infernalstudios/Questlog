@@ -3,6 +3,12 @@ plugins {
     id 'fabric-loom'
 }
 
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
@@ -20,8 +26,8 @@ dependencies {
     modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
 
     // Triggers
-    modImplementation files("libs/triggers-fabric-1.20.1-1.0.0.jar")
-    include files("libs/triggers-fabric-1.20.1-1.0.0.jar")
+    modImplementation name: 'triggers-fabric-1.20.1-1.0.0'
+    include name: 'triggers-fabric-1.20.1-1.0.0'
 
     implementation 'net.jodah:typetools:0.6.3'
     include 'net.jodah:typetools:0.6.3'
