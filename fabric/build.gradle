@@ -19,8 +19,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
     // Triggers
-    modImplementation files("libs/triggers-fabric-1.21.1-1.0.0.jar")
-    include files("libs/triggers-fabric-1.21.1-1.0.0.jar")
+    modImplementation name: 'triggers-fabric-1.21.1-1.0.0'
+    include name: 'triggers-fabric-1.21.1-1.0.0'
 
     // EMI
     modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"
