@@ -15,6 +15,10 @@ public class QuestlogConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public Gui gui = new Gui();
 
+    @ConfigEntry.Category("colors")
+    @ConfigEntry.Gui.TransitiveObject
+    public Colors colors = new Colors();
+
     public static class Button {
         @ConfigEntry.Gui.Tooltip()
         public boolean enabled = true;
@@ -59,5 +63,43 @@ public class QuestlogConfig implements ConfigData {
 
         @ConfigEntry.Gui.Tooltip()
         public int chapterButtonsY = 0;
+    }
+
+    public static class Colors {
+        @ConfigEntry.ColorPicker
+        public int textColor = 0x4C381B;
+
+        @ConfigEntry.ColorPicker
+        public int titleColor = 0x4C381B;
+
+        @ConfigEntry.ColorPicker
+        public int completedTextColor = 0x529E52;
+
+        @ConfigEntry.ColorPicker
+        public int failedTextColor = 0xAA0000;
+
+        @ConfigEntry.ColorPicker
+        public int uncollectedTextColor = 0x9E6632;
+
+        @ConfigEntry.ColorPicker
+        public int progressTextColor = 0x9E7852;
+
+        @ConfigEntry.ColorPicker
+        public int hoveredTextColor = 0xFFFFFF;
+
+        @ConfigEntry.ColorPicker
+        public int searchTextColor = 0x4C381B;
+
+        @ConfigEntry.ColorPicker
+        public int noQuestsColor = 0x4C381B;
+
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int hoverFillColor = 0x80FFFFFF;
+
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int toastTitleColor = 0x9E6632;
+
+        @ConfigEntry.ColorPicker(allowAlpha = true)
+        public int toastDescriptionColor = 0x4C381B;
     }
 }

@@ -148,11 +148,11 @@ public class QuestDisplayData {
         this.peripheralTexture = ResourceLocation.parse(peripheralLoc);
 
         this.palette = new Palette(
-                JsonUtils.getOrDefault(data, "text_color", "#4C381B"),
-                JsonUtils.getOrDefault(data, "completed_text_color", "#529E52"),
-                JsonUtils.getOrDefault(data, "hovered_text_color", "#FFFFFF"),
-                JsonUtils.getOrDefault(data, "title_color", "#4C381B"),
-                JsonUtils.getOrDefault(data, "progress_text_color", "#9E7852")
+                JsonUtils.getOrDefault(data, "text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.textColor))),
+                JsonUtils.getOrDefault(data, "completed_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.completedTextColor))),
+                JsonUtils.getOrDefault(data, "hovered_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.hoveredTextColor))),
+                JsonUtils.getOrDefault(data, "title_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.titleColor))),
+                JsonUtils.getOrDefault(data, "progress_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.progressTextColor)))
         );
 
         this.backButtonText = parseComponent(data, "back_button_text", "gui.back", translatable);

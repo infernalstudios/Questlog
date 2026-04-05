@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.NotNull;
@@ -38,11 +39,11 @@ public abstract class AbstractToast implements Toast {
     }
 
     protected int titleColor() {
-        return 0xFFFF00FF;
+        return Questlog.getConfig().colors.toastTitleColor;
     }
 
     protected int descriptionColor() {
-        return 0xFFFFFFFF;
+        return Questlog.getConfig().colors.toastDescriptionColor;
     }
 
     @Override
