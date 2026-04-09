@@ -147,11 +147,11 @@ public class QuestDisplayData {
         this.peripheralTexture = new ResourceLocation(peripheralLoc);
 
         this.palette = new Palette(
-                JsonUtils.getOrDefault(data, "text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.textColor))),
-                JsonUtils.getOrDefault(data, "completed_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.completedTextColor))),
-                JsonUtils.getOrDefault(data, "hovered_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.hoveredTextColor))),
-                JsonUtils.getOrDefault(data, "title_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.titleColor))),
-                JsonUtils.getOrDefault(data, "progress_text_color", String.format("#%06X", (0xFFFFFF & Questlog.getConfig().colors.progressTextColor)))
+                parseColor(data, "text_color"),
+                parseColor(data, "completed_text_color"),
+                parseColor(data, "hovered_text_color"),
+                parseColor(data, "title_color"),
+                parseColor(data, "progress_text_color")
         );
 
         this.backButtonText = parseComponent(data, "back_button_text", "gui.back", translatable);
@@ -414,5 +414,12 @@ public class QuestDisplayData {
 
     public int getOverlayYOffset() {
         return this.overlayYOffset;
+    }
+
+    @Nullable
+    private Integer parseColor(JsonObject data, String key) {
+        String colorStr = JsonUtils.getOrDefault(data, key, (String) null);
+        if (colorStr == null) return null;
+        return colorStr.startsWith("#") ? Integer.parseInt(colorStr.substring(1), 16) : Integer.parseInt(colorStr, 16);
     }
 }
