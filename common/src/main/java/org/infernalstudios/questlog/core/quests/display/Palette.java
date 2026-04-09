@@ -1,29 +1,32 @@
 package org.infernalstudios.questlog.core.quests.display;
 
 import org.infernalstudios.questlog.Questlog;
+import org.jetbrains.annotations.Nullable;
 
 public record Palette(
-        int textColor,
-        int completedTextColor,
-        int hoveredTextColor,
-        int titleColor,
-        int progressTextColor) {
+        @Nullable Integer textColorOverride,
+        @Nullable Integer completedTextColorOverride,
+        @Nullable Integer hoveredTextColorOverride,
+        @Nullable Integer titleColorOverride,
+        @Nullable Integer progressTextColorOverride) {
 
-    public Palette() {
-        this(
-                Questlog.getConfig().colors.textColor,
-                Questlog.getConfig().colors.completedTextColor,
-                Questlog.getConfig().colors.hoveredTextColor,
-                Questlog.getConfig().colors.titleColor,
-                Questlog.getConfig().colors.progressTextColor);
+    public int textColor() {
+        return textColorOverride != null ? textColorOverride : Questlog.getConfig().colors.textColor;
     }
 
-    public Palette(String textColor, String completedTextColor, String hoveredTextColor, String titleColor, String progressTextColor) {
-        this(
-                textColor.startsWith("#") ? Integer.parseInt(textColor.substring(1), 16) : Integer.parseInt(textColor, 16),
-                completedTextColor.startsWith("#") ? Integer.parseInt(completedTextColor.substring(1), 16) : Integer.parseInt(completedTextColor, 16),
-                hoveredTextColor.startsWith("#") ? Integer.parseInt(hoveredTextColor.substring(1), 16) : Integer.parseInt(hoveredTextColor, 16),
-                titleColor.startsWith("#") ? Integer.parseInt(titleColor.substring(1), 16) : Integer.parseInt(titleColor, 16),
-                progressTextColor.startsWith("#") ? Integer.parseInt(progressTextColor.substring(1), 16) : Integer.parseInt(progressTextColor, 16));
+    public int completedTextColor() {
+        return completedTextColorOverride != null ? completedTextColorOverride : Questlog.getConfig().colors.completedTextColor;
+    }
+
+    public int hoveredTextColor() {
+        return hoveredTextColorOverride != null ? hoveredTextColorOverride : Questlog.getConfig().colors.hoveredTextColor;
+    }
+
+    public int titleColor() {
+        return titleColorOverride != null ? titleColorOverride : Questlog.getConfig().colors.titleColor;
+    }
+
+    public int progressTextColor() {
+        return progressTextColorOverride != null ? progressTextColorOverride : Questlog.getConfig().colors.progressTextColor;
     }
 }
