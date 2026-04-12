@@ -1,7 +1,9 @@
 package org.infernalstudios.questlog.network.packet;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.network.IPacketContext;
 
 public record QuestEditModePacket(boolean enabled) {
@@ -13,6 +15,10 @@ public record QuestEditModePacket(boolean enabled) {
 
     public static void handle(QuestEditModePacket packet, IPacketContext ctx) {
         Questlog.LOGGER.info("Questlog Edit Mode has been set to: {}", packet.enabled());
+
+        Minecraft.getInstance().execute(() -> {
+            QuestlogClient.isEditModeActive = packet.enabled();
+        });
     }
 
     public void encode(FriendlyByteBuf buf) {

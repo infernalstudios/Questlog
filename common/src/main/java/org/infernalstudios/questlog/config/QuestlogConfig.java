@@ -19,6 +19,10 @@ public class QuestlogConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public Colors colors = new Colors();
 
+    @ConfigEntry.Category("editor")
+    @ConfigEntry.Gui.TransitiveObject
+    public Editor editor = new Editor();
+
     public static class Button {
         @ConfigEntry.Gui.Tooltip()
         public boolean enabled = true;
@@ -101,5 +105,10 @@ public class QuestlogConfig implements ConfigData {
 
         @ConfigEntry.ColorPicker(allowAlpha = true)
         public int toastDescriptionColor = 0x4C381B;
+    }
+
+    public static class Editor {
+        @ConfigEntry.Gui.Tooltip()
+        public boolean enableEditorButton = false;
     }
 }

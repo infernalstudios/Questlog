@@ -130,5 +130,12 @@
     "text.autoconfig.questlog-client.option.colors.noQuestsColor": "No Quests Text Color",
     "text.autoconfig.questlog-client.option.colors.hoverFillColor": "Hover Fill Color",
     "text.autoconfig.questlog-client.option.colors.toastTitleColor": "Toast Title Color",
-    "text.autoconfig.questlog-client.option.colors.toastDescriptionColor": "Toast Description Color"
+    "text.autoconfig.questlog-client.option.colors.toastDescriptionColor": "Toast Description Color",
+
+    "text.autoconfig.questlog-client.category.editor": "Editor",
+    "text.autoconfig.questlog-client.option.editor.enableEditorButton": "Enable Editor Button",
+    "text.autoconfig.questlog-client.option.editor.enableEditorButton.@Tooltip": "Shows the Edit Mode button in the Questlog if you are a modpack dev or have OP permissions.",
+    "questlog.editor.enter": "Edit Quests",
+    "questlog.editor.title": "Questlog Editor",
+    "questlog.editor.back": "Back to Questlog"
 }
