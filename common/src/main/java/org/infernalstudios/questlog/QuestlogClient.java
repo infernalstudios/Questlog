@@ -13,7 +13,7 @@ public class QuestlogClient {
             KeyMapping.CATEGORY_MISC
     );
 
-
+    public static boolean isEditModeActive = false;
     private static QuestManager QUEST_MANAGER_INSTANCE;
 
     /**

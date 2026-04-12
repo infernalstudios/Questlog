@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -92,7 +93,27 @@ public class QuestlogScreen extends Screen {
         this.clearWidgets();
         this.buildSearch();
         this.buildTabs();
+        this.buildEditorButton();
         this.refreshQuestListOnly();
+    }
+
+    private void buildEditorButton() {
+        if (QuestlogClient.isEditModeActive || Questlog.getConfig().editor.enableEditorButton) {
+
+            int listWidth = 245;
+            int listHeight = 136;
+            int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
+            int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
+
+            int btnX = listX - 10;
+            int btnY = listY + listHeight + 10;
+
+            this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.enter"), btn -> {
+                if (this.minecraft != null) {
+                    this.minecraft.setScreen(new QuestEditorScreen(this));
+                }
+            }).bounds(btnX, btnY, 80, 20).build());
+        }
     }
 
     private void refreshQuestListOnly() {
