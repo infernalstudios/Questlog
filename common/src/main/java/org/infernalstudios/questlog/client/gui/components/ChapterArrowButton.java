@@ -23,9 +23,9 @@ public class ChapterArrowButton extends AbstractButton {
     public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         boolean hovered = this.isMouseOver(mouseX, mouseY);
         if (this.isLeft) {
-            (hovered ? this.guiSet.arrowLeftHovered : this.guiSet.arrowLeft).blit(ps, this.getX(), this.getY());
+            (hovered ? this.guiSet.arrowLeftHovered : this.guiSet.arrowLeft).blit(ps, this.getX() - 9, this.getY() - 7);
         } else {
-            (hovered ? this.guiSet.arrowRightHovered : this.guiSet.arrowRight).blit(ps, this.getX(), this.getY());
+            (hovered ? this.guiSet.arrowRightHovered : this.guiSet.arrowRight).blit(ps, this.getX() - 10, this.getY() - 7);
         }
     }
 

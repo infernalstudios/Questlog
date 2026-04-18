@@ -1,3 +1,7 @@
+### Changed
+
+-Textures now have 
+
 ### Fixed
 
-- Fixed Quests sometimes not loading on dedicated servers.
+- Re-implemented per-quest peripheral textures.

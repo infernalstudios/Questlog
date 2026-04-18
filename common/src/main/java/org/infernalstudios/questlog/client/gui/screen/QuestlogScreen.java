@@ -142,9 +142,11 @@ public class QuestlogScreen extends Screen {
             public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
                 boolean hoverToggle = isMouseOver(mouseX, mouseY) && (!searchExpanded || mouseX >= getX() + width - 28);
                 if (searchExpanded) {
-                    (hoverToggle ? QuestlogGuiSet.DEFAULT.searchTabExpandedHovered : QuestlogGuiSet.DEFAULT.searchTabExpanded).blit(ps, getX(), getY());
+                    (hoverToggle ? QuestlogGuiSet.DEFAULT.searchTabExpandedHovered : QuestlogGuiSet.DEFAULT.searchTabExpanded)
+                            .blit(ps, getX() - 30, getY() - 19);
                 } else {
-                    (hoverToggle ? QuestlogGuiSet.DEFAULT.searchTabMinimizedHovered : QuestlogGuiSet.DEFAULT.searchTabMinimized).blit(ps, getX(), getY());
+                    (hoverToggle ? QuestlogGuiSet.DEFAULT.searchTabMinimizedHovered : QuestlogGuiSet.DEFAULT.searchTabMinimized)
+                            .blit(ps, getX() - 15, getY() - 19);
                 }
             }
 
@@ -191,9 +193,11 @@ public class QuestlogScreen extends Screen {
                 public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
                     boolean hovered = isMouseOver(mouseX, mouseY);
                     if (descriptionsCondensed) {
-                        (hovered ? QuestlogGuiSet.DEFAULT.expandButtonHovered : QuestlogGuiSet.DEFAULT.expandButton).blit(ps, getX(), getY());
+                        (hovered ? QuestlogGuiSet.DEFAULT.expandButtonHovered : QuestlogGuiSet.DEFAULT.expandButton)
+                                .blit(ps, getX() - 6, getY() - 6);
                     } else {
-                        (hovered ? QuestlogGuiSet.DEFAULT.condenseButtonHovered : QuestlogGuiSet.DEFAULT.condenseButton).blit(ps, getX(), getY());
+                        (hovered ? QuestlogGuiSet.DEFAULT.condenseButtonHovered : QuestlogGuiSet.DEFAULT.condenseButton)
+                                .blit(ps, getX() - 6, getY() - 6);
                     }
                 }
 
@@ -225,8 +229,8 @@ public class QuestlogScreen extends Screen {
         int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
         int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
-        int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
-        int arrowY = tabY + 5;
+        int tabY = listY + listHeight + 21 + Questlog.getConfig().gui.chapterButtonsY;
+        int arrowY = tabY - 1;
 
         if (this.tabOffset > 0) {
             this.addRenderableWidget(new ChapterArrowButton(tabX - 12, arrowY, true, () -> {

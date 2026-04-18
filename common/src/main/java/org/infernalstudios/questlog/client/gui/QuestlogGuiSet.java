@@ -77,24 +77,24 @@ public class QuestlogGuiSet {
                 new Texture(peripheralLoc, 16, 1, 62, 21, 256, 256)
         );
 
-        this.searchTabMinimized = new Texture(this.searchTabButtonsLoc, 28, 18, 17, 21, 256, 256);
-        this.searchTabMinimizedHovered = new Texture(this.searchTabButtonsLoc, 28, 18, 77, 21, 256, 256);
-        this.searchTabExpanded = new Texture(this.searchTabButtonsLoc, 193, 18, 32, 78, 256, 256);
-        this.searchTabExpandedHovered = new Texture(this.searchTabButtonsLoc, 193, 18, 32, 135, 256, 256);
+        this.searchTabMinimized = new Texture(this.searchTabButtonsLoc, 58, 55, 2, 2, 256, 256);
+        this.searchTabMinimizedHovered = new Texture(this.searchTabButtonsLoc, 58, 55, 62, 2, 256, 256);
+        this.searchTabExpanded = new Texture(this.searchTabButtonsLoc, 252, 55, 2, 59, 256, 256);
+        this.searchTabExpandedHovered = new Texture(this.searchTabButtonsLoc, 252, 55, 2, 116, 256, 256);
 
-        this.arrowLeft = new Texture(this.searchTabButtonsLoc, 8, 13, 11, 180, 256, 256);
-        this.arrowLeftHovered = new Texture(this.searchTabButtonsLoc, 8, 13, 41, 180, 256, 256);
-        this.arrowRight = new Texture(this.searchTabButtonsLoc, 8, 13, 12, 209, 256, 256);
-        this.arrowRightHovered = new Texture(this.searchTabButtonsLoc, 8, 13, 42, 209, 256, 256);
+        this.arrowLeft = new Texture(this.searchTabButtonsLoc, 28, 27, 2, 173, 256, 256);
+        this.arrowLeftHovered = new Texture(this.searchTabButtonsLoc, 28, 27, 32, 173, 256, 256);
+        this.arrowRight = new Texture(this.searchTabButtonsLoc, 28, 27, 2, 202, 256, 256);
+        this.arrowRightHovered = new Texture(this.searchTabButtonsLoc, 28, 27, 32, 202, 256, 256);
 
-        this.tabSecondary = new Texture(this.searchTabButtonsLoc, 28, 23, 75, 174, 256, 256);
-        this.tabSecondaryActive = new Texture(this.searchTabButtonsLoc, 28, 29, 75, 208, 256, 256);
-        this.tabMain = new Texture(this.searchTabButtonsLoc, 28, 23, 131, 174, 256, 256);
-        this.tabMainActive = new Texture(this.searchTabButtonsLoc, 28, 29, 131, 208, 256, 256);
+        this.tabSecondary = new Texture(this.searchTabButtonsLoc, 54, 32, 62, 174, 256, 256);
+        this.tabSecondaryActive = new Texture(this.searchTabButtonsLoc, 54, 39, 62, 208, 256, 256);
+        this.tabMain = new Texture(this.searchTabButtonsLoc, 54, 32, 118, 174, 256, 256);
+        this.tabMainActive = new Texture(this.searchTabButtonsLoc, 54, 39, 118, 208, 256, 256);
 
-        this.expandButton = new Texture(this.searchTabButtonsLoc, 14, 14, 128, 8, 256, 256);
-        this.expandButtonHovered = new Texture(this.searchTabButtonsLoc, 14, 14, 156, 8, 256, 256);
-        this.condenseButton = new Texture(this.searchTabButtonsLoc, 14, 14, 128, 36, 256, 256);
-        this.condenseButtonHovered = new Texture(this.searchTabButtonsLoc, 14, 14, 156, 36, 256, 256);
+        this.expandButton = new Texture(this.searchTabButtonsLoc, 26, 26, 122, 2, 256, 256);
+        this.expandButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 150, 2, 256, 256);
+        this.condenseButton = new Texture(this.searchTabButtonsLoc, 26, 26, 122, 30, 256, 256);
+        this.condenseButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 150, 30, 256, 256);
     }
 }
