@@ -50,6 +50,7 @@ public class QuestlogScreen extends Screen {
     private int tabOffset = 0;
     private boolean searchExpanded = false;
     private boolean descriptionsCondensed = false;
+    private boolean hideCompleted = false;
 
     public QuestlogScreen(@Nullable Screen previousScreen) {
         super(Component.empty());
@@ -188,6 +189,30 @@ public class QuestlogScreen extends Screen {
             });
             this.addRenderableWidget(this.searchBox);
 
+            this.addRenderableWidget(new AbstractButton(searchX - 36, searchY + 2, 14, 14, Component.empty()) {
+                @Override
+                public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+                    boolean hovered = isMouseOver(mouseX, mouseY);
+                    if (hideCompleted) {
+                        (hovered ? QuestlogGuiSet.DEFAULT.hiddenButtonHovered : QuestlogGuiSet.DEFAULT.hiddenButton)
+                                .blit(ps, getX() - 6, getY() - 6);
+                    } else {
+                        (hovered ? QuestlogGuiSet.DEFAULT.visibleButtonHovered : QuestlogGuiSet.DEFAULT.visibleButton)
+                                .blit(ps, getX() - 6, getY() - 6);
+                    }
+                }
+
+                @Override
+                public void onPress() {
+                    hideCompleted = !hideCompleted;
+                    refreshList();
+                }
+
+                @Override
+                protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+                }
+            });
+
             this.addRenderableWidget(new AbstractButton(searchX - 18, searchY + 2, 14, 14, Component.empty()) {
                 @Override
                 public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
@@ -267,6 +292,7 @@ public class QuestlogScreen extends Screen {
 
         List<Quest> quests = this.manager.getAllQuests().stream()
                 .filter(quest -> quest.isTriggered() && !quest.getDisplay().isHidden())
+                .filter(quest -> !this.hideCompleted || !quest.isCompleted())
                 .filter(quest -> {
                     String chapterStr = quest.getDisplay().getChapter();
                     ResourceLocation questChapter = chapterStr.contains(":")
