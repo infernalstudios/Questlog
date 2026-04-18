@@ -60,7 +60,11 @@ public class ScrollableInfo implements Scrollable {
             InfoEntry entry = entries.get(i);
             entry.x = this.parent != null ? (int) this.parent.getXOffset() : 0;
             entry.y = this.parent != null ? (int) this.parent.getYOffset() + InfoEntry.INFO_ENTRY_HEIGHT * i : 0;
-            entry.render(ps, mouseX, mouseY, partialTicks);
+
+            int absMouseX = this.parent != null ? mouseX + (int) this.parent.getXOffset() : mouseX;
+            int absMouseY = this.parent != null ? mouseY + (int) this.parent.getYOffset() : mouseY;
+
+            entry.render(ps, absMouseX, absMouseY, partialTicks);
         }
     }
 

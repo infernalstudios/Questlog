@@ -226,8 +226,13 @@ public class QuestDisplayData {
     }
 
     public void setQuest(Quest quest) {
-        this.objectiveDisplay = quest.objectives.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
-        this.rewardDisplay = quest.rewards.stream().map(WithDisplayData::getDisplay).filter(Objects::nonNull).toList();
+        this.objectiveDisplay = quest.objectives.stream()
+                .filter(obj -> !obj.isHidden())
+                .map(WithDisplayData::getDisplay)
+                .filter(Objects::nonNull).toList();
+        this.rewardDisplay = quest.rewards.stream()
+                .map(WithDisplayData::getDisplay)
+                .filter(Objects::nonNull).toList();
     }
 
     public boolean matchesSearch(String query) {

@@ -47,7 +47,7 @@ public class ChapterTabButton extends AbstractButton {
             }
         }
         if (this.icon != null) {
-            this.icon.blit(ps, this.getX() + 6, this.getY() - 3);
+            this.icon.blit(ps, this.getX() + 6, this.getY() + 3);
         }
     }
 

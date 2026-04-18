@@ -284,3 +284,10 @@ Tracks the player granting/completing a vanilla or modded advancement.
 
 Additional definition fields:
 - `advancement`: The resource location ID of the advancement to track (e.g., `"minecraft:story/mine_diamond"`).
+
+### `questlog:unobtainable`
+An objective that cannot be progressed or completed by normal player actions. This objective is completely hidden from the objective list in the quest GUI.
+
+It is primarily useful for quests where the completion is tied entirely to external triggers (like the `/questlog` command), or for creating "dummy" quests that serve only as informational lore entries without a concrete task.
+
+*(No additional fields required)*

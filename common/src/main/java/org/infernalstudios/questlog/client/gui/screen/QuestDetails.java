@@ -47,7 +47,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     public final Quest quest;
     @Nullable
     private final Screen previousScreen;
-
+    public Component pendingTooltip = null;
     private int panel1X;
     private int panel2X;
     private int panel1Y;
@@ -228,17 +228,23 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+        this.pendingTooltip = null;
+
         this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, partialTicks);
 
         this.renderTitle(ps);
-        if (this.description != null) this.description.render(ps, 0, 0, 0);
+        if (this.description != null) this.description.render(ps, mouseX, mouseY, partialTicks);
 
         if (showDetails) {
-            this.renderInfo(ps);
+            this.renderInfo(ps, mouseX, mouseY, partialTicks);
         }
 
         this.handleMouseOverLinks(mouseX, mouseY, ps);
+
+        if (this.pendingTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
+            ps.renderTooltip(this.font, this.pendingTooltip, mouseX, mouseY);
+        }
     }
 
     @Override
@@ -368,7 +374,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.getGuiSet().smallHR.blit(ps, this.panel1X + titleAreaX - 60, this.panel1Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
     }
 
-    private void renderInfo(GuiGraphics ps) {
+    private void renderInfo(GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         if (this.info == null) return;
 
         int rightWidth = this.getDisplay().getRightPanelWidth();
@@ -378,7 +384,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         ps.drawString(font, title, (int) x, (int) y, this.getPalette().titleColor(), false);
         this.getGuiSet().panelHR.blit(ps, this.panel2X + (rightWidth - 140) / 2, this.panel2Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
-        this.info.render(ps, 0, 0, 0);
+
+        this.info.render(ps, mouseX, mouseY, partialTicks);
     }
 
     @Override

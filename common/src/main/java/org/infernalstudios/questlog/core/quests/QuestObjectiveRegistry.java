@@ -58,6 +58,7 @@ public class QuestObjectiveRegistry {
         register(new ResourceLocation("questlog", "quest_complete"), QuestCompleteObjective::new);
         register(new ResourceLocation("questlog", "read"), ReadObjective::new);
         register(new ResourceLocation("questlog", "advancement"), AdvancementObjective::new);
+        register(new ResourceLocation("questlog", "unobtainable"), UnobtainableObjective::new);
     }
 
     public static void register(ResourceLocation id, Function<JsonObject, Objective> factory) {
