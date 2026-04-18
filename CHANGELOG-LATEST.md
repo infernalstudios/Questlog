@@ -1,3 +1,7 @@
+### Added
+
+- Added a button to hide completed quests.
+
 ### Changed
 
 - Textures now have additional padding for resource pack purposes.
