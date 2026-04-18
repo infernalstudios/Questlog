@@ -52,6 +52,11 @@ public class QuestlogGuiSet {
     public final Texture condenseButton;
     public final Texture condenseButtonHovered;
 
+    public final Texture hiddenButton;
+    public final Texture hiddenButtonHovered;
+    public final Texture visibleButton;
+    public final Texture visibleButtonHovered;
+
     public QuestlogGuiSet(ResourceLocation backgroundLoc, ResourceLocation rightPanelLoc, ResourceLocation peripheralLoc, int leftPanelWidth, int rightPanelWidth, int panelHeight) {
         this.backgroundLoc = backgroundLoc;
         this.rightPanelLoc = rightPanelLoc;
@@ -96,5 +101,10 @@ public class QuestlogGuiSet {
         this.expandButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 150, 2, 256, 256);
         this.condenseButton = new Texture(this.searchTabButtonsLoc, 26, 26, 122, 30, 256, 256);
         this.condenseButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 150, 30, 256, 256);
+
+        this.hiddenButton = new Texture(this.searchTabButtonsLoc, 26, 26, 180, 2, 256, 256);
+        this.hiddenButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 208, 2, 256, 256);
+        this.visibleButton = new Texture(this.searchTabButtonsLoc, 26, 26, 180, 30, 256, 256);
+        this.visibleButtonHovered = new Texture(this.searchTabButtonsLoc, 26, 26, 208, 30, 256, 256);
     }
 }
