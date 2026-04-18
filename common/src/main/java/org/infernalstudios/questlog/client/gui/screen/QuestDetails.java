@@ -47,7 +47,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     public final Quest quest;
     @Nullable
     private final Screen previousScreen;
-
+    public Component pendingTooltip = null;
     private int panel1X;
     private int panel2X;
     private int panel1Y;
@@ -228,22 +228,28 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ps, mouseX, mouseY, partialTicks);
+        this.pendingTooltip = null;
+
+        this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, partialTicks);
 
         this.renderTitle(ps);
-        if (this.description != null) this.description.render(ps, 0, 0, 0);
+        if (this.description != null) this.description.render(ps, mouseX, mouseY, partialTicks);
 
         if (showDetails) {
-            this.renderInfo(ps);
+            this.renderInfo(ps, mouseX, mouseY, partialTicks);
         }
 
         this.handleMouseOverLinks(mouseX, mouseY, ps);
+
+        if (this.pendingTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
+            ps.renderTooltip(this.font, this.pendingTooltip, mouseX, mouseY);
+        }
     }
 
     @Override
-    public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-        super.renderBackground(ps, mouseX, mouseY, partialTicks);
+    public void renderBackground(@NotNull GuiGraphics ps) {
+        super.renderBackground(ps);
         this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.panel1Y);
         if (showDetails) {
             this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.panel2Y);
@@ -302,7 +308,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
         String[] parts = data.split(":");
         if (parts.length >= 3) {
-            ResourceLocation loc = ResourceLocation.fromNamespaceAndPath(parts[1], parts[2]);
+            ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
             int w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
             int h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
 
@@ -335,7 +341,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-                    Quest target = QuestlogClient.getLocal().getQuest(ResourceLocation.parse(click.getValue()));
+                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;
@@ -368,7 +374,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         this.getGuiSet().smallHR.blit(ps, this.panel1X + titleAreaX - 60, this.panel1Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
     }
 
-    private void renderInfo(GuiGraphics ps) {
+    private void renderInfo(GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         if (this.info == null) return;
 
         int rightWidth = this.getDisplay().getRightPanelWidth();
@@ -378,7 +384,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         ps.drawString(font, title, (int) x, (int) y, this.getPalette().titleColor(), false);
         this.getGuiSet().panelHR.blit(ps, this.panel2X + (rightWidth - 140) / 2, this.panel2Y + TITLE_Y + TITLE_HEIGHT + HR_Y_OFFSET);
-        this.info.render(ps, 0, 0, 0);
+
+        this.info.render(ps, mouseX, mouseY, partialTicks);
     }
 
     @Override

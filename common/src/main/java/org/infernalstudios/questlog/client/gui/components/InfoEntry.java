@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.client.gui.components;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -48,7 +49,22 @@ public class InfoEntry implements Renderable, GuiEventListener {
         if (icon != null) icon.blit(ps, this.x, this.y + 4);
 
         int textX = this.x + (icon != null ? 20 : 0);
-        ps.drawString(Minecraft.getInstance().font, name, textX, this.y + 2, questDetails.getPalette().textColor(), false);
+        int maxWidth = questDetails.getDisplay().getRightPanelWidth() - 36 - 15 - (icon != null ? 20 : 0);
+
+        Font font = Minecraft.getInstance().font;
+        Component renderedName = name;
+        boolean truncated = false;
+
+        if (font.width(name) > maxWidth) {
+            renderedName = Component.literal(font.plainSubstrByWidth(name.getString(), maxWidth - font.width("...")) + "...");
+            truncated = true;
+        }
+
+        ps.drawString(font, renderedName, textX, this.y + 2, questDetails.getPalette().textColor(), false);
+
+        if (truncated && mouseX >= textX && mouseX <= textX + font.width(renderedName) && mouseY >= this.y + 2 && mouseY <= this.y + 2 + font.lineHeight) {
+            this.questDetails.pendingTooltip = name;
+        }
 
         if (isReward) {
             this.drawRewardStatus(ps, textX);

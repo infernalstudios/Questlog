@@ -229,8 +229,8 @@ public class QuestlogScreen extends Screen {
         int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
         int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
-        int tabY = listY + listHeight + 21 + Questlog.getConfig().gui.chapterButtonsY;
-        int arrowY = tabY - 1;
+        int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
+        int arrowY = tabY + 5;
 
         if (this.tabOffset > 0) {
             this.addRenderableWidget(new ChapterArrowButton(tabX - 12, arrowY, true, () -> {
