@@ -30,21 +30,24 @@ public class ChapterTabButton extends AbstractButton {
 
     @Override
     public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+        int renderX = this.getX() - 13;
+        int renderY = this.getY() - 5;
+
         if (this.isPrimary) {
             if (this.isSelected) {
-                this.guiSet.tabMainActive.blit(ps, this.getX(), this.getY());
+                this.guiSet.tabMainActive.blit(ps, renderX, renderY);
             } else {
-                this.guiSet.tabMain.blit(ps, this.getX(), this.getY());
+                this.guiSet.tabMain.blit(ps, renderX, renderY);
             }
         } else {
             if (this.isSelected) {
-                this.guiSet.tabSecondaryActive.blit(ps, this.getX(), this.getY());
+                this.guiSet.tabSecondaryActive.blit(ps, renderX, renderY);
             } else {
-                this.guiSet.tabSecondary.blit(ps, this.getX(), this.getY());
+                this.guiSet.tabSecondary.blit(ps, renderX, renderY);
             }
         }
         if (this.icon != null) {
-            this.icon.blit(ps, this.getX() + 6, this.getY() + 3);
+            this.icon.blit(ps, this.getX() + 6, this.getY() - 3);
         }
     }
 
