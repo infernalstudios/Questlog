@@ -13,12 +13,6 @@ repositories {
     }
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
 neoForge {
     neoFormVersion = neo_form_version
     def at = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -36,7 +30,7 @@ dependencies {
     compileOnly "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
 
     // Triggers
-    compileOnly "local:triggers-common:1.21.1-1.0.0"
+    compileOnly "maven.modrinth:triggers:${triggers_version}-neoforge"
 
     implementation 'net.jodah:typetools:0.6.3'
     compileOnly 'org.jetbrains:annotations:26.0.2-1'

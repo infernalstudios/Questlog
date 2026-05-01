@@ -16,17 +16,15 @@ import org.infernalstudios.questlog.util.Util;
 import java.util.Objects;
 
 public class StatisticObjective extends Objective {
-
     private final ResourceLocation stat;
     private int statAtStart = 0;
     private boolean retroactive = true;
+    private int ticksUntilCheck = 0;
 
     public StatisticObjective(JsonObject definition) {
         super(definition);
-
-        ResourceLocation parsedLocation = ResourceLocation.parse(JsonUtils.getString(definition, "stat"));
+        ResourceLocation parsedLocation = new ResourceLocation(JsonUtils.getString(definition, "stat"));
         this.stat = BuiltInRegistries.CUSTOM_STAT.get(parsedLocation);
-
         if (definition.has("retroactive")) {
             this.retroactive = JsonUtils.getBoolean(definition, "retroactive");
         }
@@ -35,17 +33,21 @@ public class StatisticObjective extends Objective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onStatAward);
+        Triggers.EVENTS.addListener(this::onPlayerTick);
     }
 
-    private void onStatAward(TriggerPlayerEvent.StatAward event) {
+    private void onPlayerTick(TriggerPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
 
-        if (event.player instanceof ServerPlayer player &&
-                player == this.getParent().manager.player &&
-                event.stat == this.getStat()
-        ) {
-            this.setUnits(this.getUnits() + event.amount);
+        if (event.player instanceof ServerPlayer player && player == this.getParent().manager.player && --ticksUntilCheck <= 0) {
+            int currentStatValue = this.getStatValue();
+
+            int progress = this.retroactive ? currentStatValue : Math.max(0, currentStatValue - this.statAtStart);
+
+            if (progress > this.getUnits()) {
+                this.setUnits(progress);
+            }
+            ticksUntilCheck = 20;
         }
     }
 
@@ -60,7 +62,7 @@ public class StatisticObjective extends Objective {
     @Override
     public void writeInitialData(CompoundTag data) {
         super.writeInitialData(data);
-        if (this.retroactive) {
+        if (!this.retroactive) {
             this.statAtStart = this.getStatValue();
             data.putInt("statAtStart", this.statAtStart);
         }
@@ -69,7 +71,7 @@ public class StatisticObjective extends Objective {
     @Override
     public CompoundTag serialize() {
         CompoundTag data = super.serialize();
-        if (this.retroactive) {
+        if (!this.retroactive) {
             data.putInt("statAtStart", this.statAtStart);
         }
         return data;
@@ -78,7 +80,7 @@ public class StatisticObjective extends Objective {
     @Override
     public void deserialize(CompoundTag data) {
         super.deserialize(data);
-        if (this.retroactive) {
+        if (!this.retroactive) {
             this.statAtStart = data.getInt("statAtStart");
         }
     }

@@ -3,12 +3,6 @@ plugins {
     id 'fabric-loom'
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered {
@@ -18,16 +12,16 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    // Triggers
-    modImplementation name: 'triggers-fabric-1.21.1-1.0.0'
-    include name: 'triggers-fabric-1.21.1-1.0.0'
-
     // EMI
     modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"
 
     // Cloth Config
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"
     modImplementation "com.terraformersmc:modmenu:${mod_menu_version}"
+
+    // Triggers
+    modImplementation "maven.modrinth:triggers:${triggers_version}-fabric"
+    include "maven.modrinth:triggers:${triggers_version}-fabric"
 
     implementation 'net.jodah:typetools:0.6.3'
     include 'net.jodah:typetools:0.6.3'
@@ -55,18 +49,6 @@ loom {
             setConfigName('Fabric Server')
             ideConfigGenerated(true)
             runDir('runs/server')
-        }
-        datagen {
-            client()
-            name "Data Generation"
-            vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.modid=${mod_id}"
-
-            vmArg "-Dfabric-api.datagen.output-dir=${project(":common").file("src/main/generated")}"
-            vmArg "-Dfabric-api.datagen.strict-validation=true"
-
-            ideConfigGenerated(true)
-            runDir("build/datagen")
         }
     }
 }

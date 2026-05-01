@@ -64,25 +64,23 @@ public final class Util {
 
     public static BoundingBox bbFromJson(JsonElement json) {
         if (json instanceof JsonObject jsonObject) {
-            int x1 = jsonObject.has("x1") ? jsonObject.get("x1").getAsInt() : Integer.MIN_VALUE;
-            int y1 = jsonObject.has("y1") ? jsonObject.get("y1").getAsInt() : Integer.MIN_VALUE;
-            int z1 = jsonObject.has("z1") ? jsonObject.get("z1").getAsInt() : Integer.MIN_VALUE;
-            int x2 = jsonObject.has("x2") ? jsonObject.get("x2").getAsInt() : Integer.MAX_VALUE;
-            int y2 = jsonObject.has("y2") ? jsonObject.get("y2").getAsInt() : Integer.MAX_VALUE;
-            int z2 = jsonObject.has("z2") ? jsonObject.get("z2").getAsInt() : Integer.MAX_VALUE;
+            int x1 = getIntOrDefault(jsonObject, new String[]{"x1", "minX", "min_x", "x"}, Integer.MIN_VALUE);
+            int y1 = getIntOrDefault(jsonObject, new String[]{"y1", "minY", "min_y", "y"}, Integer.MIN_VALUE);
+            int z1 = getIntOrDefault(jsonObject, new String[]{"z1", "minZ", "min_z", "z"}, Integer.MIN_VALUE);
+            int x2 = getIntOrDefault(jsonObject, new String[]{"x2", "maxX", "max_x"}, Integer.MAX_VALUE);
+            int y2 = getIntOrDefault(jsonObject, new String[]{"y2", "maxY", "max_y"}, Integer.MAX_VALUE);
+            int z2 = getIntOrDefault(jsonObject, new String[]{"z2", "maxZ", "max_z"}, Integer.MAX_VALUE);
 
             if (x1 > x2) {
                 int temp = x1;
                 x1 = x2;
                 x2 = temp;
             }
-
             if (y1 > y2) {
                 int temp = y1;
                 y1 = y2;
                 y2 = temp;
             }
-
             if (z1 > z2) {
                 int temp = z1;
                 z1 = z2;
@@ -93,6 +91,15 @@ public final class Util {
         } else {
             return new BoundingBox(0, 0, 0, 0, 0, 0);
         }
+    }
+
+    private static int getIntOrDefault(JsonObject obj, String[] keys, int defaultValue) {
+        for (String key : keys) {
+            if (obj.has(key)) {
+                return obj.get(key).getAsInt();
+            }
+        }
+        return defaultValue;
     }
 
     public static void giveToPlayer(ServerPlayer player, ItemStack item) {
