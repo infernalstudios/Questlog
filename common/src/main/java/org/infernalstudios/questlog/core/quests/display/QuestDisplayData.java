@@ -21,7 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class QuestDisplayData {
-
     private final Component title;
     private final Component description;
     @Nullable
@@ -34,18 +33,21 @@ public class QuestDisplayData {
     private final ResourceLocation completedSound;
     @Nullable
     private final ResourceLocation triggeredSound;
+
     private final boolean toastOnUnlock;
     private final boolean toastOnComplete;
     private final boolean showPopupOnUnlock;
     private final boolean hidden;
     private final boolean includeInMain;
+
+    private final boolean disableDetailsButton;
+    private final boolean detailsOpenByDefault;
+
     private final ResourceLocation bgTexture;
     private final ResourceLocation rightPanelTexture;
     private final ResourceLocation peripheralTexture;
-
     @Nullable
     private final ResourceLocation overlayTexture;
-
     private final int overlayWidth;
     private final int overlayHeight;
     private final int overlayXOffset;
@@ -66,7 +68,6 @@ public class QuestDisplayData {
     private final int leftPanelWidth;
     private final int rightPanelWidth;
     private final int panelHeight;
-
     private final int leftPanelXOffset;
     private final int leftPanelYOffset;
     private final int rightPanelXOffset;
@@ -79,9 +80,9 @@ public class QuestDisplayData {
 
     public QuestDisplayData(JsonObject data) {
         boolean translatable = JsonUtils.getOrDefault(data, "translatable", false);
+
         String title = JsonUtils.getString(data, "title");
         this.title = translatable ? Component.translatable(title) : Component.literal(title);
-
         this.sortOrder = JsonUtils.getOrDefault(data, "sort_order", 0);
 
         Component parsedDescription = parseDescription(data.get("description"), translatable);
@@ -126,7 +127,6 @@ public class QuestDisplayData {
 
         String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
         this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
-
         this.overlayWidth = JsonUtils.getOrDefault(data, "overlay_width", this.leftPanelWidth);
         this.overlayHeight = JsonUtils.getOrDefault(data, "overlay_height", this.panelHeight);
         this.overlayXOffset = JsonUtils.getOrDefault(data, "overlay_x_offset", 0);
@@ -134,14 +134,12 @@ public class QuestDisplayData {
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
         this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
-
         String triggeredSoundLoc = JsonUtils.getOrDefault(data, "triggered_sound", (String) null);
         this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
 
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
-
         this.bgTexture = new ResourceLocation(backgroundLoc);
         this.rightPanelTexture = new ResourceLocation(rightPanelLoc);
         this.peripheralTexture = new ResourceLocation(peripheralLoc);
@@ -162,8 +160,10 @@ public class QuestDisplayData {
         this.toastOnUnlock = JsonUtils.getOrDefault(data, "toast_on_unlock", true);
         this.toastOnComplete = JsonUtils.getOrDefault(data, "toast_on_complete", true);
         this.showPopupOnUnlock = JsonUtils.getOrDefault(data, "show_popup_on_unlock", false);
-
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
+
+        this.disableDetailsButton = JsonUtils.getOrDefault(data, "disable_details_button", false);
+        this.detailsOpenByDefault = JsonUtils.getOrDefault(data, "details_open_by_default", false);
 
         this.leftPanelXOffset = JsonUtils.getOrDefault(data, "left_panel_x_offset", 0);
         this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
@@ -198,12 +198,10 @@ public class QuestDisplayData {
         Matcher matcher = pattern.matcher(text);
         MutableComponent component = Component.empty();
         int lastEnd = 0;
-
         while (matcher.find()) {
             component.append(Component.literal(text.substring(lastEnd, matcher.start())));
             String display = matcher.group(1);
             String action = matcher.group(2);
-
             MutableComponent part = Component.literal(display);
             Style style = Style.EMPTY.withUnderlined(true);
 
@@ -245,19 +243,16 @@ public class QuestDisplayData {
             return true;
         if (this.descriptionFailed != null && this.descriptionFailed.getString().toLowerCase().contains(lowerQuery))
             return true;
-
         if (this.objectiveDisplay != null) {
             for (ObjectiveDisplayData obj : this.objectiveDisplay) {
                 if (obj.getName().getString().toLowerCase().contains(lowerQuery)) return true;
             }
         }
-
         if (this.rewardDisplay != null) {
             for (RewardDisplayData rew : this.rewardDisplay) {
                 if (rew.getName().getString().toLowerCase().contains(lowerQuery)) return true;
             }
         }
-
         return false;
     }
 
@@ -347,6 +342,14 @@ public class QuestDisplayData {
 
     public int getRightPanelYOffset() {
         return this.rightPanelYOffset;
+    }
+
+    public boolean isDetailsButtonDisabled() {
+        return this.disableDetailsButton;
+    }
+
+    public boolean isDetailsOpenByDefault() {
+        return this.detailsOpenByDefault;
     }
 
     public QuestlogGuiSet getGuiSet() {

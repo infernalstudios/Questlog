@@ -10,12 +10,6 @@ mixin {
     config("${mod_id}.forge.mixins.json")
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
 legacyForge {
     version = "${minecraft_version}-${forge_version}"
     validateAccessTransformers = true
@@ -57,8 +51,8 @@ dependencies {
     modImplementation "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
 
     // Triggers
-    modImplementation "local:triggers-forge:1.20.1-1.0.0"
-    jarJar "local:triggers-forge:1.20.1-1.0.0"
+    modImplementation "maven.modrinth:triggers:${triggers_version}-forge"
+    jarJar "maven.modrinth:triggers:${triggers_version}-forge"
 
     compileOnly project(":common")
     compileOnly 'org.jetbrains:annotations:26.0.2-1'
