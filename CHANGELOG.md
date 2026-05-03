@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-05-03
+
+### Added
+
+- Added a button to hide completed quests.
+- Added `disable_details_button` and `details_open_by_default` fields to the quest definition.
+
+### Changed
+
+- Textures now have additional padding for resource pack purposes.
+- `quest_complete` objectives now work retroactively.
+- Text that's too long to fit in the UI will now be truncated and show the full text in a tooltip.
+
+### Fixed
+
+- Fixed `quest_complete` objectives being triggerable early.
+- Re-implemented per-quest peripheral textures.
+
 ## [2.2.1] - 2026-04-09
 
 ### Fixed
