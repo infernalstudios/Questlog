@@ -1,6 +1,7 @@
 ### Added
 
 - Added a button to hide completed quests.
+- Added `disable_details_button` and `details_open_by_default` fields to the quest definition.
 
 ### Changed
 
