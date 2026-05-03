@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.core.quests.display;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
@@ -107,9 +108,9 @@ public class QuestDisplayData {
             int frameTime = JsonUtils.getOrDefault(badgeObj, "frame_time", 100);
 
             if (frames > 1) {
-                this.badge = new AnimatedTexture(new ResourceLocation(texture), w, h, u, v, tw, th, frames, frameTime);
+                this.badge = new AnimatedTexture(ResourceLocation.parse(texture), w, h, u, v, tw, th, frames, frameTime);
             } else {
-                this.badge = new Texture(new ResourceLocation(texture), w, h, u, v, tw, th);
+                this.badge = new Texture(ResourceLocation.parse(texture), w, h, u, v, tw, th);
             }
         } else {
             this.badge = null;
@@ -126,23 +127,23 @@ public class QuestDisplayData {
         this.panelHeight = JsonUtils.getOrDefault(data, "panel_height", 166);
 
         String overlayLoc = JsonUtils.getOrDefault(data, "overlay", (String) null);
-        this.overlayTexture = overlayLoc == null ? null : new ResourceLocation(overlayLoc);
+        this.overlayTexture = overlayLoc == null ? null : ResourceLocation.parse(overlayLoc);
         this.overlayWidth = JsonUtils.getOrDefault(data, "overlay_width", this.leftPanelWidth);
         this.overlayHeight = JsonUtils.getOrDefault(data, "overlay_height", this.panelHeight);
         this.overlayXOffset = JsonUtils.getOrDefault(data, "overlay_x_offset", 0);
         this.overlayYOffset = JsonUtils.getOrDefault(data, "overlay_y_offset", 0);
 
         String completedSoundLoc = JsonUtils.getOrDefault(data, "completed_sound", (String) null);
-        this.completedSound = completedSoundLoc == null ? null : new ResourceLocation(completedSoundLoc);
+        this.completedSound = completedSoundLoc == null ? null : ResourceLocation.parse(completedSoundLoc);
         String triggeredSoundLoc = JsonUtils.getOrDefault(data, "triggered_sound", (String) null);
-        this.triggeredSound = triggeredSoundLoc == null ? null : new ResourceLocation(triggeredSoundLoc);
+        this.triggeredSound = triggeredSoundLoc == null ? null : ResourceLocation.parse(triggeredSoundLoc);
 
         String backgroundLoc = JsonUtils.getOrDefault(data, "background_texture", Questlog.MODID + ":textures/gui/quest_page.png");
         String rightPanelLoc = JsonUtils.getOrDefault(data, "right_panel_texture", backgroundLoc);
         String peripheralLoc = JsonUtils.getOrDefault(data, "peripheral_texture", Questlog.MODID + ":textures/gui/quest_peripherals.png");
-        this.bgTexture = new ResourceLocation(backgroundLoc);
-        this.rightPanelTexture = new ResourceLocation(rightPanelLoc);
-        this.peripheralTexture = new ResourceLocation(peripheralLoc);
+        this.bgTexture = ResourceLocation.parse(backgroundLoc);
+        this.rightPanelTexture = ResourceLocation.parse(rightPanelLoc);
+        this.peripheralTexture = ResourceLocation.parse(peripheralLoc);
 
         this.palette = new Palette(
                 parseColor(data, "text_color"),
@@ -176,13 +177,13 @@ public class QuestDisplayData {
         Component parsedDescription = null;
         try {
             if (descriptionElement.isJsonArray() || descriptionElement.isJsonObject()) {
-                parsedDescription = Component.Serializer.fromJson(descriptionElement);
+                parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
             } else if (descriptionElement.isJsonPrimitive()) {
                 String rawStr = descriptionElement.getAsString();
                 if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
-                    parsedDescription = Component.Serializer.fromJson(rawStr);
+                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
                 } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
-                    parsedDescription = Component.Serializer.fromJson(rawStr);
+                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
                 } else {
                     parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
                 }

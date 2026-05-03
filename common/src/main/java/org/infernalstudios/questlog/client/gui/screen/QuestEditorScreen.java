@@ -31,7 +31,7 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
-        this.renderBackground(ps);
+        this.renderBackground(ps, mouseX, mouseY, delta);
         super.render(ps, mouseX, mouseY, delta);
 
         // TODO: title

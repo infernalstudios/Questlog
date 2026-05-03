@@ -23,7 +23,7 @@ public class StatisticObjective extends Objective {
 
     public StatisticObjective(JsonObject definition) {
         super(definition);
-        ResourceLocation parsedLocation = new ResourceLocation(JsonUtils.getString(definition, "stat"));
+        ResourceLocation parsedLocation = ResourceLocation.parse(JsonUtils.getString(definition, "stat"));
         this.stat = BuiltInRegistries.CUSTOM_STAT.get(parsedLocation);
         if (definition.has("retroactive")) {
             this.retroactive = JsonUtils.getBoolean(definition, "retroactive");
