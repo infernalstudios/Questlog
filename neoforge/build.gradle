@@ -3,12 +3,6 @@ plugins {
     id 'net.neoforged.moddev'
 }
 
-repositories {
-    flatDir {
-        dirs 'libs'
-    }
-}
-
 neoForge {
     version = neoforge_version
 
@@ -50,8 +44,8 @@ dependencies {
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 
     // Triggers
-    implementation "local:triggers-neoforge:1.21.1-1.0.0"
-    jarJar "local:triggers-neoforge:1.21.1-1.0.0"
+    implementation "maven.modrinth:triggers:${triggers_version}-neoforge"
+    jarJar "maven.modrinth:triggers:${triggers_version}-neoforge"
 
     implementation "net.neoforged:neoforge:${neoforge_version}"
 }
