@@ -36,6 +36,14 @@ public class OrObjective extends Objective {
     }
 
     @Override
+    public void markAsRequirement() {
+        super.markAsRequirement();
+        for (Objective child : children) {
+            child.markAsRequirement();
+        }
+    }
+
+    @Override
     public void registerEventListeners() {
         super.registerEventListeners();
         for (Objective child : children) {
