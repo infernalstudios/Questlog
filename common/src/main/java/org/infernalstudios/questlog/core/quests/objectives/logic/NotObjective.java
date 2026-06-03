@@ -23,6 +23,12 @@ public class NotObjective extends Objective {
     }
 
     @Override
+    public void markAsRequirement() {
+        super.markAsRequirement();
+        this.child.markAsRequirement();
+    }
+
+    @Override
     public void registerEventListeners() {
         super.registerEventListeners();
         this.child.registerEventListeners();

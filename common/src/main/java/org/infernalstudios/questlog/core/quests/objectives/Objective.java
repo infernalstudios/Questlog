@@ -15,6 +15,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     private final int requiredAmount;
     private Quest parent;
     private int units;
+    private boolean isPartOfRequirements = false;
 
     public Objective(JsonObject definition) {
         this.requiredAmount = JsonUtils.getOrDefault(definition, "required_amount", 1);
@@ -25,6 +26,10 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     }
 
     public void registerEventListeners() {
+    }
+
+    public void markAsRequirement() {
+        this.isPartOfRequirements = true;
     }
 
     @Nullable
@@ -41,7 +46,7 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     }
 
     public void setUnits(int units) {
-        if (this.getParent() != null && !this.getParent().isTriggered() && !this.getParent().requirements.contains(this)) {
+        if (this.getParent() != null && !this.getParent().isTriggered() && !this.isPartOfRequirements) {
             return;
         }
 

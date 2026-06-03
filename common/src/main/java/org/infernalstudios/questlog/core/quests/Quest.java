@@ -53,6 +53,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         }
 
         this.requirements.forEach(requirement -> {
+            requirement.markAsRequirement();
             requirement.setParent(this);
             if (!this.manager.isClient()) {
                 requirement.registerEventListeners();
