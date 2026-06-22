@@ -6,9 +6,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
+import org.infernalstudios.questlog.client.gui.screen.QuestEditorScreen;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -339,6 +342,25 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                         Questlog.getConfig().colors.hoverFillColor
                 );
             }
+
+            if (QuestlogClient.isEditModeActive) {
+                int gearX = xPosition + width - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0) - 20;
+                int gearY = yPosition + (height - 16) / 2;
+                ps.blit(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_gear.png"),
+                        gearX + (int) this.list.scroller.getXOffset(),
+                        gearY + (int) this.list.scroller.getYOffset(),
+                        0, 0, 16, 16, 16, 16);
+
+                if (isHovered) {
+                    if (mouseX >= gearX && mouseX <= gearX + 16 && mouseY >= gearY && mouseY <= gearY + 16) {
+                        ps.fill(gearX + (int) this.list.scroller.getXOffset(),
+                                gearY + (int) this.list.scroller.getYOffset(),
+                                gearX + 16 + (int) this.list.scroller.getXOffset(),
+                                gearY + 16 + (int) this.list.scroller.getYOffset(),
+                                0x40FFFFFF);
+                    }
+                }
+            }
         }
 
         private boolean hasNext() {
@@ -352,6 +374,16 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         @Override
         public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (this.isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+                if (QuestlogClient.isEditModeActive) {
+                    int gearX = this.list.getRowLeft() + this.list.getRowWidth() - (this.list.isRenderingScrollbar() ? this.list.scroller.getScrollbarWidth() * 2 : 0) - 20;
+                    int itemIndex = this.list.children.indexOf(this);
+                    int gearY = this.list.getRowTop(itemIndex) + (this.list.itemHeight - 16) / 2;
+                    if (mouseX >= gearX && mouseX <= gearX + 16 && mouseY >= gearY && mouseY <= gearY + 16) {
+                        Minecraft mc = Minecraft.getInstance();
+                        mc.setScreen(new QuestEditorScreen(mc.screen, this.quest));
+                        return true;
+                    }
+                }
                 this.list.onSelect.accept(this.quest);
                 return true;
             } else {

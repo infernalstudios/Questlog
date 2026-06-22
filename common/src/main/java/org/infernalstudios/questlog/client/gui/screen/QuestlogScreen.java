@@ -6,6 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -38,6 +39,9 @@ public class QuestlogScreen extends Screen {
             1024,
             512
     );
+    private static final ResourceLocation EDITOR_QUEST_PLUS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_quest_plus.png");
+    private static final ResourceLocation EDITOR_CHAPTER_GEAR_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_chapter_gear.png");
+    private static final ResourceLocation EDITOR_CHAPTER_PLUS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_chapter_plus.png");
     private static final int MAX_TABS = 8;
     private final Screen previousScreen;
     private final QuestManager manager;
@@ -106,15 +110,104 @@ public class QuestlogScreen extends Screen {
             int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
             int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
-            int btnX = listX - 10;
-            int btnY = listY + listHeight + 10;
+            if (QuestlogClient.isEditModeActive) {
+                int btnX = listX - 25;
+                AbstractButton addQuestBtn = getAddQuestBtn(btnX, listY + 5);
+                this.addRenderableWidget(addQuestBtn);
 
-            this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.enter"), btn -> {
-                if (this.minecraft != null) {
-                    this.minecraft.setScreen(new QuestEditorScreen(this));
-                }
-            }).bounds(btnX, btnY, 80, 20).build());
+                AbstractButton editChapBtn = getEditChapBtn(btnX, listY + 30);
+                this.addRenderableWidget(editChapBtn);
+
+                AbstractButton addChapBtn = getAddChapBtn(btnX, listY + 55);
+                this.addRenderableWidget(addChapBtn);
+            } else {
+                int btnX = listX - 10;
+                int btnY = listY - 31 + Questlog.getConfig().gui.searchBarY;
+                this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.enter"), btn -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.setScreen(new QuestEditorScreen(this));
+                    }
+                }).bounds(btnX, btnY, 80, 20).build());
+            }
         }
+    }
+
+    private @NotNull AbstractButton getAddChapBtn(int x, int y) {
+        AbstractButton addChapBtn = new AbstractButton(x, y, 20, 20, Component.translatable("questlog.editor.add_chapter")) {
+            @Override
+            public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+                boolean hovered = this.isHoveredOrFocused();
+                ps.blit(EDITOR_CHAPTER_PLUS_TEXTURE, this.getX() + 2, this.getY() + 2, 0, 0, 16, 16, 16, 16);
+                if (hovered) {
+                    ps.fill(this.getX(), this.getY(), this.getX() + 20, this.getY() + 20, 0x40FFFFFF);
+                }
+            }
+
+            @Override
+            public void onPress() {
+                if (minecraft != null) {
+                    minecraft.setScreen(new ChapterEditorScreen(QuestlogScreen.this, null));
+                }
+            }
+
+            @Override
+            protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+            }
+        };
+        addChapBtn.setTooltip(Tooltip.create(Component.translatable("questlog.editor.add_chapter")));
+        return addChapBtn;
+    }
+
+    private @NotNull AbstractButton getEditChapBtn(int x, int y) {
+        AbstractButton editChapBtn = new AbstractButton(x, y, 20, 20, Component.translatable("questlog.editor.edit_chapter")) {
+            @Override
+            public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+                boolean hovered = this.isHoveredOrFocused();
+                ps.blit(EDITOR_CHAPTER_GEAR_TEXTURE, this.getX() + 2, this.getY() + 2, 0, 0, 16, 16, 16, 16);
+                if (hovered) {
+                    ps.fill(this.getX(), this.getY(), this.getX() + 20, this.getY() + 20, 0x40FFFFFF);
+                }
+            }
+
+            @Override
+            public void onPress() {
+                if (minecraft != null) {
+                    minecraft.setScreen(new ChapterEditorScreen(QuestlogScreen.this, currentChapter));
+                }
+            }
+
+            @Override
+            protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+            }
+        };
+        editChapBtn.setTooltip(Tooltip.create(Component.translatable("questlog.editor.edit_chapter")));
+        return editChapBtn;
+    }
+
+    private @NotNull AbstractButton getAddQuestBtn(int x, int y) {
+        AbstractButton addQuestBtn = new AbstractButton(x, y, 20, 20, Component.translatable("questlog.editor.add_quest")) {
+            @Override
+            public void renderWidget(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
+                boolean hovered = this.isHoveredOrFocused();
+                ps.blit(EDITOR_QUEST_PLUS_TEXTURE, this.getX() + 2, this.getY() + 2, 0, 0, 16, 16, 16, 16);
+                if (hovered) {
+                    ps.fill(this.getX(), this.getY(), this.getX() + 20, this.getY() + 20, 0x40FFFFFF);
+                }
+            }
+
+            @Override
+            public void onPress() {
+                if (minecraft != null) {
+                    minecraft.setScreen(new QuestEditorScreen(QuestlogScreen.this));
+                }
+            }
+
+            @Override
+            protected void updateWidgetNarration(@NotNull NarrationElementOutput output) {
+            }
+        };
+        addQuestBtn.setTooltip(Tooltip.create(Component.translatable("questlog.editor.add_quest")));
+        return addQuestBtn;
     }
 
     private void refreshQuestListOnly() {
@@ -244,7 +337,7 @@ public class QuestlogScreen extends Screen {
     private void buildTabs() {
         List<ResourceLocation> chapterKeys = new ArrayList<>();
         for (Map.Entry<ResourceLocation, ChapterInfo> entry : this.availableChapters.entrySet()) {
-            if (!entry.getValue().hidden) {
+            if (QuestlogClient.isEditModeActive || !entry.getValue().hidden) {
                 chapterKeys.add(entry.getKey());
             }
         }
@@ -291,7 +384,7 @@ public class QuestlogScreen extends Screen {
         int y = (this.height - height) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
         List<Quest> quests = this.manager.getAllQuests().stream()
-                .filter(quest -> quest.isTriggered() && !quest.getDisplay().isHidden())
+                .filter(quest -> QuestlogClient.isEditModeActive || (quest.isTriggered() && !quest.getDisplay().isHidden()))
                 .filter(quest -> !this.hideCompleted || !quest.isCompleted())
                 .filter(quest -> {
                     String chapterStr = quest.getDisplay().getChapter();
@@ -300,7 +393,7 @@ public class QuestlogScreen extends Screen {
                             : ResourceLocation.fromNamespaceAndPath(Questlog.MODID, chapterStr);
 
                     ChapterInfo questChapterInfo = this.availableChapters.get(questChapter);
-                    boolean shouldShowChapter = questChapterInfo != null && !questChapterInfo.hidden;
+                    boolean shouldShowChapter = questChapterInfo != null && (QuestlogClient.isEditModeActive || !questChapterInfo.hidden);
 
                     return Objects.requireNonNull(questChapter).equals(this.currentChapter) ||
                             (this.currentChapter.getPath().equals("main") && quest.getDisplay().shouldIncludeInMain() && shouldShowChapter);
@@ -352,6 +445,12 @@ public class QuestlogScreen extends Screen {
                         false
                 );
                 ps.pose().popPose();
+            }
+        }
+        if (QuestlogClient.isEditModeActive) {
+            Font font = this.minecraft != null ? this.minecraft.font : null;
+            if (font != null) {
+                ps.drawString(font, Component.translatable("questlog.editor.active"), 10, this.height - 15, 0xE6AA1C | 0xFF000000, false);
             }
         }
     }

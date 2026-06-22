@@ -9,6 +9,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogEvents;
+import org.infernalstudios.questlog.client.gui.screen.ChapterEditorScreen;
+import org.infernalstudios.questlog.client.gui.screen.QuestEditorScreen;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.core.DefinitionUtil;
@@ -100,8 +102,12 @@ public class ClientPacketHandler {
     }
 
     public static void handle(QuestEditModePacket packet, IPacketContext ctx) {
-        // TODO: integrate with actual edit mode
+        QuestlogClient.isEditModeActive = packet.enabled();
         Questlog.LOGGER.info("Questlog Edit Mode has been set to: {}", packet.enabled());
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof QuestlogScreen questlogScreen) {
+            questlogScreen.init(mc, questlogScreen.width, questlogScreen.height);
+        }
     }
 
     public static void handle(QuestSyncPacket packet, IPacketContext ctx) {
@@ -110,6 +116,23 @@ public class ClientPacketHandler {
             return;
         }
         processSync(packet);
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.screen instanceof QuestlogScreen questlogScreen) {
+            questlogScreen.init(mc, questlogScreen.width, questlogScreen.height);
+        } else if (mc.screen instanceof QuestDetails detailsScreen) {
+            Quest updatedQuest = QuestlogClient.getLocal().getQuest(detailsScreen.quest.getId());
+            if (updatedQuest != null) {
+                mc.setScreen(new QuestDetails(detailsScreen.getPreviousScreen(), updatedQuest));
+            } else {
+                mc.setScreen(new QuestlogScreen(detailsScreen.getPreviousScreen()));
+            }
+        } else if (mc.screen instanceof ChapterEditorScreen chapterEditorScreen) {
+            chapterEditorScreen.saveTemporaryState();
+            chapterEditorScreen.refreshScreen();
+        } else if (mc.screen instanceof QuestEditorScreen questEditorScreen) {
+            questEditorScreen.saveTemporaryState();
+            questEditorScreen.refreshScreen();
+        }
     }
 
     public static void handleDeferredSync() {
@@ -121,7 +144,7 @@ public class ClientPacketHandler {
 
     private static void processSync(QuestSyncPacket packet) {
         Questlog.LOGGER.info("Received quest & chapter sync from server.");
-        DefinitionUtil.getCachedChapterKeys().clear();
+        DefinitionUtil.clearClientCaches();
         for (Map.Entry<ResourceLocation, String> entry : packet.chapterDefinitions().entrySet()) {
             try {
                 JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
@@ -137,6 +160,9 @@ public class ClientPacketHandler {
         for (Map.Entry<ResourceLocation, String> entry : packet.definitions().entrySet()) {
             try {
                 JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
+                if (def != null) {
+                    DefinitionUtil.putCachedQuest(entry.getKey(), def);
+                }
                 Quest quest = Quest.create(def, entry.getKey(), manager);
                 manager.addQuest(quest);
             } catch (Exception e) {

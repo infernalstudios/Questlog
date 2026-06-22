@@ -94,9 +94,21 @@ public class QuestManager {
                     Questlog.LOGGER.error("=====================================================");
                     Questlog.LOGGER.error(" QUESTLOG ERROR: Failed to load quest '{}'", id);
                     Questlog.LOGGER.error(" The JSON file has a syntax error, typo, or missing field.");
-                    Questlog.LOGGER.error(" Skipping this quest...");
                     Questlog.LOGGER.error(" Exception Details: ", e);
                     Questlog.LOGGER.error("=====================================================");
+                    try {
+                        JsonObject fallbackDef = new JsonObject();
+                        fallbackDef.addProperty("title", "Broken Quest (" + id.getPath() + ")");
+                        fallbackDef.addProperty("description", "This quest failed to load properly. Edit it to fix errors.");
+                        fallbackDef.addProperty("chapter", definition != null && definition.has("chapter") ? definition.get("chapter").getAsString() : "main");
+                        quest = Quest.create(fallbackDef, id, this);
+                        CompoundTag data = new CompoundTag();
+                        quest.writeInitialData(data);
+                        quest.deserialize(data);
+                        this.addQuest(quest);
+                    } catch (Exception fallbackEx) {
+                        Questlog.LOGGER.error("Fallback load failed for quest '{}'", id, fallbackEx);
+                    }
                 }
             }
         }

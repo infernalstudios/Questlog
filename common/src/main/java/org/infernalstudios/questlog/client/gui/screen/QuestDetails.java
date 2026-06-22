@@ -49,14 +49,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Nullable
     private final Screen previousScreen;
-
     public Component pendingTooltip = null;
-
     private int panel1X;
     private int panel2X;
     private int panel1Y;
     private int panel2Y;
-
     @Nullable
     private QuestlogButton backButton;
     @Nullable
@@ -70,6 +67,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super(quest.getDisplay().getTitle());
         this.previousScreen = previousScreen;
         this.quest = quest;
+    }
+
+    @Nullable
+    public Screen getPreviousScreen() {
+        return this.previousScreen;
     }
 
     public QuestDisplayData getDisplay() {

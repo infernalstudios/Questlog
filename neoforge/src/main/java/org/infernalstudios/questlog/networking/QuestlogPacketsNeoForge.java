@@ -20,6 +20,18 @@ public class QuestlogPacketsNeoForge {
         registrar.playToServer(QuestReadPacket.TYPE, QuestReadPacket.STREAM_CODEC, (payload, context) ->
                 context.enqueueWork(() -> QuestReadPacket.handle(payload, createServerContext(context.player())))
         );
+        registrar.playToServer(QuestEditSavePacket.TYPE, QuestEditSavePacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> QuestEditSavePacket.handle(payload, createServerContext(context.player())))
+        );
+        registrar.playToServer(QuestEditRemovePacket.TYPE, QuestEditRemovePacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> QuestEditRemovePacket.handle(payload, createServerContext(context.player())))
+        );
+        registrar.playToServer(ChapterEditSavePacket.TYPE, ChapterEditSavePacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> ChapterEditSavePacket.handle(payload, createServerContext(context.player())))
+        );
+        registrar.playToServer(ChapterEditRemovePacket.TYPE, ChapterEditRemovePacket.STREAM_CODEC, (payload, context) ->
+                context.enqueueWork(() -> ChapterEditRemovePacket.handle(payload, createServerContext(context.player())))
+        );
 
         // Server to Client
         registrar.playToClient(QuestSyncPacket.TYPE, QuestSyncPacket.STREAM_CODEC, (payload, context) ->

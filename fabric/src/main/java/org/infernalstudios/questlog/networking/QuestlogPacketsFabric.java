@@ -23,6 +23,10 @@ public class QuestlogPacketsFabric {
         // Register C2S Payloads
         PayloadTypeRegistry.playC2S().register(QuestRewardCollectPacket.TYPE, QuestRewardCollectPacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(QuestReadPacket.TYPE, QuestReadPacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(QuestEditSavePacket.TYPE, QuestEditSavePacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(QuestEditRemovePacket.TYPE, QuestEditRemovePacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(ChapterEditSavePacket.TYPE, ChapterEditSavePacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(ChapterEditRemovePacket.TYPE, ChapterEditRemovePacket.STREAM_CODEC);
 
         // Register Server Receivers
         registerServerReceivers();
@@ -42,6 +46,10 @@ public class QuestlogPacketsFabric {
     private static void registerServerReceivers() {
         ServerPlayNetworking.registerGlobalReceiver(QuestRewardCollectPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestRewardCollectPacket.handle(payload, createServerContext(context.player()))));
         ServerPlayNetworking.registerGlobalReceiver(QuestReadPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestReadPacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(QuestEditSavePacket.TYPE, (payload, context) -> context.server().execute(() -> QuestEditSavePacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(QuestEditRemovePacket.TYPE, (payload, context) -> context.server().execute(() -> QuestEditRemovePacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(ChapterEditSavePacket.TYPE, (payload, context) -> context.server().execute(() -> ChapterEditSavePacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(ChapterEditRemovePacket.TYPE, (payload, context) -> context.server().execute(() -> ChapterEditRemovePacket.handle(payload, createServerContext(context.player()))));
     }
 
     private static IPacketContext createClientContext() {

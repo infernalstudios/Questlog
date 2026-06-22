@@ -1,3 +1,3 @@
-### Fixed
+### Added
 
-- Fixed issues with `OR` and `NOT` objectives in `requirements`.
+- Added an in-game config screen.

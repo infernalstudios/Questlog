@@ -36,6 +36,15 @@ public class DefinitionUtil {
         return QUEST_DEFINITION_CACHE.get(path);
     }
 
+    public static synchronized void putCachedQuest(ResourceLocation path, JsonObject definition) {
+        QUEST_DEFINITION_CACHE.put(path, definition);
+    }
+
+    public static synchronized void clearClientCaches() {
+        QUEST_DEFINITION_CACHE.clear();
+        CHAPTER_DEFINITION_CACHE.clear();
+    }
+
     public static List<ResourceLocation> getCachedChapterKeys() {
         List<ResourceLocation> keys = new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
         keys.sort((a, b) -> {
