@@ -86,4 +86,19 @@ public class NotObjective extends Objective {
         data.put("child", this.child.serialize());
         return data;
     }
+
+    @Override
+    public java.util.List<Objective> getChildren() {
+        return java.util.List.of(this.child);
+    }
+
+    @Override
+    public void forceSetUnits(int units) {
+        super.forceSetUnits(units);
+        if (units == 0) {
+            this.child.forceSetUnits(this.child.getRequiredAmount());
+        } else {
+            this.child.forceSetUnits(0);
+        }
+    }
 }

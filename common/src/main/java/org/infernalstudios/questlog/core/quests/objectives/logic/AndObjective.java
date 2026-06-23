@@ -116,4 +116,23 @@ public class AndObjective extends Objective {
         data.put("children", list);
         return data;
     }
+
+    @Override
+    public List<Objective> getChildren() {
+        return this.children;
+    }
+
+    @Override
+    public void forceSetUnits(int units) {
+        super.forceSetUnits(units);
+        if (units == 0) {
+            for (Objective child : this.children) {
+                child.forceSetUnits(0);
+            }
+        } else {
+            for (Objective child : this.children) {
+                child.forceSetUnits(child.getRequiredAmount());
+            }
+        }
+    }
 }

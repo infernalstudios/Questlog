@@ -16,12 +16,17 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) implements CustomPacketPayload {
+public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex, java.util.List<Integer> selections) implements CustomPacketPayload {
     public static final Type<QuestRewardCollectPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "reward_collect"));
+
+    public QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) {
+        this(id, rewardIndex, java.util.Collections.emptyList());
+    }
 
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestRewardCollectPacket> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC, QuestRewardCollectPacket::id,
             ByteBufCodecs.INT, QuestRewardCollectPacket::rewardIndex,
+            ByteBufCodecs.collection(java.util.ArrayList::new, ByteBufCodecs.INT), QuestRewardCollectPacket::selections,
             QuestRewardCollectPacket::new
     );
 
@@ -38,6 +43,9 @@ public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) imp
             return;
         }
         if (!reward.hasRewarded()) {
+            if (reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward) {
+                choiceReward.setSelectedIndices(packet.selections());
+            }
             reward.applyReward((ServerPlayer) manager.player);
         }
     }

@@ -93,4 +93,15 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     public boolean isReadObjective() {
         return false;
     }
+
+    public void forceSetUnits(int units) {
+        this.units = Math.min(units, this.requiredAmount);
+        if (this.getParent() != null) {
+            this.getParent().markForUpdate();
+        }
+    }
+
+    public java.util.List<Objective> getChildren() {
+        return java.util.List.of();
+    }
 }

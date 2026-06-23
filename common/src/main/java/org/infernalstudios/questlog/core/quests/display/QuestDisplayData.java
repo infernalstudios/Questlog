@@ -225,13 +225,39 @@ public class QuestDisplayData {
     }
 
     public void setQuest(Quest quest) {
-        this.objectiveDisplay = quest.objectives.stream()
-                .filter(obj -> !obj.isHidden())
-                .map(WithDisplayData::getDisplay)
-                .filter(Objects::nonNull).toList();
-        this.rewardDisplay = quest.rewards.stream()
-                .map(WithDisplayData::getDisplay)
-                .filter(Objects::nonNull).toList();
+        this.objectiveDisplay = new java.util.ArrayList<>();
+        for (org.infernalstudios.questlog.core.quests.objectives.Objective obj : quest.objectives) {
+            addObjectiveDisplayData(obj, 0);
+        }
+        this.rewardDisplay = new java.util.ArrayList<>();
+        for (org.infernalstudios.questlog.core.quests.rewards.Reward reward : quest.rewards) {
+            addRewardDisplayData(reward, 0);
+        }
+    }
+
+    private void addRewardDisplayData(org.infernalstudios.questlog.core.quests.rewards.Reward reward, int indentLevel) {
+        RewardDisplayData displayData = reward.getDisplay();
+        if (displayData != null) {
+            displayData.setIndentLevel(indentLevel);
+            this.rewardDisplay.add(displayData);
+        }
+        if (reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward) {
+            for (org.infernalstudios.questlog.core.quests.rewards.Reward choice : choiceReward.getChoices()) {
+                addRewardDisplayData(choice, indentLevel + 1);
+            }
+        }
+    }
+
+    private void addObjectiveDisplayData(org.infernalstudios.questlog.core.quests.objectives.Objective obj, int indentLevel) {
+        if (obj.isHidden()) return;
+        ObjectiveDisplayData displayData = obj.getDisplay();
+        if (displayData != null) {
+            displayData.setIndentLevel(indentLevel);
+            this.objectiveDisplay.add(displayData);
+        }
+        for (org.infernalstudios.questlog.core.quests.objectives.Objective child : obj.getChildren()) {
+            addObjectiveDisplayData(child, indentLevel + 1);
+        }
     }
 
     public boolean matchesSearch(String query) {

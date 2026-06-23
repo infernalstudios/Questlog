@@ -6,11 +6,11 @@ hide_meta: true
 Quest rewards are defined in the `rewards` property of a quest. They are a list of reward objects, each of which can be one of the following types:
 
 ### `questlog:item`
-Gives the player an item
+Gives the player an item.
 
 #### Properties
-- `item`: The item to give the player
-- `count` (optional, default: 1): The amount of the item to give the player
+- `item`: Either the item ID string (e.g. `"minecraft:diamond"`) or a full item object containing custom components/enchantments (e.g. `{"id": "minecraft:enchanted_book", "components": {"minecraft:stored_enchantments": {"levels": {"minecraft:fortune": 3}}}}`).
+- `count` (optional, default: 1): The amount of the item to give the player. (Can also be defined inside the item object).
 
 ### `questlog:command`
 Runs a command as the player, at the player's position. If `permission_level` is specified, the command is run with that permission level.
@@ -35,6 +35,13 @@ Gives the player loot from a loot table. The loot context is set as such:
 
 #### Properties
 - `loot_table`: The loot table to give the player. If the table does not exist, it will log an error in the log.
+
+### `questlog:choice`
+Allows the player to choose a subset of rewards from a list of options.
+
+#### Properties
+- `choices`: A list of reward objects to choose from.
+- `pick_count` (optional, default: 1): The number of choices the player is required to select.
 
 ### Base Reward Properties
 All reward types support the following optional properties:

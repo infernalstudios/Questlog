@@ -460,6 +460,8 @@ public class QuestEditorScreen extends Screen {
         boolean isLogical = "questlog:or".equals(this.editingType) || "questlog:and".equals(this.editingType) || "questlog:not".equals(this.editingType)
                 || "or".equals(this.editingType) || "and".equals(this.editingType) || "not".equals(this.editingType);
 
+        boolean isChoice = "questlog:choice".equals(this.editingType) || "choice".equals(this.editingType);
+
         if (isLogical) {
             String btnText = ("questlog:not".equals(this.editingType) || "not".equals(this.editingType)) ? "Edit Child" : "Edit Children";
             this.addRenderableWidget(Button.builder(Component.literal(btnText), btn -> {
@@ -485,6 +487,40 @@ public class QuestEditorScreen extends Screen {
 
             this.entryTargetBox = null;
             this.entryAmountBox = null;
+        } else if (isChoice) {
+            this.addRenderableWidget(Button.builder(Component.literal("Edit Choices"), btn -> {
+                this.saveTemporaryState();
+                this.saveEditingEntry();
+                this.nestingStack.push(new NestingFrame(
+                        this.editingEntry,
+                        this.getActiveList(),
+                        this.selectedEntryIndex,
+                        this.listPage,
+                        this.rightPageState,
+                        this.editingType,
+                        this.editingEntry,
+                        this.entryLevelsToggle
+                ));
+                this.rightPageState = RightPageState.LIST;
+                this.listPage = 0;
+                this.selectedEntryIndex = -1;
+                this.editingEntry = null;
+                this.currentNestedList = null;
+                this.rebuildWidgets();
+            }).bounds(panel2X + 15, panel2Y + 58, 130, 18).build());
+
+            this.entryTargetBox = null;
+
+            if (meta == null || meta.amountFieldKey() != null) {
+                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 94, 50, 16, Component.empty());
+                this.entryAmountBox.setMaxLength(6);
+                this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
+                int amtVal = getAmountValue();
+                this.entryAmountBox.setValue(String.valueOf(amtVal));
+                this.addRenderableWidget(this.entryAmountBox);
+            } else {
+                this.entryAmountBox = null;
+            }
         } else {
             if (meta == null || meta.targetFieldKey() != null) {
                 this.entryTargetBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 58, 130, 16, Component.empty());
@@ -553,13 +589,15 @@ public class QuestEditorScreen extends Screen {
         if (meta != null && meta.targetFieldKey() != null) {
             String key = meta.targetFieldKey();
             if (this.editingEntry.has(key)) {
-                return this.editingEntry.get(key).getAsString();
+                com.google.gson.JsonElement el = this.editingEntry.get(key);
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
             }
         }
         String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table"};
         for (String k : keys) {
             if (this.editingEntry.has(k)) {
-                return this.editingEntry.get(k).getAsString();
+                com.google.gson.JsonElement el = this.editingEntry.get(k);
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
             }
         }
         return "";
@@ -609,7 +647,7 @@ public class QuestEditorScreen extends Screen {
         String[] allKeys = new String[]{
                 "block", "item", "entity", "biome", "dimension", "structure",
                 "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table",
-                "required_amount", "count", "experience", "levels"
+                "required_amount", "count", "experience", "levels", "pick_count"
         };
         for (String k : allKeys) {
             this.editingEntry.remove(k);
@@ -618,7 +656,16 @@ public class QuestEditorScreen extends Screen {
         EditorMetadata meta = getMetadata(this.editingType);
         if (meta != null) {
             if (meta.targetFieldKey() != null && !target.isEmpty()) {
-                this.editingEntry.addProperty(meta.targetFieldKey(), target);
+                if (target.trim().startsWith("{") && target.trim().endsWith("}")) {
+                    try {
+                        com.google.gson.JsonElement parsed = JsonParser.parseString(target);
+                        this.editingEntry.add(meta.targetFieldKey(), parsed);
+                    } catch (Exception e) {
+                        this.editingEntry.addProperty(meta.targetFieldKey(), target);
+                    }
+                } else {
+                    this.editingEntry.addProperty(meta.targetFieldKey(), target);
+                }
             }
             if (meta.amountFieldKey() != null) {
                 this.editingEntry.addProperty(meta.amountFieldKey(), amount);
@@ -673,6 +720,13 @@ public class QuestEditorScreen extends Screen {
             if (entry.has("objective") && entry.get("objective").isJsonObject()) {
                 children.add(entry.getAsJsonObject("objective"));
             }
+        } else if ("questlog:choice".equals(type) || "choice".equals(type)) {
+            JsonArray array = JsonUtils.getOrDefault(entry, "choices", new JsonArray());
+            for (JsonElement el : array) {
+                if (el.isJsonObject()) {
+                    children.add(el.getAsJsonObject());
+                }
+            }
         }
         return children;
     }
@@ -692,6 +746,12 @@ public class QuestEditorScreen extends Screen {
             } else {
                 entry.remove("objective");
             }
+        } else if ("questlog:choice".equals(type) || "choice".equals(type)) {
+            JsonArray array = new JsonArray();
+            for (JsonObject child : children) {
+                array.add(child);
+            }
+            entry.add("choices", array);
         }
     }
 
@@ -1027,7 +1087,9 @@ public class QuestEditorScreen extends Screen {
                 ps.drawString(this.font, getTargetFieldLabel(), panel2X + 15, panel2Y + 48, color, false);
             }
             if (meta == null || meta.amountFieldKey() != null) {
-                String amtLabel = this.activeTab == ActiveTab.REWARDS ? "Count/Experience:" : "Req Amount:";
+                String amtLabel = this.activeTab == ActiveTab.REWARDS ? 
+                        (("questlog:choice".equals(this.editingType) || "choice".equals(this.editingType)) ? "Pick Count:" : "Count/Experience:") 
+                        : "Req Amount:";
                 ps.drawString(this.font, amtLabel, panel2X + 15, panel2Y + 84, color, false);
             }
         } else if (this.rightPageState == RightPageState.LIST && this.activeTab != ActiveTab.SETTINGS) {
@@ -1060,7 +1122,14 @@ public class QuestEditorScreen extends Screen {
                         if (meta != null && meta.targetFieldKey() != null) {
                             String key = meta.targetFieldKey();
                             if (entry.has(key)) {
-                                target = entry.get(key).getAsString();
+                                com.google.gson.JsonElement el = entry.get(key);
+                                if (el.isJsonPrimitive()) {
+                                    target = el.getAsString();
+                                } else if (el.isJsonObject() && el.getAsJsonObject().has("id")) {
+                                    target = el.getAsJsonObject().get("id").getAsString();
+                                } else {
+                                    target = el.toString();
+                                }
                             }
                         }
                     }
@@ -1068,7 +1137,14 @@ public class QuestEditorScreen extends Screen {
                         String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "command", "loot_table", "enchantment", "effect"};
                         for (String k : keys) {
                             if (entry.has(k)) {
-                                target = entry.get(k).getAsString();
+                                com.google.gson.JsonElement el = entry.get(k);
+                                if (el.isJsonPrimitive()) {
+                                    target = el.getAsString();
+                                } else if (el.isJsonObject() && el.getAsJsonObject().has("id")) {
+                                    target = el.getAsJsonObject().get("id").getAsString();
+                                } else {
+                                    target = el.toString();
+                                }
                                 break;
                             }
                         }

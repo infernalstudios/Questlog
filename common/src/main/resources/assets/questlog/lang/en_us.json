@@ -82,6 +82,8 @@
     "questlog.reward.default.questlog.command": "Run Command",
     "questlog.reward.default.item": "Item Reward",
     "questlog.reward.default.questlog.loot_table": "Loot Table",
+    "questlog.reward.default.questlog.choice.pick": "Choose %s:",
+    "questlog.reward.make_choices": "Select Choice(s)",
 
     "questlog.chapter.questlog.main": "Main Quests",
 

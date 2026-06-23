@@ -19,6 +19,8 @@ public class RewardDisplayData {
     private final ResourceLocation claimSound;
     @Nullable
     private Reward reward;
+    private int indentLevel = 0;
+    private Component lazyName;
 
     public RewardDisplayData(JsonObject data) {
         String name = JsonUtils.getOrDefault(data, "name", (String) null);
@@ -63,6 +65,9 @@ public class RewardDisplayData {
                 } else {
                     return Component.translatable("questlog.reward.default.experience.points", amount);
                 }
+            } else if (path.equals("choice")) {
+                int pickCount = JsonUtils.getOrDefault(data, "pick_count", 1);
+                return Component.translatable("questlog.reward.default.questlog.choice.pick", pickCount);
             }
 
             return Component.translatable("questlog.reward.default." + type.getNamespace() + "." + path);
@@ -75,8 +80,54 @@ public class RewardDisplayData {
         this.reward = reward;
     }
 
+    @Nullable
+    public Reward getReward() {
+        return this.reward;
+    }
+
+    public int getIndentLevel() {
+        return this.indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
+    }
+
     public Component getName() {
-        return this.name;
+        if (this.lazyName == null) {
+            if (this.reward instanceof org.infernalstudios.questlog.core.quests.rewards.ItemReward itemReward) {
+                net.minecraft.world.item.ItemStack stack = itemReward.getStack();
+                if (!stack.isEmpty()) {
+                    int count = stack.getCount();
+                    Component itemName = stack.getHoverName();
+                    if (count > 1) {
+                        this.lazyName = Component.literal(count + "x ").append(itemName);
+                    } else {
+                        this.lazyName = itemName;
+                    }
+                }
+            }
+            if (this.lazyName == null) {
+                this.lazyName = this.name;
+            }
+        }
+
+        if (this.reward != null && this.reward.getContainer() != null) {
+            boolean isSelected = this.reward.isSelected();
+            if (isSelected) {
+                int greenColor = 0x529E52;
+                try {
+                    greenColor = org.infernalstudios.questlog.Questlog.getConfig().colors.completedTextColor;
+                } catch (Exception ignored) {}
+                final int finalColor = greenColor;
+                Component xComponent = Component.literal("x").withStyle(style -> style.withColor(net.minecraft.network.chat.TextColor.fromRgb(finalColor)));
+                return Component.literal("[").append(xComponent).append("] ").append(this.lazyName);
+            } else {
+                return Component.literal("[ ] ").append(this.lazyName);
+            }
+        }
+
+        return this.lazyName;
     }
 
     public boolean hasRewarded() {
@@ -88,6 +139,12 @@ public class RewardDisplayData {
 
     @Nullable
     public Blittable getIcon() {
+        if (this.icon == null && this.reward instanceof org.infernalstudios.questlog.core.quests.rewards.ItemReward itemReward) {
+            net.minecraft.world.item.ItemStack stack = itemReward.getStack();
+            if (!stack.isEmpty()) {
+                return new org.infernalstudios.questlog.util.texture.ItemRenderable(stack);
+            }
+        }
         return this.icon;
     }
 

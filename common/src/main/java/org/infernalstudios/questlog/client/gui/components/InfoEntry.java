@@ -46,10 +46,13 @@ public class InfoEntry implements Renderable, GuiEventListener {
         Blittable icon = isReward ? rewardData.getIcon() : objectiveData.getIcon();
         Component name = isReward ? rewardData.getName() : objectiveData.getName();
 
-        if (icon != null) icon.blit(ps, this.x, this.y + 4);
+        int indent = isReward ? rewardData.getIndentLevel() * 12 : objectiveData.getIndentLevel() * 12;
+        int currentX = this.x + indent;
 
-        int textX = this.x + (icon != null ? 20 : 0);
-        int maxWidth = questDetails.getDisplay().getRightPanelWidth() - 36 - 15 - (icon != null ? 20 : 0);
+        if (icon != null) icon.blit(ps, currentX, this.y + 4);
+
+        int textX = currentX + (icon != null ? 20 : 0);
+        int maxWidth = questDetails.getDisplay().getRightPanelWidth() - 36 - 15 - (icon != null ? 20 : 0) - indent;
 
         Font font = Minecraft.getInstance().font;
         Component renderedName = name;
@@ -94,5 +97,24 @@ public class InfoEntry implements Renderable, GuiEventListener {
 
     @Override
     public void setFocused(boolean var1) {
+    }
+
+    public boolean handleChoiceClick() {
+        if (this.rewardData != null) {
+            org.infernalstudios.questlog.core.quests.rewards.Reward reward = this.rewardData.getReward();
+            if (reward != null && reward.getContainer() != null) {
+                org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward = reward.getContainer();
+                if (!choiceReward.hasRewarded()) {
+                    choiceReward.toggleChoice(reward);
+                    net.minecraft.client.resources.sounds.SimpleSoundInstance sound =
+                            net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+                                    net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK.value(), 1.0F
+                            );
+                    net.minecraft.client.Minecraft.getInstance().getSoundManager().play(sound);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

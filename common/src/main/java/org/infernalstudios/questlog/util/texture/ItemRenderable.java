@@ -19,14 +19,22 @@ public class ItemRenderable implements Blittable {
         this.item = item;
     }
 
+    public ItemRenderable(ItemStack stack) {
+        this.item = null;
+        this.cachedStack = stack;
+        this.isResolved = true;
+    }
+
     @Nullable
     private ItemStack getItem() {
         if (!this.isResolved) {
-            Item item = BuiltInRegistries.ITEM.get(this.item);
-            if (item != Items.AIR) {
-                this.cachedStack = item.getDefaultInstance();
-            } else {
-                Questlog.LOGGER.warn("Item {} not found", this.item);
+            if (this.item != null) {
+                Item item = BuiltInRegistries.ITEM.get(this.item);
+                if (item != Items.AIR) {
+                    this.cachedStack = item.getDefaultInstance();
+                } else {
+                    Questlog.LOGGER.warn("Item {} not found", this.item);
+                }
             }
             this.isResolved = true;
         }

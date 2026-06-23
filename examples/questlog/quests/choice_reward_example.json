@@ -1,0 +1,38 @@
+{
+  "title": "Miner's Choice",
+  "description": "Mine some coal and choose your precious rewards!",
+  "icon": {
+    "item": "minecraft:coal_ore"
+  },
+  "objectives": [
+    {
+      "type": "questlog:block_mine",
+      "block": "minecraft:coal_ore",
+      "required_amount": 10,
+      "name": "Mine 10 Coal Ore"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:choice",
+      "pick_count": 1,
+      "choices": [
+        {
+          "type": "questlog:item",
+          "item": "minecraft:diamond",
+          "count": 2
+        },
+        {
+          "type": "questlog:item",
+          "item": "minecraft:emerald",
+          "count": 5
+        },
+        {
+          "type": "questlog:experience",
+          "experience": 100,
+          "levels": false
+        }
+      ]
+    }
+  ]
+}

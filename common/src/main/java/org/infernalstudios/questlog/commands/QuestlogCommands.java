@@ -177,10 +177,12 @@ public class QuestlogCommands {
 
             for (Quest quest : affectedQuests) {
                 if (!quest.isTriggered()) {
-                    quest.requirements.forEach(trigger -> trigger.setUnits(trigger.getRequiredAmount()));
+                    quest.requirements.forEach(trigger -> trigger.forceSetUnits(trigger.getRequiredAmount()));
                     count++;
                 }
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         if (count == 0) {
@@ -202,17 +204,19 @@ public class QuestlogCommands {
 
             for (Quest quest : affectedQuests) {
                 if (complete) {
-                    quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-                    quest.failureConditions.forEach(obj -> obj.setUnits(0)); // clear fails if force completed
+                    quest.objectives.forEach(obj -> obj.forceSetUnits(obj.getRequiredAmount()));
+                    quest.failureConditions.forEach(obj -> obj.forceSetUnits(0)); // clear fails if force completed
                 } else {
-                    quest.requirements.forEach(trigger -> trigger.setUnits(0));
-                    quest.objectives.forEach(obj -> obj.setUnits(0));
-                    quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                    quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                    quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                    quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
                     quest.rewards.forEach(Reward::revokeReward);
                     quest.hasSentTrigger = quest.requirements.isEmpty();
                     quest.hasSentCompletion = false;
                 }
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
             modified += affectedQuests.size();
         }
 
@@ -231,13 +235,15 @@ public class QuestlogCommands {
         for (ServerPlayer player : players) {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
             for (Quest quest : manager.getAllQuests()) {
-                quest.requirements.forEach(trigger -> trigger.setUnits(0));
-                quest.objectives.forEach(obj -> obj.setUnits(0));
-                quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
                 quest.hasSentTrigger = quest.requirements.isEmpty();
                 quest.hasSentCompletion = false;
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         ctx.getSource().sendSuccess(() -> Component.literal("Successfully reset all quest progress for " + players.size() + " player(s)."), true);
@@ -248,9 +254,11 @@ public class QuestlogCommands {
         for (ServerPlayer player : players) {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
             for (Quest quest : manager.getAllQuests()) {
-                quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-                quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(obj.getRequiredAmount()));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         ctx.getSource().sendSuccess(() -> Component.literal("Successfully completed all quests for " + players.size() + " player(s)."), true);
