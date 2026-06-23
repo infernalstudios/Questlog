@@ -13,7 +13,14 @@ public class NotObjective extends Objective {
 
     public NotObjective(JsonObject definition) {
         super(definition);
-        this.child = QuestObjectiveRegistry.create(JsonUtils.getObject(definition, "objective"));
+        JsonObject childObj;
+        if (definition.has("objective") && definition.get("objective").isJsonObject()) {
+            childObj = definition.getAsJsonObject("objective");
+        } else {
+            childObj = new JsonObject();
+            childObj.addProperty("type", "questlog:unobtainable");
+        }
+        this.child = QuestObjectiveRegistry.create(childObj);
     }
 
     @Override

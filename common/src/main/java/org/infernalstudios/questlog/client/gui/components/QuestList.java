@@ -82,6 +82,10 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         this.scroller = component;
     }
 
+    public QuestListEntry getHovered() {
+        return this.hovered;
+    }
+
     private boolean isRenderingScrollbar() {
         return this.scroller != null && this.scroller.canScroll();
     }
@@ -215,6 +219,10 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
 
         private final QuestList list;
         private final Quest quest;
+
+        public Quest getQuest() {
+            return this.quest;
+        }
 
         protected QuestListEntry(QuestList list, Quest quest) {
             this.list = list;

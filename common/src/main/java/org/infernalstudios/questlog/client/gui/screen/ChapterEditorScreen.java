@@ -53,6 +53,8 @@ public class ChapterEditorScreen extends Screen {
     private NoShadowEditBox orderBox;
 
     private int listPage = 0;
+    private int selectedSuggestionIndex = -1;
+    private String lastActiveBoxValue = "";
 
     public ChapterEditorScreen(Screen previousScreen, @Nullable ResourceLocation chapterToEdit) {
         super(Component.translatable(chapterToEdit != null ? "questlog.editor.edit_chapter" : "questlog.editor.add_chapter"));
@@ -412,6 +414,12 @@ public class ChapterEditorScreen extends Screen {
             ps.drawString(this.font, displayText, panel2X + 10, rowY + 5, color, false);
         }
 
+        String currentVal = this.iconBox != null ? this.iconBox.getValue() : "";
+        if (this.iconBox == null || !this.iconBox.isFocused() || !currentVal.equals(this.lastActiveBoxValue)) {
+            this.selectedSuggestionIndex = -1;
+            this.lastActiveBoxValue = currentVal;
+        }
+
         if (this.iconBox != null && this.iconBox.isFocused()) {
             List<String> matches = getLeftSuggestions(this.iconBox);
             if (!matches.isEmpty()) {
@@ -432,8 +440,9 @@ public class ChapterEditorScreen extends Screen {
                     String match = matches.get(i);
                     int itemY = startY + 1 + i * rowHeight;
                     boolean hovered = mouseX >= boxX && mouseX <= boxX + boxW && mouseY >= itemY && mouseY <= itemY + rowHeight;
+                    boolean selected = hovered || this.selectedSuggestionIndex == i;
 
-                    if (hovered) {
+                    if (selected) {
                         ps.fill(boxX, itemY, boxX + boxW, itemY + rowHeight, 0xFF404040);
                     }
 
@@ -441,7 +450,7 @@ public class ChapterEditorScreen extends Screen {
                     if (this.font.width(drawText) > boxW - 10) {
                         drawText = this.font.plainSubstrByWidth(drawText, boxW - 16) + "...";
                     }
-                    ps.drawString(this.font, drawText, boxX + 4, itemY + 3, hovered ? 0xFFFFFF00 : 0xFFFFFFFF, false);
+                    ps.drawString(this.font, drawText, boxX + 4, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
                 }
             }
         }
@@ -484,6 +493,32 @@ public class ChapterEditorScreen extends Screen {
                 this.minecraft.setScreen(this.previousScreen);
             }
             return true;
+        }
+
+        if (this.iconBox != null && this.iconBox.isFocused()) {
+            List<String> matches = getLeftSuggestions(this.iconBox);
+            if (!matches.isEmpty()) {
+                if (key == GLFW.GLFW_KEY_DOWN) {
+                    this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % matches.size();
+                    return true;
+                } else if (key == GLFW.GLFW_KEY_UP) {
+                    if (this.selectedSuggestionIndex <= 0) {
+                        this.selectedSuggestionIndex = matches.size() - 1;
+                    } else {
+                        this.selectedSuggestionIndex--;
+                    }
+                    return true;
+                } else if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
+                    if (this.selectedSuggestionIndex >= 0 && this.selectedSuggestionIndex < matches.size()) {
+                        this.iconBox.setValue(matches.get(this.selectedSuggestionIndex));
+                        this.saveTemporaryState();
+                        this.iconBox.setFocused(false);
+                        this.rebuildWidgets();
+                        this.selectedSuggestionIndex = -1;
+                        return true;
+                    }
+                }
+            }
         }
 
         if (this.getFocused() != null && this.getFocused().keyPressed(key, scancode, modifiers)) {

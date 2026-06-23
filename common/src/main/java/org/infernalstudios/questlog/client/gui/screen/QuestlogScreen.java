@@ -453,6 +453,26 @@ public class QuestlogScreen extends Screen {
                 ps.drawString(font, Component.translatable("questlog.editor.active"), 10, this.height - 15, 0xE6AA1C | 0xFF000000, false);
             }
         }
+
+        if (this.questList != null && this.questList.scrollable instanceof QuestList list) {
+            QuestList.QuestListEntry hovered = list.getHovered();
+            if (hovered != null && hovered.getQuest() != null) {
+                String titleStr = hovered.getQuest().getDisplay().getTitle().getString();
+                if (titleStr.startsWith("Broken Quest")) {
+                    String descStr = hovered.getQuest().getDisplay().getDescription().getString();
+                    int errorIdx = descStr.indexOf("Error details:\n");
+                    if (errorIdx != -1) {
+                        String errorMsg = descStr.substring(errorIdx + "Error details:\n".length());
+                        List<Component> tooltipLines = new ArrayList<>();
+                        tooltipLines.add(Component.literal("JSON Error Details:").withStyle(net.minecraft.ChatFormatting.RED).withStyle(net.minecraft.ChatFormatting.BOLD));
+                        for (String line : errorMsg.split("\n")) {
+                            tooltipLines.add(Component.literal(line).withStyle(net.minecraft.ChatFormatting.GRAY));
+                        }
+                        ps.renderComponentTooltip(this.font, tooltipLines, mouseX, mouseY);
+                    }
+                }
+            }
+        }
     }
 
     @Override

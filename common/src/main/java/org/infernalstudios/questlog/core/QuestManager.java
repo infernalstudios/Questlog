@@ -99,7 +99,11 @@ public class QuestManager {
                     try {
                         JsonObject fallbackDef = new JsonObject();
                         fallbackDef.addProperty("title", "Broken Quest (" + id.getPath() + ")");
-                        fallbackDef.addProperty("description", "This quest failed to load properly. Edit it to fix errors.");
+                        String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+                        if (e.getCause() != null) {
+                            errorMsg += "\nCaused by: " + e.getCause().getMessage();
+                        }
+                        fallbackDef.addProperty("description", "This quest failed to load properly. Edit it to fix errors.\n\nError details:\n" + errorMsg);
                         fallbackDef.addProperty("chapter", definition != null && definition.has("chapter") ? definition.get("chapter").getAsString() : "main");
                         quest = Quest.create(fallbackDef, id, this);
                         CompoundTag data = new CompoundTag();

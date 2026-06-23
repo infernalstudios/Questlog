@@ -9,6 +9,7 @@ import org.infernalstudios.questlog.core.quests.objectives.block.BlockMineObject
 import org.infernalstudios.questlog.core.quests.objectives.block.BlockPlaceObjective;
 import org.infernalstudios.questlog.core.quests.objectives.entity.*;
 import org.infernalstudios.questlog.core.quests.objectives.item.*;
+import org.infernalstudios.questlog.core.quests.objectives.logic.AndObjective;
 import org.infernalstudios.questlog.core.quests.objectives.logic.NotObjective;
 import org.infernalstudios.questlog.core.quests.objectives.logic.OrObjective;
 import org.infernalstudios.questlog.core.quests.objectives.misc.*;
@@ -46,6 +47,8 @@ public class QuestObjectiveRegistry {
                 new EditorMetadata("entity", "Entity ID:", "required_amount", EditorMetadata.SuggestionType.ENTITY_TYPE));
 
         // Logic
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "and"), AndObjective::new,
+                new EditorMetadata(null, null, "required_amount"));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "or"), OrObjective::new,
                 new EditorMetadata(null, null, "required_amount"));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "not"), NotObjective::new,

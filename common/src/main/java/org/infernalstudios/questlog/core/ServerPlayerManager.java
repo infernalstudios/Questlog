@@ -11,11 +11,14 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 import org.infernalstudios.questlog.platform.Services;
+import net.minecraft.advancements.AdvancementHolder;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -159,7 +162,12 @@ public class ServerPlayerManager {
                 }
             }
 
-            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data));
+            List<ResourceLocation> advancements = new ArrayList<>();
+            for (AdvancementHolder holder : serverPlayer.getServer().getAdvancements().getAllAdvancements()) {
+                advancements.add(holder.id());
+            }
+
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data, advancements));
         }
     }
 

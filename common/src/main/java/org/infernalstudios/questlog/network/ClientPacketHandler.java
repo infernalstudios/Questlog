@@ -145,6 +145,7 @@ public class ClientPacketHandler {
     private static void processSync(QuestSyncPacket packet) {
         Questlog.LOGGER.info("Received quest & chapter sync from server.");
         DefinitionUtil.clearClientCaches();
+        QuestlogClient.ALL_ADVANCEMENTS = packet.advancements();
         for (Map.Entry<ResourceLocation, String> entry : packet.chapterDefinitions().entrySet()) {
             try {
                 JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
@@ -167,6 +168,21 @@ public class ClientPacketHandler {
                 manager.addQuest(quest);
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to parse synced quest {}", entry.getKey(), e);
+                try {
+                    JsonObject def = GSON.fromJson(entry.getValue(), JsonObject.class);
+                    JsonObject fallbackDef = new JsonObject();
+                    fallbackDef.addProperty("title", "Broken Quest (" + entry.getKey().getPath() + ")");
+                    String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+                    if (e.getCause() != null) {
+                        errorMsg += "\nCaused by: " + e.getCause().getMessage();
+                    }
+                    fallbackDef.addProperty("description", "This quest failed to load properly. Edit it to fix errors.\n\nError details:\n" + errorMsg);
+                    fallbackDef.addProperty("chapter", def != null && def.has("chapter") ? def.get("chapter").getAsString() : "main");
+                    Quest quest = Quest.create(fallbackDef, entry.getKey(), manager);
+                    manager.addQuest(quest);
+                } catch (Exception ex) {
+                    Questlog.LOGGER.error("Failed to load fallback for synced quest {}", entry.getKey(), ex);
+                }
             }
         }
         for (Map.Entry<ResourceLocation, CompoundTag> entry : packet.data().entrySet()) {
