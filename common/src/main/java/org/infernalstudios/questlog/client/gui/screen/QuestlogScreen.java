@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.client.gui.screen;
 
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,12 +10,15 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
+import org.infernalstudios.questlog.client.gui.EditorUtils;
 import org.infernalstudios.questlog.client.gui.components.*;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
@@ -55,6 +59,7 @@ public class QuestlogScreen extends Screen {
     private boolean searchExpanded = false;
     private boolean descriptionsCondensed = false;
     private boolean hideCompleted = false;
+    private ContextMenu contextMenu = null;
 
     public QuestlogScreen(@Nullable Screen previousScreen) {
         super(Component.empty());
@@ -362,7 +367,7 @@ public class QuestlogScreen extends Screen {
             ChapterInfo info = this.availableChapters.get(chap);
             boolean isSelected = chap.equals(this.currentChapter);
 
-            this.addRenderableWidget(new ChapterTabButton(tabX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
+            this.addRenderableWidget(new ChapterTabButton(chap, tabX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
                 this.currentChapter = chap;
                 this.refreshList();
             }, QuestlogGuiSet.DEFAULT, info.name));
@@ -473,11 +478,158 @@ public class QuestlogScreen extends Screen {
                 }
             }
         }
+
+        if (this.contextMenu != null) {
+            this.contextMenu.render(ps, mouseX, mouseY, this.font);
+        }
     }
 
     @Override
     public boolean isPauseScreen() {
         return true;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.contextMenu != null) {
+            if (this.contextMenu.isMouseOver(mouseX, mouseY)) {
+                this.contextMenu.mouseClicked(mouseX, mouseY, button);
+            }
+            this.contextMenu = null;
+            return true;
+        }
+
+        if (QuestlogClient.isEditModeActive && button == GLFW.GLFW_MOUSE_BUTTON_2) {
+            // 1. Check if click is on a chapter tab button
+            for (var listener : this.children()) {
+                if (listener instanceof ChapterTabButton btn && btn.isMouseOver(mouseX, mouseY)) {
+                    List<ContextMenuItem> items = new ArrayList<>();
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.edit_chapter"), () -> {
+                        if (this.minecraft != null) {
+                            this.minecraft.setScreen(new ChapterEditorScreen(this, btn.getChapterId()));
+                        }
+                    }));
+                    if (!btn.getChapterId().getPath().equals("main")) {
+                        items.add(new ContextMenuItem(Component.translatable("questlog.menu.delete_chapter"), () -> {
+                            this.confirmDeleteChapter(btn.getChapterId(), btn.getMessage());
+                        }));
+                    }
+                    this.openContextMenu((int) mouseX, (int) mouseY, items);
+                    return true;
+                }
+            }
+
+            // 2. Check if click is on the empty chapter tab bar area
+            int listWidth = 245;
+            int listHeight = 136;
+            int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
+            int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
+            int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
+            int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
+            if (mouseX >= tabX - 12 && mouseX <= tabX + (MAX_TABS * 30) + 12 && mouseY >= tabY && mouseY <= tabY + 30) {
+                List<ContextMenuItem> items = new ArrayList<>();
+                items.add(new ContextMenuItem(Component.translatable("questlog.menu.add_chapter"), () -> {
+                    if (this.minecraft != null) {
+                        this.minecraft.setScreen(new ChapterEditorScreen(this, null));
+                    }
+                }));
+                this.openContextMenu((int) mouseX, (int) mouseY, items);
+                return true;
+            }
+
+            // 3. Check if click is on the quest list area
+            boolean isOverListArea = mouseX >= listX && mouseX <= listX + listWidth && mouseY >= listY && mouseY <= listY + listHeight;
+            if (isOverListArea) {
+                Quest hoveredQuest = null;
+                if (this.questList != null && this.questList.scrollable instanceof QuestList list) {
+                    QuestList.QuestListEntry hovered = list.getHovered();
+                    if (hovered != null) {
+                        hoveredQuest = hovered.getQuest();
+                    }
+                }
+
+                List<ContextMenuItem> items = new ArrayList<>();
+                if (hoveredQuest != null) {
+                    Quest finalHovered = hoveredQuest;
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.edit"), () -> {
+                        if (this.minecraft != null) {
+                            this.minecraft.setScreen(new QuestEditorScreen(this, finalHovered));
+                        }
+                    }));
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.duplicate"), () -> {
+                        EditorUtils.duplicateQuest(finalHovered.getId());
+                    }));
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.copy"), () -> {
+                        EditorUtils.copyQuestToClipboard(finalHovered.getId());
+                    }));
+                    if (EditorUtils.hasCopiedQuest()) {
+                        items.add(new ContextMenuItem(Component.translatable("questlog.menu.paste"), () -> {
+                            EditorUtils.pasteQuest(this.currentChapter);
+                        }));
+                    }
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.delete"), () -> {
+                        this.confirmDeleteQuest(finalHovered);
+                    }));
+                } else {
+                    if (EditorUtils.hasCopiedQuest()) {
+                        items.add(new ContextMenuItem(Component.translatable("questlog.menu.paste"), () -> {
+                            EditorUtils.pasteQuest(this.currentChapter);
+                        }));
+                    }
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.add_quest"), () -> {
+                        if (this.minecraft != null) {
+                            this.minecraft.setScreen(new QuestEditorScreen(this));
+                        }
+                    }));
+                }
+
+                if (!items.isEmpty()) {
+                    this.openContextMenu((int) mouseX, (int) mouseY, items);
+                    return true;
+                }
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void openContextMenu(int x, int y, List<ContextMenuItem> items) {
+        if (this.minecraft != null) {
+            this.contextMenu = new ContextMenu(x, y, items, this.font, this.width, this.height);
+        }
+    }
+
+    private void confirmDeleteQuest(Quest quest) {
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(new ConfirmScreen(
+                (boolean confirm) -> {
+                    if (confirm) {
+                        EditorUtils.deleteQuest(quest.getId());
+                    }
+                    this.minecraft.setScreen(this);
+                },
+                Component.translatable("questlog.menu.delete.confirm.title"),
+                Component.translatable("questlog.menu.delete.confirm.message", quest.getDisplay().getTitle())
+            ));
+        }
+    }
+
+    private void confirmDeleteChapter(ResourceLocation chapterId, Component name) {
+        if (this.minecraft != null) {
+            this.minecraft.setScreen(new ConfirmScreen(
+                (boolean confirm) -> {
+                    if (confirm) {
+                        EditorUtils.deleteChapter(chapterId);
+                        if (chapterId.equals(this.currentChapter)) {
+                            this.currentChapter = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "main");
+                        }
+                    }
+                    this.minecraft.setScreen(this);
+                },
+                Component.translatable("questlog.menu.delete_chapter.confirm.title"),
+                Component.translatable("questlog.menu.delete_chapter.confirm.message", name)
+            ));
+        }
     }
 
     @Override
@@ -510,6 +662,86 @@ public class QuestlogScreen extends Screen {
             this.isPrimary = isPrimary;
             this.hidden = hidden;
             this.name = name;
+        }
+    }
+
+    private static class ContextMenuItem {
+        final Component label;
+        final Runnable action;
+
+        ContextMenuItem(Component label, Runnable action) {
+            this.label = label;
+            this.action = action;
+        }
+    }
+
+    private static class ContextMenu {
+        private final int x;
+        private final int y;
+        private final int width;
+        private final int height;
+        private final List<ContextMenuItem> items;
+
+        ContextMenu(int x, int y, List<ContextMenuItem> items, Font font, int screenWidth, int screenHeight) {
+            this.items = items;
+            int maxW = 0;
+            for (ContextMenuItem item : items) {
+                maxW = Math.max(maxW, font.width(item.label));
+            }
+            this.width = maxW + 20;
+            this.height = items.size() * 18 + 6;
+
+            // Constrain within screen bounds
+            if (x + this.width > screenWidth) {
+                this.x = screenWidth - this.width - 2;
+            } else {
+                this.x = x;
+            }
+            if (y + this.height > screenHeight) {
+                this.y = screenHeight - this.height - 2;
+            } else {
+                this.y = y;
+            }
+        }
+
+        void render(GuiGraphics ps, int mouseX, int mouseY, Font font) {
+            ps.pose().pushPose();
+            ps.pose().translate(0, 0, 400); // Render above list and other screens
+            
+            // Draw background
+            ps.fill(this.x, this.y, this.x + this.width, this.y + this.height, 0xFF181818);
+            // Draw borders
+            ps.fill(this.x - 1, this.y, this.x, this.y + this.height, 0xFF505050);
+            ps.fill(this.x + this.width, this.y, this.x + this.width + 1, this.y + this.height, 0xFF505050);
+            ps.fill(this.x, this.y - 1, this.x + this.width, this.y, 0xFF505050);
+            ps.fill(this.x, this.y + this.height, this.x + this.width, this.y + this.height + 1, 0xFF505050);
+
+            for (int i = 0; i < this.items.size(); i++) {
+                ContextMenuItem item = this.items.get(i);
+                int itemY = this.y + 3 + i * 18;
+                boolean hovered = mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= itemY && mouseY <= itemY + 18;
+                if (hovered) {
+                    ps.fill(this.x + 2, itemY, this.x + this.width - 2, itemY + 18, 0xFF404040);
+                }
+                ps.drawString(font, item.label, this.x + 10, itemY + 5, hovered ? 0xFFFFFF00 : 0xFFFFFFFF, false);
+            }
+            ps.pose().popPose();
+        }
+
+        boolean isMouseOver(double mouseX, double mouseY) {
+            return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
+        }
+
+        void mouseClicked(double mouseX, double mouseY, int button) {
+            if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
+                for (int i = 0; i < this.items.size(); i++) {
+                    int itemY = this.y + 3 + i * 18;
+                    if (mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= itemY && mouseY <= itemY + 18) {
+                        this.items.get(i).action.run();
+                        break;
+                    }
+                }
+            }
         }
     }
 }

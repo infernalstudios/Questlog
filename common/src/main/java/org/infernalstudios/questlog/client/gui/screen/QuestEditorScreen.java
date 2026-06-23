@@ -21,6 +21,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
+import org.infernalstudios.questlog.client.gui.EditorUtils;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.quests.EditorMetadata;
 import org.infernalstudios.questlog.core.quests.EditorMetadata.SuggestionType;
@@ -789,7 +790,7 @@ public class QuestEditorScreen extends Screen {
 
     private void deleteQuestOnServer() {
         if (this.questToEdit != null) {
-            Services.PLATFORM.sendPacketToServer(new QuestEditRemovePacket(this.questToEdit.getId()));
+            EditorUtils.deleteQuest(this.questToEdit.getId());
             if (this.minecraft != null) {
                 this.minecraft.setScreen(this.previousScreen);
             }

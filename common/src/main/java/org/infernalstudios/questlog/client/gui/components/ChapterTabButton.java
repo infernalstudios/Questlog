@@ -5,12 +5,14 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ChapterTabButton extends AbstractButton {
+    private final ResourceLocation chapterId;
     private final QuestlogGuiSet guiSet;
     @Nullable
     private final Blittable icon;
@@ -18,14 +20,19 @@ public class ChapterTabButton extends AbstractButton {
     private final boolean isPrimary;
     private final Runnable onPress;
 
-    public ChapterTabButton(int x, int y, @Nullable Blittable icon, boolean isSelected, boolean isPrimary, Runnable onPress, QuestlogGuiSet guiSet, Component name) {
+    public ChapterTabButton(ResourceLocation chapterId, int x, int y, @Nullable Blittable icon, boolean isSelected, boolean isPrimary, Runnable onPress, QuestlogGuiSet guiSet, Component name) {
         super(x, y, 28, isSelected ? 29 : 23, name);
+        this.chapterId = chapterId;
         this.icon = icon;
         this.isSelected = isSelected;
         this.isPrimary = isPrimary;
         this.onPress = onPress;
         this.guiSet = guiSet;
         this.setTooltip(Tooltip.create(name));
+    }
+
+    public ResourceLocation getChapterId() {
+        return this.chapterId;
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
 import org.infernalstudios.questlog.core.DefinitionUtil;
+import org.infernalstudios.questlog.client.gui.EditorUtils;
 import org.infernalstudios.questlog.network.packet.ChapterEditRemovePacket;
 import org.infernalstudios.questlog.network.packet.ChapterEditSavePacket;
 import org.infernalstudios.questlog.network.packet.QuestEditSavePacket;
@@ -298,22 +299,7 @@ public class ChapterEditorScreen extends Screen {
 
     private void deleteChapterOnServer() {
         if (this.chapterToEdit != null) {
-            String chapPath = this.chapterToEdit.getPath();
-            if (!chapPath.equals("main")) {
-                for (ResourceLocation qKey : DefinitionUtil.getCachedQuestKeys()) {
-                    try {
-                        JsonObject qJson = DefinitionUtil.getCachedQuest(qKey);
-                        String qChap = qJson.has("chapter") ? qJson.get("chapter").getAsString() : "main";
-                        if (qChap.equals(chapPath)) {
-                            qJson.addProperty("chapter", "main");
-                            Services.PLATFORM.sendPacketToServer(new QuestEditSavePacket(qKey, qJson.toString()));
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-
-                Services.PLATFORM.sendPacketToServer(new ChapterEditRemovePacket(this.chapterToEdit));
-            }
+            EditorUtils.deleteChapter(this.chapterToEdit);
         }
         if (this.minecraft != null) {
             this.minecraft.setScreen(this.previousScreen);
