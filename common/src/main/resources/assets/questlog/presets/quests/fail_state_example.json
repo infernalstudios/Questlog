@@ -1,0 +1,34 @@
+{
+  "title": "Speedrunner",
+  "description": "Obtain a diamond within 5 minutes, or fail!",
+  "description_completed": "You did it! You're a true speedrunner.",
+  "description_failed": "Too slow! Try again!",
+  "icon": {
+    "item": "minecraft:diamond"
+  },
+  "requirements": [],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:diamond",
+      "required_amount": 1,
+      "name": "Obtain a Diamond"
+    }
+  ],
+  "failures": [
+    {
+      "type": "questlog:stat",
+      "stat": "minecraft:play_time",
+      "required_amount": 6000,
+      "retroactive": false,
+      "name": "Don't take longer than 5 minutes"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:netherite_ingot",
+      "count": 1
+    }
+  ]
+}

@@ -22,6 +22,8 @@ import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
 import org.infernalstudios.questlog.client.gui.EditorUtils;
+import org.infernalstudios.questlog.client.gui.ContextMenu;
+import org.infernalstudios.questlog.client.gui.ContextMenuItem;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.quests.EditorMetadata;
 import org.infernalstudios.questlog.core.quests.EditorMetadata.SuggestionType;
@@ -73,6 +75,10 @@ public class QuestEditorScreen extends Screen {
     private List<JsonObject> currentNestedList = null;
     @Nullable
     private Quest questToEdit;
+    @Nullable
+    private JsonObject presetJson = null;
+    @Nullable
+    private ContextMenu contextMenu = null;
     private NineSliceTexture bgLeft;
     private NineSliceTexture bgRight;
     private int typeListScroll = 0;
@@ -110,13 +116,18 @@ public class QuestEditorScreen extends Screen {
     private NoShadowEditBox entryTargetBox;
     private NoShadowEditBox entryAmountBox;
     public QuestEditorScreen(Screen previousScreen) {
-        this(previousScreen, null);
+        this(previousScreen, null, null);
     }
 
     public QuestEditorScreen(Screen previousScreen, @Nullable Quest questToEdit) {
+        this(previousScreen, questToEdit, null);
+    }
+
+    public QuestEditorScreen(Screen previousScreen, @Nullable Quest questToEdit, @Nullable JsonObject presetJson) {
         super(Component.translatable(questToEdit != null ? "questlog.editor.title" : "questlog.editor.add_quest"));
         this.previousScreen = previousScreen;
         this.questToEdit = questToEdit;
+        this.presetJson = presetJson;
 
         this.loadQuestData();
     }
@@ -126,28 +137,16 @@ public class QuestEditorScreen extends Screen {
             this.tempId = this.questToEdit.getId().toString();
             try {
                 JsonObject definition = DefinitionUtil.getCachedQuest(this.questToEdit.getId());
-                this.tempTitle = definition.has("title") ? definition.get("title").getAsString() : "";
-                this.tempDescription = definition.has("description") ? definition.get("description").getAsString() : "";
-
-                if (definition.has("icon") && definition.get("icon").isJsonObject()) {
-                    JsonObject iconObj = definition.getAsJsonObject("icon");
-                    this.tempIconItem = iconObj.has("item") ? iconObj.get("item").getAsString() : "";
-                }
-
-                this.tempChapter = definition.has("chapter") ? definition.get("chapter").getAsString() : "main";
-                this.tempSortOrder = definition.has("order") ? definition.get("order").getAsInt() : 0;
-
-                this.tempHidden = definition.has("hidden") && definition.get("hidden").getAsBoolean();
-                this.tempIncludeInMain = !definition.has("include_in_main") || definition.get("include_in_main").getAsBoolean();
-                this.tempDetailsDefault = definition.has("details_default") && definition.get("details_default").getAsBoolean();
-                this.tempDetailsDisabled = definition.has("details_disabled") && definition.get("details_disabled").getAsBoolean();
-
-                this.loadList(definition.getAsJsonArray("objectives"), this.tempObjectives);
-                this.loadList(definition.getAsJsonArray("requirements"), this.tempRequirements);
-                this.loadList(definition.getAsJsonArray("failures"), null);
-                this.loadList(definition.getAsJsonArray("rewards"), this.tempRewards);
+                this.loadFromDefinition(definition);
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to load quest definition for editing", e);
+            }
+        } else if (this.presetJson != null) {
+            this.tempId = "questlog:new_quest_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+            try {
+                this.loadFromDefinition(this.presetJson);
+            } catch (Exception e) {
+                Questlog.LOGGER.error("Failed to load quest preset definition", e);
             }
         } else {
             this.tempId = "questlog:new_quest_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
@@ -156,7 +155,37 @@ public class QuestEditorScreen extends Screen {
             this.tempIconItem = "minecraft:knowledge_book";
             this.tempChapter = "main";
             this.tempSortOrder = 0;
+            this.tempHidden = false;
+            this.tempIncludeInMain = true;
+            this.tempDetailsDefault = false;
+            this.tempDetailsDisabled = false;
+            this.tempObjectives.clear();
+            this.tempRequirements.clear();
+            this.tempRewards.clear();
         }
+    }
+
+    private void loadFromDefinition(JsonObject definition) {
+        this.tempTitle = definition.has("title") ? definition.get("title").getAsString() : "";
+        this.tempDescription = definition.has("description") ? definition.get("description").getAsString() : "";
+
+        if (definition.has("icon") && definition.get("icon").isJsonObject()) {
+            JsonObject iconObj = definition.getAsJsonObject("icon");
+            this.tempIconItem = iconObj.has("item") ? iconObj.get("item").getAsString() : "";
+        }
+
+        this.tempChapter = definition.has("chapter") ? definition.get("chapter").getAsString() : "main";
+        this.tempSortOrder = definition.has("order") ? definition.get("order").getAsInt() : 0;
+
+        this.tempHidden = definition.has("hidden") && definition.get("hidden").getAsBoolean();
+        this.tempIncludeInMain = !definition.has("include_in_main") || definition.get("include_in_main").getAsBoolean();
+        this.tempDetailsDefault = definition.has("details_default") && definition.get("details_default").getAsBoolean();
+        this.tempDetailsDisabled = definition.has("details_disabled") && definition.get("details_disabled").getAsBoolean();
+
+        this.loadList(definition.getAsJsonArray("objectives"), this.tempObjectives);
+        this.loadList(definition.getAsJsonArray("requirements"), this.tempRequirements);
+        this.loadList(definition.getAsJsonArray("failures"), null);
+        this.loadList(definition.getAsJsonArray("rewards"), this.tempRewards);
     }
 
     private void loadList(@Nullable JsonArray array, List<JsonObject> target) {
@@ -266,6 +295,49 @@ public class QuestEditorScreen extends Screen {
             }).bounds(panel2X + 80, bottomY, 80, 20).build();
             btnDelete.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.delete_quest")));
             this.addRenderableWidget(btnDelete);
+        } else {
+            Button btnPresets = Button.builder(Component.translatable("questlog.editor.presets"), btn -> {
+                this.openPresetsContextMenu();
+            }).bounds(panel2X, bottomY, 160, 20).build();
+            this.addRenderableWidget(btnPresets);
+        }
+    }
+
+    private void openPresetsContextMenu() {
+        int PANEL_SPACING = 6;
+        int leftWidth = 240;
+        int rightWidth = 160;
+        int height = 190;
+        int totalWidth = leftWidth + rightWidth + PANEL_SPACING;
+        int baseX = (this.width - totalWidth) / 2;
+        int baseY = (this.height - height) / 2;
+        int panel2X = baseX + leftWidth + PANEL_SPACING;
+        int bottomY = baseY + height + 10;
+
+        List<ContextMenuItem> items = new ArrayList<>();
+        for (EditorUtils.QuestPreset preset : EditorUtils.getPresets()) {
+            items.add(new ContextMenuItem(
+                Component.literal(preset.getTitle()),
+                () -> {
+                    try {
+                        JsonObject presetJsonCloned = preset.getJson().deepCopy();
+                        if (this.chapterBox != null) {
+                            presetJsonCloned.addProperty("chapter", this.chapterBox.getValue());
+                        }
+                        this.presetJson = presetJsonCloned;
+                        this.loadQuestData();
+                        this.rebuildWidgets();
+                    } catch (Exception e) {
+                        Questlog.LOGGER.error("Failed to load preset in editor", e);
+                    }
+                },
+                preset.getDescription().isEmpty() ? null : Component.literal(preset.getDescription())
+            ));
+        }
+
+        if (!items.isEmpty()) {
+            int menuHeight = Math.min(items.size(), 8) * 18 + 6;
+            this.contextMenu = new ContextMenu(panel2X, bottomY - menuHeight - 2, items, this.font, this.width, this.height);
         }
     }
 
@@ -1041,7 +1113,9 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
-        super.render(ps, mouseX, mouseY, delta);
+        int renderMouseX = this.contextMenu != null ? -9999 : mouseX;
+        int renderMouseY = this.contextMenu != null ? -9999 : mouseY;
+        super.render(ps, renderMouseX, renderMouseY, delta);
 
         int PANEL_SPACING = 6;
         int leftWidth = 240;
@@ -1093,7 +1167,7 @@ public class QuestEditorScreen extends Screen {
                 String shortName = type.replace("questlog:", "");
                 int rowY = listY + (i - start) * itemHeight;
 
-                boolean hovered = mouseX >= listX && mouseX <= listX + listW && mouseY >= rowY && mouseY <= rowY + itemHeight;
+                boolean hovered = renderMouseX >= listX && renderMouseX <= listX + listW && renderMouseY >= rowY && renderMouseY <= rowY + itemHeight;
                 if (hovered) {
                     ps.fill(listX, rowY, listX + listW, rowY + itemHeight, 0xFF404040);
                 }
@@ -1231,7 +1305,7 @@ public class QuestEditorScreen extends Screen {
                 for (int i = 0; i < matches.size(); i++) {
                     String match = matches.get(i);
                     int itemY = startY + 1 + i * rowHeight;
-                    boolean hovered = mouseX >= boxX && mouseX <= boxX + boxW && mouseY >= itemY && mouseY <= itemY + rowHeight;
+                    boolean hovered = renderMouseX >= boxX && renderMouseX <= boxX + boxW && renderMouseY >= itemY && renderMouseY <= itemY + rowHeight;
                     boolean selected = hovered || this.selectedSuggestionIndex == i;
 
                     if (selected) {
@@ -1263,7 +1337,7 @@ public class QuestEditorScreen extends Screen {
                 for (int i = 0; i < matches.size(); i++) {
                     String match = matches.get(i);
                     int itemY = startY + 1 + i * rowHeight;
-                    boolean hovered = mouseX >= panel2X + 15 && mouseX <= panel2X + 145 && mouseY >= itemY && mouseY <= itemY + rowHeight;
+                    boolean hovered = renderMouseX >= panel2X + 15 && renderMouseX <= panel2X + 145 && renderMouseY >= itemY && renderMouseY <= itemY + rowHeight;
                     boolean selected = hovered || this.selectedSuggestionIndex == i;
 
                     if (selected) {
@@ -1277,6 +1351,10 @@ public class QuestEditorScreen extends Screen {
                     ps.drawString(this.font, drawText, panel2X + 18, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
                 }
             }
+        }
+
+        if (this.contextMenu != null) {
+            this.contextMenu.render(ps, mouseX, mouseY, this.font);
         }
     }
 
@@ -1305,6 +1383,19 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (this.contextMenu != null) {
+            ContextMenu menu = this.contextMenu;
+            if (menu.isMouseOver(mouseX, mouseY)) {
+                menu.mouseClicked(mouseX, mouseY, button);
+                if (this.contextMenu == menu) {
+                    this.contextMenu = null;
+                }
+                return true;
+            }
+            this.contextMenu = null;
+            return true;
+        }
+
         if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
 
             NoShadowEditBox activeLeftBox = null;
@@ -1400,6 +1491,11 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.contextMenu != null) {
+            if (this.contextMenu.mouseScrolled(scrollY)) {
+                return true;
+            }
+        }
         if (this.rightPageState == RightPageState.SELECT_TYPE) {
             int count = getCount();
             int maxScroll = Math.max(0, count - 7);

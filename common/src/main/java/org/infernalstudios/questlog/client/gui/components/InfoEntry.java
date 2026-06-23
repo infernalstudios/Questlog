@@ -63,9 +63,12 @@ public class InfoEntry implements Renderable, GuiEventListener {
             truncated = true;
         }
 
-        ps.drawString(font, renderedName, textX, this.y + 2, questDetails.getPalette().textColor(), false);
+        boolean isSubReward = isReward && rewardData.getReward() != null && rewardData.getReward().getContainer() != null;
+        int nameY = isSubReward ? this.y + 9 : this.y + 2;
 
-        if (truncated && mouseX >= textX && mouseX <= textX + font.width(renderedName) && mouseY >= this.y + 2 && mouseY <= this.y + 2 + font.lineHeight) {
+        ps.drawString(font, renderedName, textX, nameY, questDetails.getPalette().textColor(), false);
+
+        if (truncated && mouseX >= textX && mouseX <= textX + font.width(renderedName) && mouseY >= nameY && mouseY <= nameY + font.lineHeight) {
             this.questDetails.pendingTooltip = name;
         }
 
@@ -77,6 +80,9 @@ public class InfoEntry implements Renderable, GuiEventListener {
     }
 
     private void drawRewardStatus(GuiGraphics ps, int textX) {
+        if (rewardData.getReward() != null && rewardData.getReward().getContainer() != null) {
+            return;
+        }
         Component status = rewardData.hasRewarded() ?
                 (display != null ? display.getCollectedText() : Component.translatable("questlog.reward.collected")) :
                 (display != null ? display.getUncollectedText() : Component.translatable("questlog.reward.uncollected"));

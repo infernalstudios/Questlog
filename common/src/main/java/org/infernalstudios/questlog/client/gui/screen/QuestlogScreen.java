@@ -19,6 +19,8 @@ import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.EditorUtils;
+import org.infernalstudios.questlog.client.gui.ContextMenu;
+import org.infernalstudios.questlog.client.gui.ContextMenuItem;
 import org.infernalstudios.questlog.client.gui.components.*;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
@@ -421,7 +423,9 @@ public class QuestlogScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
-        super.render(ps, mouseX, mouseY, delta);
+        int renderMouseX = this.contextMenu != null ? -9999 : mouseX;
+        int renderMouseY = this.contextMenu != null ? -9999 : mouseY;
+        super.render(ps, renderMouseX, renderMouseY, delta);
 
         if (this.questList == null) {
             Font font = this.minecraft != null ? this.minecraft.font : null;
@@ -463,7 +467,7 @@ public class QuestlogScreen extends Screen {
                         for (String line : errorMsg.split("\n")) {
                             tooltipLines.add(Component.literal(line).withStyle(net.minecraft.ChatFormatting.GRAY));
                         }
-                        ps.renderComponentTooltip(this.font, tooltipLines, mouseX, mouseY);
+                        ps.renderComponentTooltip(this.font, tooltipLines, renderMouseX, renderMouseY);
                     }
                 }
             }
@@ -480,10 +484,25 @@ public class QuestlogScreen extends Screen {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (this.contextMenu != null) {
+            if (this.contextMenu.mouseScrolled(scrollY)) {
+                return true;
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (this.contextMenu != null) {
-            if (this.contextMenu.isMouseOver(mouseX, mouseY)) {
-                this.contextMenu.mouseClicked(mouseX, mouseY, button);
+            ContextMenu menu = this.contextMenu;
+            if (menu.isMouseOver(mouseX, mouseY)) {
+                menu.mouseClicked(mouseX, mouseY, button);
+                if (this.contextMenu == menu) {
+                    this.contextMenu = null;
+                }
+                return true;
             }
             this.contextMenu = null;
             return true;
@@ -571,6 +590,9 @@ public class QuestlogScreen extends Screen {
                             this.minecraft.setScreen(new QuestEditorScreen(this));
                         }
                     }));
+                    items.add(new ContextMenuItem(Component.translatable("questlog.menu.add_quest_preset"), () -> {
+                        this.openPresetsContextMenu((int) mouseX, (int) mouseY);
+                    }));
                 }
 
                 if (!items.isEmpty()) {
@@ -587,6 +609,47 @@ public class QuestlogScreen extends Screen {
         if (this.minecraft != null) {
             this.contextMenu = new ContextMenu(x, y, items, this.font, this.width, this.height);
         }
+    }
+
+    private void openPresetsContextMenu(int x, int y) {
+        List<ContextMenuItem> items = new ArrayList<>();
+        items.add(new ContextMenuItem(Component.translatable("questlog.menu.back"), () -> {
+            List<ContextMenuItem> mainItems = new ArrayList<>();
+            if (EditorUtils.hasCopiedQuest()) {
+                mainItems.add(new ContextMenuItem(Component.translatable("questlog.menu.paste"), () -> {
+                    EditorUtils.pasteQuest(this.currentChapter);
+                }));
+            }
+            mainItems.add(new ContextMenuItem(Component.translatable("questlog.menu.add_quest"), () -> {
+                if (this.minecraft != null) {
+                    this.minecraft.setScreen(new QuestEditorScreen(this));
+                }
+            }));
+            mainItems.add(new ContextMenuItem(Component.translatable("questlog.menu.add_quest_preset"), () -> {
+                this.openPresetsContextMenu(x, y);
+            }));
+            this.openContextMenu(x, y, mainItems);
+        }));
+
+        for (EditorUtils.QuestPreset preset : EditorUtils.getPresets()) {
+            items.add(new ContextMenuItem(
+                Component.literal(preset.getTitle()),
+                () -> {
+                    if (this.minecraft != null) {
+                        try {
+                            JsonObject presetJsonCloned = preset.getJson().deepCopy();
+                            presetJsonCloned.addProperty("chapter", this.currentChapter.toString());
+                            this.minecraft.setScreen(new QuestEditorScreen(this, null, presetJsonCloned));
+                        } catch (Exception e) {
+                            Questlog.LOGGER.error("Failed to load preset json", e);
+                        }
+                    }
+                },
+                preset.getDescription().isEmpty() ? null : Component.literal(preset.getDescription())
+            ));
+        }
+
+        this.openContextMenu(x, y, items);
     }
 
     private void confirmDeleteQuest(Quest quest) {
@@ -652,86 +715,6 @@ public class QuestlogScreen extends Screen {
             this.isPrimary = isPrimary;
             this.hidden = hidden;
             this.name = name;
-        }
-    }
-
-    private static class ContextMenuItem {
-        final Component label;
-        final Runnable action;
-
-        ContextMenuItem(Component label, Runnable action) {
-            this.label = label;
-            this.action = action;
-        }
-    }
-
-    private static class ContextMenu {
-        private final int x;
-        private final int y;
-        private final int width;
-        private final int height;
-        private final List<ContextMenuItem> items;
-
-        ContextMenu(int x, int y, List<ContextMenuItem> items, Font font, int screenWidth, int screenHeight) {
-            this.items = items;
-            int maxW = 0;
-            for (ContextMenuItem item : items) {
-                maxW = Math.max(maxW, font.width(item.label));
-            }
-            this.width = maxW + 20;
-            this.height = items.size() * 18 + 6;
-
-            // Constrain within screen bounds
-            if (x + this.width > screenWidth) {
-                this.x = screenWidth - this.width - 2;
-            } else {
-                this.x = x;
-            }
-            if (y + this.height > screenHeight) {
-                this.y = screenHeight - this.height - 2;
-            } else {
-                this.y = y;
-            }
-        }
-
-        void render(GuiGraphics ps, int mouseX, int mouseY, Font font) {
-            ps.pose().pushPose();
-            ps.pose().translate(0, 0, 400); // Render above list and other screens
-            
-            // Draw background
-            ps.fill(this.x, this.y, this.x + this.width, this.y + this.height, 0xFF181818);
-            // Draw borders
-            ps.fill(this.x - 1, this.y, this.x, this.y + this.height, 0xFF505050);
-            ps.fill(this.x + this.width, this.y, this.x + this.width + 1, this.y + this.height, 0xFF505050);
-            ps.fill(this.x, this.y - 1, this.x + this.width, this.y, 0xFF505050);
-            ps.fill(this.x, this.y + this.height, this.x + this.width, this.y + this.height + 1, 0xFF505050);
-
-            for (int i = 0; i < this.items.size(); i++) {
-                ContextMenuItem item = this.items.get(i);
-                int itemY = this.y + 3 + i * 18;
-                boolean hovered = mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= itemY && mouseY <= itemY + 18;
-                if (hovered) {
-                    ps.fill(this.x + 2, itemY, this.x + this.width - 2, itemY + 18, 0xFF404040);
-                }
-                ps.drawString(font, item.label, this.x + 10, itemY + 5, hovered ? 0xFFFFFF00 : 0xFFFFFFFF, false);
-            }
-            ps.pose().popPose();
-        }
-
-        boolean isMouseOver(double mouseX, double mouseY) {
-            return mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= this.y && mouseY <= this.y + this.height;
-        }
-
-        void mouseClicked(double mouseX, double mouseY, int button) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-                for (int i = 0; i < this.items.size(); i++) {
-                    int itemY = this.y + 3 + i * 18;
-                    if (mouseX >= this.x && mouseX <= this.x + this.width && mouseY >= itemY && mouseY <= itemY + 18) {
-                        this.items.get(i).action.run();
-                        break;
-                    }
-                }
-            }
         }
     }
 }

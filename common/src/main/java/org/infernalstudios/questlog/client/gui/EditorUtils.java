@@ -4,14 +4,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.network.packet.ChapterEditRemovePacket;
 import org.infernalstudios.questlog.network.packet.QuestEditRemovePacket;
 import org.infernalstudios.questlog.network.packet.QuestEditSavePacket;
 import org.infernalstudios.questlog.platform.Services;
+import org.infernalstudios.questlog.util.Util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class EditorUtils {
     public static JsonObject copiedQuestJson = null;
@@ -130,5 +137,69 @@ public class EditorUtils {
             }
             Services.PLATFORM.sendPacketToServer(new ChapterEditRemovePacket(chapterId));
         }
+    }
+
+    public static class QuestPreset {
+        private final String filename;
+        private final String title;
+        private final String description;
+        private final JsonObject json;
+
+        public QuestPreset(String filename, String title, String description, JsonObject json) {
+            this.filename = filename;
+            this.title = title;
+            this.description = description;
+            this.json = json;
+        }
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public JsonObject getJson() {
+            return json;
+        }
+    }
+
+    public static List<QuestPreset> getPresets() {
+        List<QuestPreset> presets = new ArrayList<>();
+        try {
+            ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+            Map<ResourceLocation, Resource> resources = resourceManager.listResources(
+                "presets/quests",
+                loc -> loc.getNamespace().equals(Questlog.MODID) && loc.getPath().endsWith(".json")
+            );
+
+            Map<ResourceLocation, Resource> sortedResources = new TreeMap<>(resources);
+            for (Map.Entry<ResourceLocation, Resource> entry : sortedResources.entrySet()) {
+                ResourceLocation loc = entry.getKey();
+                try {
+                    JsonObject json = Util.getJsonResource(entry.getValue());
+                    String filename = loc.getPath();
+                    if (filename.startsWith("presets/quests/")) {
+                        filename = filename.substring("presets/quests/".length());
+                    }
+                    if (filename.endsWith(".json")) {
+                        filename = filename.substring(0, filename.length() - 5);
+                    }
+                    String title = json.has("title") ? json.get("title").getAsString() : filename;
+                    String description = json.has("description") ? json.get("description").getAsString() : "";
+                    presets.add(new QuestPreset(filename, title, description, json));
+                } catch (Exception e) {
+                    Questlog.LOGGER.error("Failed to load quest preset: " + loc, e);
+                }
+            }
+        } catch (Exception e) {
+            Questlog.LOGGER.error("Failed to list quest presets", e);
+        }
+        return presets;
     }
 }
