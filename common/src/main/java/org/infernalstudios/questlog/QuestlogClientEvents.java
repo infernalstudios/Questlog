@@ -51,6 +51,7 @@ public class QuestlogClientEvents {
     }
 
     public static void onClientPlayerLogout() {
+        QuestlogClient.isEditModeActive = false;
         QuestlogClient.destroyLocal();
         Questlog.EVENTS.removeAllListeners();
         QuestToastState.addedToasts.clear();

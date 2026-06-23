@@ -108,32 +108,22 @@ public class QuestlogScreen extends Screen {
     }
 
     private void buildEditorButton() {
-        if (QuestlogClient.isEditModeActive || Questlog.getConfig().editor.enableEditorButton) {
+        if (QuestlogClient.isEditModeActive) {
 
             int listWidth = 245;
             int listHeight = 136;
             int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
             int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
-            if (QuestlogClient.isEditModeActive) {
-                int btnX = listX - 25;
-                AbstractButton addQuestBtn = getAddQuestBtn(btnX, listY + 5);
-                this.addRenderableWidget(addQuestBtn);
+            int btnX = listX - 25;
+            AbstractButton addQuestBtn = getAddQuestBtn(btnX, listY + 5);
+            this.addRenderableWidget(addQuestBtn);
 
-                AbstractButton editChapBtn = getEditChapBtn(btnX, listY + 30);
-                this.addRenderableWidget(editChapBtn);
+            AbstractButton editChapBtn = getEditChapBtn(btnX, listY + 30);
+            this.addRenderableWidget(editChapBtn);
 
-                AbstractButton addChapBtn = getAddChapBtn(btnX, listY + 55);
-                this.addRenderableWidget(addChapBtn);
-            } else {
-                int btnX = listX - 10;
-                int btnY = listY - 31 + Questlog.getConfig().gui.searchBarY;
-                this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.enter"), btn -> {
-                    if (this.minecraft != null) {
-                        this.minecraft.setScreen(new QuestEditorScreen(this));
-                    }
-                }).bounds(btnX, btnY, 80, 20).build());
-            }
+            AbstractButton addChapBtn = getAddChapBtn(btnX, listY + 55);
+            this.addRenderableWidget(addChapBtn);
         }
     }
 

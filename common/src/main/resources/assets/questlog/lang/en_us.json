@@ -135,10 +135,6 @@
     "text.autoconfig.questlog-client.option.colors.toastTitleColor": "Toast Title Color",
     "text.autoconfig.questlog-client.option.colors.toastDescriptionColor": "Toast Description Color",
 
-    "text.autoconfig.questlog-client.category.editor": "Editor",
-    "text.autoconfig.questlog-client.option.editor.enableEditorButton": "Enable Editor Button",
-    "text.autoconfig.questlog-client.option.editor.enableEditorButton.@Tooltip": "Shows the Edit Mode button in the Questlog if you are a modpack dev or have OP permissions.",
-    "questlog.editor.enter": "Edit Quests",
     "questlog.editor.title": "Questlog Editor",
     "questlog.editor.back": "Back to Questlog",
     "questlog.editor.active": "Questlog Edit Mode Enabled",
@@ -182,5 +178,35 @@
     "questlog.editor.objectives": "Objectives",
     "questlog.editor.requirements": "Requirements",
     "questlog.editor.rewards": "Rewards",
-    "questlog.editor.settings": "Settings"
+    "questlog.editor.settings": "Settings",
+
+    "questlog.editor.tooltip.id": "The unique ID used to identify this quest (e.g., questlog:my_quest).",
+    "questlog.editor.tooltip.title": "The display name of the quest in the questlog.",
+    "questlog.editor.tooltip.description": "The description or instructions for the quest.",
+    "questlog.editor.tooltip.icon": "The ID of the item to display as the quest's icon (e.g., minecraft:diamond_sword).",
+    "questlog.editor.tooltip.chapter": "The chapter ID this quest belongs to.",
+    "questlog.editor.tooltip.order": "The sorting index. Quests with lower values appear first.",
+    "questlog.editor.tooltip.hidden": "If enabled, this quest remains hidden in the log until unlocked or completed.",
+    "questlog.editor.tooltip.include_in_main": "If enabled, the quest will be shown in the main chapter list in addition to its assigned chapter.",
+    "questlog.editor.tooltip.details_default": "If enabled, opening this quest's chapter will display this quest's details page by default.",
+    "questlog.editor.tooltip.details_disabled": "If enabled, players will not be able to open the details page for this quest.",
+    "questlog.editor.tooltip.entry_name": "A custom display name for this specific objective or reward (optional).",
+    "questlog.editor.tooltip.entry_target": "The target registry key, tag, or value for this entry (e.g., minecraft:stone).",
+    "questlog.editor.tooltip.entry_amount": "The required count, amount, or experience points.",
+    "questlog.editor.tooltip.levels": "If enabled, the reward/objective value specifies levels instead of experience points.",
+
+    "questlog.editor.tooltip.chapter_id": "The unique ID used to identify this chapter (e.g., questlog:my_chapter).",
+    "questlog.editor.tooltip.chapter_title": "The display name of the chapter tab.",
+    "questlog.editor.tooltip.chapter_icon": "The ID of the item to display as the chapter tab's icon (e.g., minecraft:book).",
+    "questlog.editor.tooltip.chapter_order": "The sorting index. Chapters with lower values appear first on the tabs.",
+    "questlog.editor.tooltip.chapter_default": "If enabled, this chapter tab will be selected by default when the questlog is opened.",
+    "questlog.editor.tooltip.chapter_hidden": "If enabled, this chapter tab will be hidden from the questlog.",
+
+    "questlog.editor.tooltip.duplicate_quest": "Duplicate this quest.",
+    "questlog.editor.tooltip.delete_quest": "Permanently delete this quest.",
+    "questlog.editor.tooltip.delete_chapter": "Permanently delete this chapter.",
+    "questlog.editor.tooltip.edit_entry": "Edit details for this entry.",
+    "questlog.editor.tooltip.duplicate_entry": "Duplicate this entry.",
+    "questlog.editor.tooltip.delete_entry": "Delete this entry from the list.",
+    "questlog.editor.tooltip.add_entry": "Add a new entry."
 }

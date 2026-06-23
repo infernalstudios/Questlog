@@ -127,33 +127,41 @@ public class ChapterEditorScreen extends Screen {
         this.idBox.setValue(this.tempId);
         this.idBox.setEditable(this.chapterToEdit == null);
         this.idBox.active = (this.chapterToEdit == null);
+        this.idBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_id")));
         this.addRenderableWidget(this.idBox);
 
         this.titleBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 52, 210, 16, Component.empty());
         this.titleBox.setMaxLength(64);
         this.titleBox.setValue(this.tempTitle);
+        this.titleBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_title")));
         this.addRenderableWidget(this.titleBox);
 
         this.iconBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 84, 210, 16, Component.empty());
         this.iconBox.setMaxLength(128);
         this.iconBox.setValue(this.tempIconItem);
+        this.iconBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_icon")));
         this.addRenderableWidget(this.iconBox);
 
         this.orderBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 116, 50, 16, Component.empty());
         this.orderBox.setMaxLength(8);
         this.orderBox.setValue(String.valueOf(this.tempSortOrder));
         this.orderBox.setFilter(s -> s.isEmpty() || s.matches("-?\\d*"));
+        this.orderBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_order")));
         this.addRenderableWidget(this.orderBox);
 
-        this.addRenderableWidget(Button.builder(Component.literal("Default: " + (this.tempDefault ? "True" : "False")), btn -> {
+        Button btnDefault = Button.builder(Component.literal("Default: " + (this.tempDefault ? "True" : "False")), btn -> {
             this.tempDefault = !this.tempDefault;
             btn.setMessage(Component.literal("Default: " + (this.tempDefault ? "True" : "False")));
-        }).bounds(panel1X + 75, panel1Y + 116, 70, 16).build());
+        }).bounds(panel1X + 75, panel1Y + 116, 70, 16).build();
+        btnDefault.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_default")));
+        this.addRenderableWidget(btnDefault);
 
-        this.addRenderableWidget(Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
+        Button btnHidden = Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
             this.tempHidden = !this.tempHidden;
             btn.setMessage(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")));
-        }).bounds(panel1X + 155, panel1Y + 116, 70, 16).build());
+        }).bounds(panel1X + 155, panel1Y + 116, 70, 16).build();
+        btnHidden.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter_hidden")));
+        this.addRenderableWidget(btnHidden);
 
         List<ResourceLocation> allQuests = DefinitionUtil.getCachedQuestKeys();
         int itemsPerPage = 5;
@@ -261,9 +269,11 @@ public class ChapterEditorScreen extends Screen {
 
         // Delete
         if (this.chapterToEdit != null && !this.chapterToEdit.getPath().equals("main")) {
-            this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.delete_chapter"), btn -> {
+            Button btnDeleteChapter = Button.builder(Component.translatable("questlog.editor.delete_chapter"), btn -> {
                 this.deleteChapterOnServer();
-            }).bounds(panel2X + rightWidth - btnWidth, bottomY, btnWidth, 20).build());
+            }).bounds(panel2X + rightWidth - btnWidth, bottomY, btnWidth, 20).build();
+            btnDeleteChapter.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.delete_chapter")));
+            this.addRenderableWidget(btnDeleteChapter);
         }
     }
 
@@ -346,7 +356,6 @@ public class ChapterEditorScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
-        this.renderBackground(ps, mouseX, mouseY, delta);
         super.render(ps, mouseX, mouseY, delta);
 
         int PANEL_SPACING = 6;

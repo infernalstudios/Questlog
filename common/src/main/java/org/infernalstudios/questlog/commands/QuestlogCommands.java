@@ -125,6 +125,7 @@ public class QuestlogCommands {
                                 )
                         )
                         .then(Commands.literal("edit_mode")
+                                .executes(ctx -> toggleEditMode(ctx, null))
                                 .then(Commands.argument("enabled", BoolArgumentType.bool())
                                         .executes(ctx -> setEditMode(ctx, BoolArgumentType.getBool(ctx, "enabled"), null))
                                         .then(Commands.argument("player", EntityArgument.player())
@@ -164,9 +165,18 @@ public class QuestlogCommands {
 
     private static int setEditMode(CommandContext<CommandSourceStack> ctx, boolean enabled, ServerPlayer target) throws CommandSyntaxException {
         ServerPlayer player = target != null ? target : ctx.getSource().getPlayerOrException();
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+        manager.setEditMode(enabled);
+        ServerPlayerManager.INSTANCE.save(manager);
         Services.PLATFORM.sendPacketToClient(player, new QuestEditModePacket(enabled));
         ctx.getSource().sendSuccess(() -> Component.literal("Edit mode for " + player.getName().getString() + " set to " + enabled), true);
         return 1;
+    }
+
+    private static int toggleEditMode(CommandContext<CommandSourceStack> ctx, ServerPlayer target) throws CommandSyntaxException {
+        ServerPlayer player = target != null ? target : ctx.getSource().getPlayerOrException();
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+        return setEditMode(ctx, !manager.isEditMode(), player);
     }
 
     private static int trigger(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {

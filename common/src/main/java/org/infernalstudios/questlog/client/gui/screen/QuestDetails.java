@@ -62,6 +62,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private ScrollableComponent description;
     @Nullable
     private ScrollableComponent info;
+    private long handCursor = 0L;
+    private boolean changedCursor = false;
 
     public QuestDetails(@Nullable Screen previousScreen, Quest quest) {
         super(quest.getDisplay().getTitle());
@@ -257,7 +259,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         this.pendingTooltip = null;
-        this.renderBackground(ps, mouseX, mouseY, partialTicks);
         super.render(ps, mouseX, mouseY, partialTicks);
         this.renderTitle(ps);
         if (this.description != null) this.description.render(ps, mouseX, mouseY, partialTicks);
@@ -303,14 +304,21 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null) {
                 if (style.getClickEvent() != null) {
                     isHoveringLink = true;
-                    GLFW.glfwSetCursor(window, GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+                    if (!this.changedCursor) {
+                        if (this.handCursor == 0L) {
+                            this.handCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR);
+                        }
+                        GLFW.glfwSetCursor(window, this.handCursor);
+                        this.changedCursor = true;
+                    }
                 }
                 this.renderHoverEffect(ps, style, mouseX, mouseY);
             }
         }
 
-        if (!isHoveringLink) {
+        if (!isHoveringLink && this.changedCursor) {
             GLFW.glfwSetCursor(window, 0L);
+            this.changedCursor = false;
         }
     }
 
@@ -444,6 +452,20 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.backButton.getMessage().equals(Component.translatable("questlog.button.read"))) {
             this.rebuildWidgets();
         }
+    }
+
+    @Override
+    public void removed() {
+        if (this.changedCursor) {
+            long window = this.minecraft.getWindow().getWindow();
+            GLFW.glfwSetCursor(window, 0L);
+            this.changedCursor = false;
+        }
+        if (this.handCursor != 0L) {
+            GLFW.glfwDestroyCursor(this.handCursor);
+            this.handCursor = 0L;
+        }
+        super.removed();
     }
 
     @Override

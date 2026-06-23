@@ -195,32 +195,38 @@ public class QuestEditorScreen extends Screen {
         this.idBox.setMaxLength(64);
         this.idBox.setValue(this.tempId);
         this.idBox.setEditable(this.questToEdit == null);
+        this.idBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.id")));
         this.addRenderableWidget(this.idBox);
 
         this.titleBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 52, 210, 16, Component.empty());
         this.titleBox.setMaxLength(64);
         this.titleBox.setValue(this.tempTitle);
+        this.titleBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.title")));
         this.addRenderableWidget(this.titleBox);
 
         this.descriptionBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 84, 210, 16, Component.empty());
         this.descriptionBox.setMaxLength(256);
         this.descriptionBox.setValue(this.tempDescription);
+        this.descriptionBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.description")));
         this.addRenderableWidget(this.descriptionBox);
 
         this.iconBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 116, 210, 16, Component.empty());
         this.iconBox.setMaxLength(128);
         this.iconBox.setValue(this.tempIconItem);
+        this.iconBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.icon")));
         this.addRenderableWidget(this.iconBox);
 
         this.chapterBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 148, 140, 16, Component.empty());
         this.chapterBox.setMaxLength(64);
         this.chapterBox.setValue(this.tempChapter);
+        this.chapterBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter")));
         this.addRenderableWidget(this.chapterBox);
 
         this.orderBox = new NoShadowEditBox(this.font, panel1X + 165, panel1Y + 148, 60, 16, Component.empty());
         this.orderBox.setMaxLength(8);
         this.orderBox.setValue(String.valueOf(this.tempSortOrder));
         this.orderBox.setFilter(s -> s.isEmpty() || s.matches("-?\\d*"));
+        this.orderBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.order")));
         this.addRenderableWidget(this.orderBox);
 
         if (this.rightPageState == RightPageState.LIST) {
@@ -246,16 +252,20 @@ public class QuestEditorScreen extends Screen {
         }).bounds(panel1X + btnWidth + 5, bottomY, btnWidth, 20).build());
 
         if (this.questToEdit != null) {
-            this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.duplicate"), btn -> {
+            Button btnDuplicate = Button.builder(Component.translatable("questlog.editor.duplicate"), btn -> {
                 this.saveTemporaryState();
                 this.tempId = this.tempId + "_copy";
                 this.questToEdit = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X, bottomY, 75, 20).build());
+            }).bounds(panel2X, bottomY, 75, 20).build();
+            btnDuplicate.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.duplicate_quest")));
+            this.addRenderableWidget(btnDuplicate);
 
-            this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.delete"), btn -> {
+            Button btnDelete = Button.builder(Component.translatable("questlog.editor.delete"), btn -> {
                 this.deleteQuestOnServer();
-            }).bounds(panel2X + 80, bottomY, 80, 20).build());
+            }).bounds(panel2X + 80, bottomY, 80, 20).build();
+            btnDelete.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.delete_quest")));
+            this.addRenderableWidget(btnDelete);
         }
     }
 
@@ -344,25 +354,33 @@ public class QuestEditorScreen extends Screen {
         }
 
         if (this.nestingStack.isEmpty() && this.activeTab == ActiveTab.SETTINGS) {
-            this.addRenderableWidget(Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
+            Button btnHidden = Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
                 this.tempHidden = !this.tempHidden;
                 btn.setMessage(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 36, 140, 18).build());
+            }).bounds(panel2X + 10, panel2Y + 36, 140, 18).build();
+            btnHidden.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.hidden")));
+            this.addRenderableWidget(btnHidden);
 
-            this.addRenderableWidget(Button.builder(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")), btn -> {
+            Button btnIncludeMain = Button.builder(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")), btn -> {
                 this.tempIncludeInMain = !this.tempIncludeInMain;
                 btn.setMessage(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 62, 140, 18).build());
+            }).bounds(panel2X + 10, panel2Y + 62, 140, 18).build();
+            btnIncludeMain.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.include_in_main")));
+            this.addRenderableWidget(btnIncludeMain);
 
-            this.addRenderableWidget(Button.builder(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")), btn -> {
+            Button btnDetailsDefault = Button.builder(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")), btn -> {
                 this.tempDetailsDefault = !this.tempDetailsDefault;
                 btn.setMessage(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 88, 140, 18).build());
+            }).bounds(panel2X + 10, panel2Y + 88, 140, 18).build();
+            btnDetailsDefault.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_default")));
+            this.addRenderableWidget(btnDetailsDefault);
 
-            this.addRenderableWidget(Button.builder(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")), btn -> {
+            Button btnDetailsDisabled = Button.builder(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")), btn -> {
                 this.tempDetailsDisabled = !this.tempDetailsDisabled;
                 btn.setMessage(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 114, 140, 18).build());
+            }).bounds(panel2X + 10, panel2Y + 114, 140, 18).build();
+            btnDetailsDisabled.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_disabled")));
+            this.addRenderableWidget(btnDetailsDisabled);
         } else {
             List<JsonObject> list = getActiveList();
             int itemsPerPage = 5;
@@ -374,7 +392,7 @@ public class QuestEditorScreen extends Screen {
                 JsonObject entry = list.get(index);
                 int rowY = panel2Y + 28 + (i - startIdx) * 22;
 
-                this.addRenderableWidget(createImageButton(panel2X + 100, rowY + 2, GEAR_ICON, GEAR_HIGHLIGHTED, () -> {
+                AbstractButton btnEditEntry = createImageButton(panel2X + 100, rowY + 2, GEAR_ICON, GEAR_HIGHLIGHTED, () -> {
                     this.saveTemporaryState();
                     this.selectedEntryIndex = index;
                     this.editingEntry = entry;
@@ -382,33 +400,41 @@ public class QuestEditorScreen extends Screen {
                     this.entryLevelsToggle = entry.has("levels") && entry.get("levels").getAsBoolean();
                     this.rightPageState = RightPageState.EDIT_ENTRY;
                     this.rebuildWidgets();
-                }));
+                });
+                btnEditEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.edit_entry")));
+                this.addRenderableWidget(btnEditEntry);
 
-                this.addRenderableWidget(createImageButton(panel2X + 120, rowY + 2, DUPLICATE_ICON, DUPLICATE_HIGHLIGHTED, () -> {
+                AbstractButton btnDuplicateEntry = createImageButton(panel2X + 120, rowY + 2, DUPLICATE_ICON, DUPLICATE_HIGHLIGHTED, () -> {
                     this.saveTemporaryState();
                     JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
                     list.add(index + 1, copy);
                     this.updateParentEntryWithChildren();
                     this.rebuildWidgets();
-                }));
+                });
+                btnDuplicateEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.duplicate_entry")));
+                this.addRenderableWidget(btnDuplicateEntry);
 
-                this.addRenderableWidget(createImageButton(panel2X + 140, rowY + 2, CROSS_ICON, CROSS_HIGHLIGHTED, () -> {
+                AbstractButton btnDeleteEntry = createImageButton(panel2X + 140, rowY + 2, CROSS_ICON, CROSS_HIGHLIGHTED, () -> {
                     this.saveTemporaryState();
                     list.remove(index);
                     this.updateParentEntryWithChildren();
                     this.listPage = Math.max(0, (list.size() - 1) / itemsPerPage);
                     this.rebuildWidgets();
-                }));
+                });
+                btnDeleteEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.delete_entry")));
+                this.addRenderableWidget(btnDeleteEntry);
             }
 
-            this.addRenderableWidget(createImageButton(panel2X + 72, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
+            AbstractButton btnAddEntry = createImageButton(panel2X + 72, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
                 this.saveTemporaryState();
                 this.selectedEntryIndex = -1;
                 this.editingEntry = new JsonObject();
                 this.typeSearchQuery = "";
                 this.rightPageState = RightPageState.SELECT_TYPE;
                 this.rebuildWidgets();
-            }));
+            });
+            btnAddEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.add_entry")));
+            this.addRenderableWidget(btnAddEntry);
 
             if (this.listPage > 0) {
                 this.addRenderableWidget(Button.builder(Component.literal("<"), btn -> {
@@ -453,6 +479,7 @@ public class QuestEditorScreen extends Screen {
         this.entryNameBox.setMaxLength(64);
         String nameVal = this.editingEntry != null && this.editingEntry.has("name") ? this.editingEntry.get("name").getAsString() : "";
         this.entryNameBox.setValue(nameVal);
+        this.entryNameBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_name")));
         this.addRenderableWidget(this.entryNameBox);
 
         EditorMetadata meta = getMetadata(this.editingType);
@@ -517,6 +544,7 @@ public class QuestEditorScreen extends Screen {
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
+                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
                 this.addRenderableWidget(this.entryAmountBox);
             } else {
                 this.entryAmountBox = null;
@@ -527,6 +555,7 @@ public class QuestEditorScreen extends Screen {
                 this.entryTargetBox.setMaxLength(128);
                 String targetVal = getTargetFieldValue();
                 this.entryTargetBox.setValue(targetVal);
+                this.entryTargetBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_target")));
                 this.addRenderableWidget(this.entryTargetBox);
             } else {
                 this.entryTargetBox = null;
@@ -538,6 +567,7 @@ public class QuestEditorScreen extends Screen {
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
+                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
                 this.addRenderableWidget(this.entryAmountBox);
             } else {
                 this.entryAmountBox = null;
@@ -545,10 +575,12 @@ public class QuestEditorScreen extends Screen {
         }
 
         if ("questlog:experience".equals(this.editingType)) {
-            this.addRenderableWidget(Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
+            Button btnLevels = Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
                 this.entryLevelsToggle = !this.entryLevelsToggle;
                 btn.setMessage(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")));
-            }).bounds(panel2X + 75, panel2Y + 94, 70, 16).build());
+            }).bounds(panel2X + 75, panel2Y + 94, 70, 16).build();
+            btnLevels.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.levels")));
+            this.addRenderableWidget(btnLevels);
         }
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.cancel"), btn -> {
@@ -1009,7 +1041,6 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
-        this.renderBackground(ps, mouseX, mouseY, delta);
         super.render(ps, mouseX, mouseY, delta);
 
         int PANEL_SPACING = 6;

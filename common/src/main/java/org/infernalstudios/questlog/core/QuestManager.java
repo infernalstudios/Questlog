@@ -21,9 +21,18 @@ import java.util.Map;
 public class QuestManager {
     private final Map<ResourceLocation, Quest> quests = new LinkedHashMap<>();
     public Player player;
+    private boolean editMode = false;
 
     public QuestManager(Player player) {
         this.player = player;
+    }
+
+    public boolean isEditMode() {
+        return this.editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
     }
 
     public void addQuest(Quest quest) {

@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
+import org.infernalstudios.questlog.network.packet.QuestEditModePacket;
 import org.infernalstudios.questlog.platform.Services;
 import net.minecraft.advancements.AdvancementHolder;
 
@@ -74,6 +75,8 @@ public class ServerPlayerManager {
             data.put(quest.getId().toString(), quest.serialize());
         }
 
+        data.putBoolean("edit_mode", questManager.isEditMode());
+
         File playerDataFile = this.getPlayerDataFile(questManager.player);
 
         try {
@@ -126,6 +129,13 @@ public class ServerPlayerManager {
 
         boolean shouldSave = false;
         questManager.reload();
+
+        if (data.contains("edit_mode")) {
+            questManager.setEditMode(data.getBoolean("edit_mode"));
+        } else {
+            questManager.setEditMode(false);
+        }
+
         for (Quest quest : questManager.getAllQuests()) {
             if (data.contains(quest.getId().toString())) {
                 CompoundTag questData = data.getCompound(quest.getId().toString());
@@ -168,6 +178,7 @@ public class ServerPlayerManager {
             }
 
             Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data, advancements));
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestEditModePacket(questManager.isEditMode()));
         }
     }
 
