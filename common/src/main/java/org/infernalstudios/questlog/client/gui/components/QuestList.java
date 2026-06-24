@@ -220,13 +220,13 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         private final QuestList list;
         private final Quest quest;
 
-        public Quest getQuest() {
-            return this.quest;
-        }
-
         protected QuestListEntry(QuestList list, Quest quest) {
             this.list = list;
             this.quest = quest;
+        }
+
+        public Quest getQuest() {
+            return this.quest;
         }
 
         public void render(
@@ -366,6 +366,9 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
                                 gearX + 16 + (int) this.list.scroller.getXOffset(),
                                 gearY + 16 + (int) this.list.scroller.getYOffset(),
                                 0x40FFFFFF);
+                        if (Minecraft.getInstance().screen instanceof org.infernalstudios.questlog.client.gui.screen.QuestlogScreen qScreen) {
+                            qScreen.pendingTooltip = Component.translatable("questlog.menu.edit");
+                        }
                     }
                 }
             }

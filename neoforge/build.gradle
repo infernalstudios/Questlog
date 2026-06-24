@@ -40,6 +40,10 @@ dependencies {
     // EMI
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
 
+    // Origins
+    implementation "maven.modrinth:origins-neoforge:${origins_neoforge_version}"
+    implementation "maven.modrinth:jupiter:${jupiter_version}-neoforge"
+
     // Cloth Config
     implementation "me.shedaniel.cloth:cloth-config-neoforge:${cloth_config_version}"
 

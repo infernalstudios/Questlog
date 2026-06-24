@@ -91,6 +91,10 @@ public class QuestObjectiveRegistry {
                 new EditorMetadata("advancement", "Advancement ID:", "required_amount", EditorMetadata.SuggestionType.ADVANCEMENT));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "unobtainable"), UnobtainableObjective::new,
                 new EditorMetadata(null, null, "required_amount"));
+
+        // Origins
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "origin"), OriginObjective::new,
+                new EditorMetadata("origin", "Origin ID:", "required_amount", EditorMetadata.SuggestionType.ORIGIN));
     }
 
     public static Set<ResourceLocation> getRegisteredTypes() {

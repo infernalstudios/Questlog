@@ -425,6 +425,9 @@ public class ChapterEditorScreen extends Screen {
                 int rowHeight = 14;
                 int overlayHeight = matches.size() * rowHeight + 2;
 
+                ps.pose().pushPose();
+                ps.pose().translate(0, 0, 400.0F);
+
                 ps.fill(boxX, startY, boxX + boxW, startY + overlayHeight, 0xFF202020);
                 ps.fill(boxX - 1, startY, boxX, startY + overlayHeight, 0xFF505050);
                 ps.fill(boxX + boxW, startY, boxX + boxW + 1, startY + overlayHeight, 0xFF505050);
@@ -447,6 +450,8 @@ public class ChapterEditorScreen extends Screen {
                     }
                     ps.drawString(this.font, drawText, boxX + 4, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
                 }
+
+                ps.pose().popPose();
             }
         }
     }

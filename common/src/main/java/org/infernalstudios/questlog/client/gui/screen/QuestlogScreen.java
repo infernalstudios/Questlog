@@ -62,6 +62,7 @@ public class QuestlogScreen extends Screen {
     private boolean descriptionsCondensed = false;
     private boolean hideCompleted = false;
     private ContextMenu contextMenu = null;
+    public Component pendingTooltip = null;
 
     public QuestlogScreen(@Nullable Screen previousScreen) {
         super(Component.empty());
@@ -117,7 +118,7 @@ public class QuestlogScreen extends Screen {
             int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
             int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
-            int btnX = listX - 25;
+            int btnX = listX - 33;
             AbstractButton addQuestBtn = getAddQuestBtn(btnX, listY + 5);
             this.addRenderableWidget(addQuestBtn);
 
@@ -423,6 +424,7 @@ public class QuestlogScreen extends Screen {
 
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float delta) {
+        this.pendingTooltip = null;
         int renderMouseX = this.contextMenu != null ? -9999 : mouseX;
         int renderMouseY = this.contextMenu != null ? -9999 : mouseY;
         super.render(ps, renderMouseX, renderMouseY, delta);
@@ -475,6 +477,10 @@ public class QuestlogScreen extends Screen {
 
         if (this.contextMenu != null) {
             this.contextMenu.render(ps, mouseX, mouseY, this.font);
+        }
+
+        if (this.pendingTooltip != null) {
+            ps.renderTooltip(this.font, this.pendingTooltip, mouseX, mouseY);
         }
     }
 

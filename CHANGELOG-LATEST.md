@@ -3,6 +3,7 @@
 - Added an in-game config screen.
 - Added a `questlog:choice` reward type.
 - Item rewards now support components.
+- Added a `questlog:origin` trigger for specific origins.
 
 ### Changed
 

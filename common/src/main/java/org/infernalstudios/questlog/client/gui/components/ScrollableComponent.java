@@ -136,7 +136,7 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
     }
 
     // Scroll handling
-    private double getScrollAmount() {
+    public double getScrollAmount() {
         return this.scrollAmount;
     }
 
