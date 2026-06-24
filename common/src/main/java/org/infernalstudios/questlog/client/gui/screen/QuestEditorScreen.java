@@ -11,8 +11,6 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
@@ -22,13 +20,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
-import org.infernalstudios.questlog.client.gui.ContextMenu;
-import org.infernalstudios.questlog.client.gui.ContextMenuItem;
-import org.infernalstudios.questlog.client.gui.EditorUtils;
-import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
+import org.infernalstudios.questlog.client.gui.*;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
-import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.infernalstudios.questlog.compat.origins.OriginsClientHelper;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.quests.EditorMetadata;
@@ -45,17 +39,17 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public class QuestEditorScreen extends Screen {
-
-    private static final ResourceLocation GEAR_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_gear.png");
-    private static final ResourceLocation GEAR_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_gear_highlighted.png");
-    private static final ResourceLocation CROSS_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_cross.png");
-    private static final ResourceLocation CROSS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_cross_highlighted.png");
-    private static final ResourceLocation PLUS_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_plus.png");
-    private static final ResourceLocation PLUS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_plus_highlighted.png");
-    private static final ResourceLocation DUPLICATE_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate.png");
-    private static final ResourceLocation DUPLICATE_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate_highlighted.png");
+    static final ResourceLocation GEAR_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_gear.png");
+    static final ResourceLocation GEAR_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_gear_highlighted.png");
+    static final ResourceLocation CROSS_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_cross.png");
+    static final ResourceLocation CROSS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_cross_highlighted.png");
+    static final ResourceLocation PLUS_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_plus.png");
+    static final ResourceLocation PLUS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_plus_highlighted.png");
+    static final ResourceLocation DUPLICATE_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate.png");
+    static final ResourceLocation DUPLICATE_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate_highlighted.png");
 
     private static final ResourceLocation TAB_OBJECTIVES_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives.png");
     private static final ResourceLocation TAB_OBJECTIVES_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives_selected.png");
@@ -72,19 +66,34 @@ public class QuestEditorScreen extends Screen {
     private static final ResourceLocation TAB_SETTINGS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings.png");
     private static final ResourceLocation TAB_SETTINGS_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings_selected.png");
     private static final ResourceLocation TAB_SETTINGS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings_highlighted.png");
+    final List<net.minecraft.client.gui.components.AbstractWidget> leftFields = new ArrayList<>();
     private final Screen previousScreen;
     private final List<JsonObject> tempObjectives = new ArrayList<>();
     private final List<JsonObject> tempRequirements = new ArrayList<>();
     private final List<JsonObject> tempRewards = new ArrayList<>();
     private final Stack<NestingFrame> nestingStack = new Stack<>();
+    private final AutocompleteHelper autocompleteHelper = new AutocompleteHelper();
     public Component pendingTooltip = null;
+    @Nullable
+    Quest questToEdit;
+    @Nullable
+    ContextMenu contextMenu = null;
+    RightPageState rightPageState = RightPageState.LIST;
+    int selectedEntryIndex = -1;
+    String editingType = "questlog:item_obtain";
+    @Nullable
+    JsonObject editingEntry = null;
+    boolean entryLevelsToggle = false;
+    NoShadowEditBox idBox;
+    NoShadowEditBox titleBox;
+    MultiLineEditBox descriptionBox;
+    NoShadowEditBox iconBox;
+    NoShadowEditBox chapterBox;
+    NoShadowEditBox orderBox;
+    NoShadowEditBox entryTargetBox;
     private List<JsonObject> currentNestedList = null;
     @Nullable
-    private Quest questToEdit;
-    @Nullable
-    private JsonObject presetJson = null;
-    @Nullable
-    private ContextMenu contextMenu = null;
+    private JsonObject presetJson;
     private NineSliceTexture bgLeft;
     private NineSliceTexture bgRight;
     private int typeListScroll = 0;
@@ -98,30 +107,14 @@ public class QuestEditorScreen extends Screen {
     private boolean tempIncludeInMain = true;
     private boolean tempDetailsDefault = false;
     private boolean tempDetailsDisabled = false;
-    private RightPageState rightPageState = RightPageState.LIST;
     private ActiveTab activeTab = ActiveTab.REQUIREMENTS;
     private int listPage = 0;
-    private int selectedEntryIndex = -1;
-    private String editingType = "questlog:item_obtain";
-    @Nullable
-    private JsonObject editingEntry = null;
-    private boolean entryLevelsToggle = false;
     private String typeSearchQuery = "";
-    private int selectedSuggestionIndex = -1;
-    private NoShadowEditBox lastActiveBox = null;
-    private String lastActiveBoxValue = "";
     private boolean tempSearchFocused = false;
-    private NoShadowEditBox idBox;
-    private NoShadowEditBox titleBox;
-    private MultiLineEditBox descriptionBox;
-    private NoShadowEditBox iconBox;
-    private NoShadowEditBox chapterBox;
-    private NoShadowEditBox orderBox;
     private ScrollableComponent leftScrollable;
     private ScrollableComponent rightScrollable;
     private NoShadowEditBox typeSearchBox;
     private NoShadowEditBox entryNameBox;
-    private NoShadowEditBox entryTargetBox;
     private NoShadowEditBox entryAmountBox;
 
     public QuestEditorScreen(Screen previousScreen) {
@@ -139,6 +132,10 @@ public class QuestEditorScreen extends Screen {
         this.presetJson = presetJson;
 
         this.loadQuestData();
+    }
+
+    net.minecraft.client.gui.Font getFont() {
+        return this.font;
     }
 
     private void loadQuestData() {
@@ -261,7 +258,15 @@ public class QuestEditorScreen extends Screen {
         this.orderBox.setFilter(s -> s.isEmpty() || s.matches("-?\\d*"));
         this.orderBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.order")));
 
-        this.leftScrollable = new ScrollableComponent(panel1X + 10, panel1Y + 12, 220, 170, new LeftPanelScrollable());
+        this.leftFields.clear();
+        this.leftFields.add(this.idBox);
+        this.leftFields.add(this.titleBox);
+        this.leftFields.add(this.descriptionBox);
+        this.leftFields.add(this.iconBox);
+        this.leftFields.add(this.chapterBox);
+        this.leftFields.add(this.orderBox);
+
+        this.leftScrollable = new ScrollableComponent(panel1X + 10, panel1Y + 12, 220, 170, new LeftPanelScrollable(this));
         this.addRenderableWidget(this.leftScrollable);
 
         if (this.rightPageState == RightPageState.LIST) {
@@ -460,7 +465,7 @@ public class QuestEditorScreen extends Screen {
             btnDetailsDisabled.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_disabled")));
             this.addRenderableWidget(btnDetailsDisabled);
         } else {
-            this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable());
+            this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable(this));
             this.addRenderableWidget(this.rightScrollable);
 
             AbstractButton btnAddEntry = createImageButton(panel2X + 72, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
@@ -619,7 +624,7 @@ public class QuestEditorScreen extends Screen {
         }).bounds(panel2X + 85, panel2Y + 162, 60, 16).build());
     }
 
-    private EditorMetadata getMetadata(String typeStr) {
+    EditorMetadata getMetadata(String typeStr) {
         ResourceLocation rl = ResourceLocation.tryParse(typeStr);
         if (rl == null) return null;
         if (this.activeTab == ActiveTab.REWARDS) {
@@ -743,7 +748,7 @@ public class QuestEditorScreen extends Screen {
         this.updateParentEntryWithChildren();
     }
 
-    private List<JsonObject> getActiveList() {
+    List<JsonObject> getActiveList() {
         if (!this.nestingStack.isEmpty()) {
             if (this.currentNestedList == null) {
                 this.currentNestedList = getChildrenList(this.nestingStack.peek().parentEntry);
@@ -809,7 +814,7 @@ public class QuestEditorScreen extends Screen {
         }
     }
 
-    private void updateParentEntryWithChildren() {
+    void updateParentEntryWithChildren() {
         if (!nestingStack.isEmpty()) {
             NestingFrame frame = nestingStack.peek();
             saveChildrenList(frame.parentEntry, getActiveList());
@@ -1157,98 +1162,22 @@ public class QuestEditorScreen extends Screen {
             }
         }
 
-        NoShadowEditBox currentActive = null;
-        if (this.iconBox != null && this.iconBox.isFocused()) currentActive = this.iconBox;
-        else if (this.chapterBox != null && this.chapterBox.isFocused()) currentActive = this.chapterBox;
-        else if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused())
-            currentActive = this.entryTargetBox;
+        NoShadowEditBox activeBox = null;
+        Supplier<List<String>> suggestionProvider = null;
 
-        if (currentActive != this.lastActiveBox || (currentActive != null && !currentActive.getValue().equals(this.lastActiveBoxValue))) {
-            this.selectedSuggestionIndex = -1;
-            this.lastActiveBox = currentActive;
-            this.lastActiveBoxValue = currentActive != null ? currentActive.getValue() : "";
+        if (this.iconBox != null && this.iconBox.isFocused()) {
+            activeBox = this.iconBox;
+            suggestionProvider = () -> getLeftSuggestions(this.iconBox);
+        } else if (this.chapterBox != null && this.chapterBox.isFocused()) {
+            activeBox = this.chapterBox;
+            suggestionProvider = () -> getLeftSuggestions(this.chapterBox);
+        } else if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused()) {
+            activeBox = this.entryTargetBox;
+            suggestionProvider = () -> getSuggestions(this.entryTargetBox.getValue());
         }
 
-        NoShadowEditBox activeLeftBox = null;
-        if (this.iconBox != null && this.iconBox.isFocused()) activeLeftBox = this.iconBox;
-        else if (this.chapterBox != null && this.chapterBox.isFocused()) activeLeftBox = this.chapterBox;
-
-        if (activeLeftBox != null) {
-            List<String> matches = getLeftSuggestions(activeLeftBox);
-            if (!matches.isEmpty()) {
-                int boxX = activeLeftBox.getX();
-                int boxY = activeLeftBox.getY();
-                int boxW = activeLeftBox.getWidth();
-                int startY = boxY + 17;
-                int rowHeight = 14;
-                int overlayHeight = matches.size() * rowHeight + 2;
-
-                ps.pose().pushPose();
-                ps.pose().translate(0, 0, 400.0F);
-
-                ps.fill(boxX, startY, boxX + boxW, startY + overlayHeight, 0xFF202020);
-                ps.fill(boxX - 1, startY, boxX, startY + overlayHeight, 0xFF505050);
-                ps.fill(boxX + boxW, startY, boxX + boxW + 1, startY + overlayHeight, 0xFF505050);
-                ps.fill(boxX, startY - 1, boxX + boxW, startY, 0xFF505050);
-                ps.fill(boxX, startY + overlayHeight, boxX + boxW, startY + overlayHeight + 1, 0xFF505050);
-
-                for (int i = 0; i < matches.size(); i++) {
-                    String match = matches.get(i);
-                    int itemY = startY + 1 + i * rowHeight;
-                    boolean hovered = renderMouseX >= boxX && renderMouseX <= boxX + boxW && renderMouseY >= itemY && renderMouseY <= itemY + rowHeight;
-                    boolean selected = hovered || this.selectedSuggestionIndex == i;
-
-                    if (selected) {
-                        ps.fill(boxX, itemY, boxX + boxW, itemY + rowHeight, 0xFF404040);
-                    }
-
-                    String drawText = match;
-                    if (this.font.width(drawText) > boxW - 10) {
-                        drawText = this.font.plainSubstrByWidth(drawText, boxW - 16) + "...";
-                    }
-                    ps.drawString(this.font, drawText, boxX + 4, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
-                }
-
-                ps.pose().popPose();
-            }
-        }
-
-        if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused()) {
-            List<String> matches = getSuggestions(this.entryTargetBox.getValue());
-            if (!matches.isEmpty()) {
-                int startY = panel2Y + 75;
-                int rowHeight = 14;
-                int overlayHeight = matches.size() * rowHeight + 2;
-
-                ps.pose().pushPose();
-                ps.pose().translate(0, 0, 400.0F);
-
-                ps.fill(panel2X + 15, startY, panel2X + 145, startY + overlayHeight, 0xFF202020);
-                ps.fill(panel2X + 14, startY, panel2X + 15, startY + overlayHeight, 0xFF505050);
-                ps.fill(panel2X + 145, startY, panel2X + 146, startY + overlayHeight, 0xFF505050);
-                ps.fill(panel2X + 15, startY - 1, panel2X + 145, startY, 0xFF505050);
-                ps.fill(panel2X + 15, startY + overlayHeight, panel2X + 145, startY + overlayHeight + 1, 0xFF505050);
-
-                for (int i = 0; i < matches.size(); i++) {
-                    String match = matches.get(i);
-                    int itemY = startY + 1 + i * rowHeight;
-                    boolean hovered = renderMouseX >= panel2X + 15 && renderMouseX <= panel2X + 145 && renderMouseY >= itemY && renderMouseY <= itemY + rowHeight;
-                    boolean selected = hovered || this.selectedSuggestionIndex == i;
-
-                    if (selected) {
-                        ps.fill(panel2X + 15, itemY, panel2X + 145, itemY + rowHeight, 0xFF404040);
-                    }
-
-                    String drawText = match;
-                    if (this.font.width(drawText) > 120) {
-                        drawText = this.font.plainSubstrByWidth(drawText, 110) + "...";
-                    }
-                    ps.drawString(this.font, drawText, panel2X + 18, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
-                }
-
-                ps.pose().popPose();
-            }
-        }
+        this.autocompleteHelper.update(activeBox, suggestionProvider != null ? suggestionProvider : Collections::emptyList);
+        this.autocompleteHelper.render(ps, this.font, renderMouseX, renderMouseY);
 
         if (this.contextMenu != null) {
             this.contextMenu.render(ps, mouseX, mouseY, this.font);
@@ -1297,94 +1226,48 @@ public class QuestEditorScreen extends Screen {
             return true;
         }
 
-
-        if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-
-            NoShadowEditBox activeLeftBox = null;
-            if (this.iconBox != null && this.iconBox.isFocused()) activeLeftBox = this.iconBox;
-            else if (this.chapterBox != null && this.chapterBox.isFocused()) activeLeftBox = this.chapterBox;
-
-            if (activeLeftBox != null) {
-                List<String> matches = getLeftSuggestions(activeLeftBox);
-                if (!matches.isEmpty()) {
-                    int boxX = activeLeftBox.getX();
-                    int boxY = activeLeftBox.getY();
-                    int boxW = activeLeftBox.getWidth();
-                    int startY = boxY + 17;
-                    int rowHeight = 14;
-
-                    if (mouseX >= boxX && mouseX <= boxX + boxW) {
-                        for (int i = 0; i < matches.size(); i++) {
-                            int itemY = startY + 1 + i * rowHeight;
-                            if (mouseY >= itemY && mouseY <= itemY + rowHeight) {
-                                activeLeftBox.setValue(matches.get(i));
-                                this.saveTemporaryState();
-                                activeLeftBox.setFocused(false);
-                                this.rebuildWidgets();
-                                return true;
-                            }
-                        }
-                    }
+        if (this.autocompleteHelper.mouseClicked(mouseX, mouseY, button, val -> {
+            NoShadowEditBox box = this.autocompleteHelper.getLastBox();
+            if (box != null) {
+                box.setValue(val);
+                this.saveTemporaryState();
+                if (box == this.entryTargetBox) {
+                    this.saveEditingEntry();
                 }
+                box.setFocused(false);
+                this.rebuildWidgets();
             }
+        })) {
+            return true;
+        }
 
-            if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused()) {
-                List<String> matches = getSuggestions(this.entryTargetBox.getValue());
-                if (!matches.isEmpty()) {
-                    int PANEL_SPACING = 6;
-                    int leftWidth = 240;
-                    int totalWidth = leftWidth + 160 + PANEL_SPACING;
-                    int baseX = (this.width - totalWidth) / 2;
-                    int panel2X = baseX + leftWidth + PANEL_SPACING;
-                    int panel2Y = (this.height - 190) / 2;
+        if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.rightPageState == RightPageState.SELECT_TYPE) {
+            int PANEL_SPACING = 6;
+            int leftWidth = 240;
+            int totalWidth = leftWidth + 160 + PANEL_SPACING;
+            int baseX = (this.width - totalWidth) / 2;
+            int panel2X = baseX + leftWidth + PANEL_SPACING;
+            int panel2Y = (this.height - 190) / 2;
 
-                    int startY = panel2Y + 75;
-                    int rowHeight = 14;
+            int listX = panel2X + 15;
+            int listY = panel2Y + 40;
+            int listW = 130;
+            int listH = 116;
 
-                    if (mouseX >= panel2X + 15 && mouseX <= panel2X + 145) {
-                        for (int i = 0; i < matches.size(); i++) {
-                            int itemY = startY + 1 + i * rowHeight;
-                            if (mouseY >= itemY && mouseY <= itemY + rowHeight) {
-                                this.entryTargetBox.setValue(matches.get(i));
-                                this.saveTemporaryState();
-                                this.saveEditingEntry();
-                                this.entryTargetBox.setFocused(false);
-                                this.rebuildWidgets();
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
+            if (mouseX >= listX && mouseX <= listX + listW && mouseY >= listY && mouseY <= listY + listH) {
+                List<String> filteredList = getFilteredList();
+                filteredList.sort(String::compareTo);
 
-            if (this.rightPageState == RightPageState.SELECT_TYPE) {
-                int PANEL_SPACING = 6;
-                int leftWidth = 240;
-                int totalWidth = leftWidth + 160 + PANEL_SPACING;
-                int baseX = (this.width - totalWidth) / 2;
-                int panel2X = baseX + leftWidth + PANEL_SPACING;
-                int panel2Y = (this.height - 190) / 2;
+                int maxScroll = Math.max(0, filteredList.size() - 7);
+                int currentScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
 
-                int listX = panel2X + 15;
-                int listY = panel2Y + 40;
-                int listW = 130;
-                int listH = 116;
-
-                if (mouseX >= listX && mouseX <= listX + listW && mouseY >= listY && mouseY <= listY + listH) {
-                    List<String> filteredList = getFilteredList();
-                    filteredList.sort(String::compareTo);
-
-                    int maxScroll = Math.max(0, filteredList.size() - 7);
-                    int currentScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
-
-                    int clickedIdx = currentScroll + (int) ((mouseY - listY) / 16);
-                    if (clickedIdx >= 0 && clickedIdx < filteredList.size()) {
-                        this.saveTemporaryState();
-                        this.editingType = filteredList.get(clickedIdx);
-                        this.rightPageState = RightPageState.EDIT_ENTRY;
-                        this.rebuildWidgets();
-                        return true;
-                    }
+                int clickedIdx = currentScroll + (int) ((mouseY - listY) / 16);
+                if (clickedIdx >= 0 && clickedIdx < filteredList.size()) {
+                    this.saveTemporaryState();
+                    this.editingType = filteredList.get(clickedIdx);
+                    this.rightPageState = RightPageState.EDIT_ENTRY;
+                    this.rebuildWidgets();
+                    return true;
                 }
             }
         }
@@ -1451,64 +1334,19 @@ public class QuestEditorScreen extends Screen {
             return true;
         }
 
-        NoShadowEditBox activeLeftBox = null;
-        List<String> leftMatches = null;
-        if (this.iconBox != null && this.iconBox.isFocused()) {
-            activeLeftBox = this.iconBox;
-            leftMatches = getLeftSuggestions(activeLeftBox);
-        } else if (this.chapterBox != null && this.chapterBox.isFocused()) {
-            activeLeftBox = this.chapterBox;
-            leftMatches = getLeftSuggestions(activeLeftBox);
-        }
-
-        if (activeLeftBox != null && !leftMatches.isEmpty()) {
-            if (key == GLFW.GLFW_KEY_DOWN) {
-                this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % leftMatches.size();
-                return true;
-            } else if (key == GLFW.GLFW_KEY_UP) {
-                if (this.selectedSuggestionIndex <= 0) {
-                    this.selectedSuggestionIndex = leftMatches.size() - 1;
-                } else {
-                    this.selectedSuggestionIndex--;
+        if (this.autocompleteHelper.keyPressed(key, val -> {
+            NoShadowEditBox box = this.autocompleteHelper.getLastBox();
+            if (box != null) {
+                box.setValue(val);
+                this.saveTemporaryState();
+                if (box == this.entryTargetBox) {
+                    this.saveEditingEntry();
                 }
-                return true;
-            } else if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
-                if (this.selectedSuggestionIndex >= 0 && this.selectedSuggestionIndex < leftMatches.size()) {
-                    activeLeftBox.setValue(leftMatches.get(this.selectedSuggestionIndex));
-                    this.saveTemporaryState();
-                    activeLeftBox.setFocused(false);
-                    this.rebuildWidgets();
-                    this.selectedSuggestionIndex = -1;
-                    return true;
-                }
+                box.setFocused(false);
+                this.rebuildWidgets();
             }
-        }
-
-        if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused()) {
-            List<String> rightMatches = getSuggestions(this.entryTargetBox.getValue());
-            if (!rightMatches.isEmpty()) {
-                if (key == GLFW.GLFW_KEY_DOWN) {
-                    this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % rightMatches.size();
-                    return true;
-                } else if (key == GLFW.GLFW_KEY_UP) {
-                    if (this.selectedSuggestionIndex <= 0) {
-                        this.selectedSuggestionIndex = rightMatches.size() - 1;
-                    } else {
-                        this.selectedSuggestionIndex--;
-                    }
-                    return true;
-                } else if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
-                    if (this.selectedSuggestionIndex >= 0 && this.selectedSuggestionIndex < rightMatches.size()) {
-                        this.entryTargetBox.setValue(rightMatches.get(this.selectedSuggestionIndex));
-                        this.saveTemporaryState();
-                        this.saveEditingEntry();
-                        this.entryTargetBox.setFocused(false);
-                        this.rebuildWidgets();
-                        this.selectedSuggestionIndex = -1;
-                        return true;
-                    }
-                }
-            }
+        })) {
+            return true;
         }
 
         if (this.getFocused() != null && this.getFocused().keyPressed(key, scancode, modifiers)) {
@@ -1522,7 +1360,7 @@ public class QuestEditorScreen extends Screen {
         this.rebuildWidgets();
     }
 
-    private enum RightPageState {
+    enum RightPageState {
         LIST,
         SELECT_TYPE,
         EDIT_ENTRY
@@ -1538,437 +1376,5 @@ public class QuestEditorScreen extends Screen {
     private record NestingFrame(JsonObject parentEntry, List<JsonObject> activeList, int selectedEntryIndex,
                                 int listPage, RightPageState rightPageState, String editingType,
                                 JsonObject editingEntry, boolean entryLevelsToggle) {
-    }
-
-    private class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEntry {
-        private ScrollableComponent scroller;
-        private GuiEventListener focusedBox = null;
-
-        @Override
-        public int getHeight() {
-            return 200;
-        }
-
-        @Override
-        public void setScrollableComponent(ScrollableComponent component) {
-            this.scroller = component;
-        }
-
-        @Override
-        public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-            if (this.scroller == null) return;
-
-            int PANEL_SPACING = 6;
-            int leftWidth = 240;
-            int rightWidth = 160;
-            int height = 190;
-            int totalWidth = leftWidth + rightWidth + PANEL_SPACING;
-            int baseX = (QuestEditorScreen.this.width - totalWidth) / 2;
-            int baseY = (QuestEditorScreen.this.height - height) / 2;
-
-            int startX = baseX + 10;
-            int startY = baseY + 12;
-            int scroll = (int) this.scroller.getScrollAmount();
-
-            idBox.setX(startX + 5);
-            idBox.setY(startY + 10 - scroll);
-
-            titleBox.setX(startX + 5);
-            titleBox.setY(startY + 42 - scroll);
-
-            descriptionBox.setX(startX + 5);
-            descriptionBox.setY(startY + 74 - scroll);
-
-            iconBox.setX(startX + 5);
-            iconBox.setY(startY + 144 - scroll);
-
-            chapterBox.setX(startX + 5);
-            chapterBox.setY(startY + 176 - scroll);
-
-            orderBox.setX(startX + 155);
-            orderBox.setY(startY + 176 - scroll);
-
-            int absMouseX = mouseX + (int) this.scroller.getXOffset();
-            int absMouseY = mouseY + (int) this.scroller.getYOffset();
-
-            boolean hovered = this.scroller.isMouseOver(absMouseX, absMouseY);
-            int renderMouseX = hovered ? absMouseX : -9999;
-            int renderMouseY = hovered ? absMouseY : -9999;
-
-            int color = Questlog.getConfig().colors.textColor | 0xFF000000;
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.id"), startX + 5, startY - scroll, color, false);
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.title_label"), startX + 5, startY + 32 - scroll, color, false);
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.description_label"), startX + 5, startY + 64 - scroll, color, false);
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.icon_label"), startX + 5, startY + 134 - scroll, color, false);
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.chapter_label"), startX + 5, startY + 166 - scroll, color, false);
-            ps.drawString(QuestEditorScreen.this.font, Component.translatable("questlog.editor.order_label"), startX + 155, startY + 166 - scroll, color, false);
-
-            idBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-            titleBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-            descriptionBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-            iconBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-            chapterBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-            orderBox.render(ps, renderMouseX, renderMouseY, partialTicks);
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (this.scroller == null) return false;
-            double absoluteX = mouseX + this.scroller.getXOffset();
-            double absoluteY = mouseY + this.scroller.getYOffset();
-
-            if (!this.scroller.isMouseOver(absoluteX, absoluteY)) {
-                return false;
-            }
-
-            boolean idClicked = (QuestEditorScreen.this.questToEdit == null) && idBox.mouseClicked(absoluteX, absoluteY, button);
-            boolean titleClicked = titleBox.mouseClicked(absoluteX, absoluteY, button);
-            boolean descriptionClicked = descriptionBox.mouseClicked(absoluteX, absoluteY, button);
-            boolean iconClicked = iconBox.mouseClicked(absoluteX, absoluteY, button);
-            boolean chapterClicked = chapterBox.mouseClicked(absoluteX, absoluteY, button);
-            boolean orderClicked = orderBox.mouseClicked(absoluteX, absoluteY, button);
-
-            idBox.setFocused(idClicked);
-            titleBox.setFocused(titleClicked);
-            descriptionBox.setFocused(descriptionClicked);
-            iconBox.setFocused(iconClicked);
-            chapterBox.setFocused(chapterClicked);
-            orderBox.setFocused(orderClicked);
-
-            if (idClicked) this.focusedBox = idBox;
-            else if (titleClicked) this.focusedBox = titleBox;
-            else if (descriptionClicked) this.focusedBox = descriptionBox;
-            else if (iconClicked) this.focusedBox = iconBox;
-            else if (chapterClicked) this.focusedBox = chapterBox;
-            else if (orderClicked) this.focusedBox = orderBox;
-            else this.focusedBox = null;
-
-            return idClicked || titleClicked || descriptionClicked || iconClicked || chapterClicked || orderClicked;
-        }
-
-        @Override
-        public boolean mouseReleased(double mouseX, double mouseY, int button) {
-            if (this.scroller == null) return false;
-            double absoluteX = mouseX + this.scroller.getXOffset();
-            double absoluteY = mouseY + this.scroller.getYOffset();
-
-            if (idBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-            if (titleBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-            if (descriptionBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-            if (iconBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-            if (chapterBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-            if (orderBox.mouseReleased(absoluteX, absoluteY, button)) return true;
-
-            return false;
-        }
-
-        @Override
-        public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-            if (this.scroller == null) return false;
-            double absoluteX = mouseX + this.scroller.getXOffset();
-            double absoluteY = mouseY + this.scroller.getYOffset();
-
-            if (idBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-            if (titleBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-            if (descriptionBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-            if (iconBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-            if (chapterBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-            if (orderBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
-
-            return false;
-        }
-
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            if (idBox.isFocused() && idBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            if (titleBox.isFocused() && titleBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            if (descriptionBox.isFocused() && descriptionBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            if (iconBox.isFocused() && iconBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            if (chapterBox.isFocused() && chapterBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            if (orderBox.isFocused() && orderBox.keyPressed(keyCode, scanCode, modifiers)) return true;
-            return false;
-        }
-
-        @Override
-        public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-            if (idBox.isFocused() && idBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            if (titleBox.isFocused() && titleBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            if (descriptionBox.isFocused() && descriptionBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            if (iconBox.isFocused() && iconBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            if (chapterBox.isFocused() && chapterBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            if (orderBox.isFocused() && orderBox.keyReleased(keyCode, scanCode, modifiers)) return true;
-            return false;
-        }
-
-        @Override
-        public boolean charTyped(char codePoint, int modifiers) {
-            if (idBox.isFocused() && idBox.charTyped(codePoint, modifiers)) return true;
-            if (titleBox.isFocused() && titleBox.charTyped(codePoint, modifiers)) return true;
-            if (descriptionBox.isFocused() && descriptionBox.charTyped(codePoint, modifiers)) return true;
-            if (iconBox.isFocused() && iconBox.charTyped(codePoint, modifiers)) return true;
-            if (chapterBox.isFocused() && chapterBox.charTyped(codePoint, modifiers)) return true;
-            if (orderBox.isFocused() && orderBox.charTyped(codePoint, modifiers)) return true;
-            return false;
-        }
-
-        @Override
-        public boolean isFocused() {
-            return this.focusedBox != null && this.focusedBox.isFocused();
-        }
-
-        @Override
-        public void setFocused(boolean focused) {
-            if (!focused) {
-                idBox.setFocused(false);
-                titleBox.setFocused(false);
-                descriptionBox.setFocused(false);
-                iconBox.setFocused(false);
-                chapterBox.setFocused(false);
-                orderBox.setFocused(false);
-            } else {
-                if (this.focusedBox != null) {
-                    this.focusedBox.setFocused(true);
-                } else {
-                    if (QuestEditorScreen.this.questToEdit == null) {
-                        idBox.setFocused(true);
-                        this.focusedBox = idBox;
-                    } else {
-                        titleBox.setFocused(true);
-                        this.focusedBox = titleBox;
-                    }
-                }
-            }
-        }
-
-        @Override
-        public @NotNull NarratableEntry.NarrationPriority narrationPriority() {
-            return NarratableEntry.NarrationPriority.NONE;
-        }
-
-        @Override
-        public void updateNarration(@NotNull NarrationElementOutput output) {
-        }
-    }
-
-    private class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEntry {
-        private ScrollableComponent scroller;
-
-        @Override
-        public int getHeight() {
-            return getActiveList().size() * 22 + 8;
-        }
-
-        @Override
-        public void setScrollableComponent(ScrollableComponent component) {
-            this.scroller = component;
-        }
-
-        @Override
-        public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
-            if (this.scroller == null) return;
-
-            int PANEL_SPACING = 6;
-            int leftWidth = 240;
-            int rightWidth = 160;
-            int height = 190;
-            int totalWidth = leftWidth + rightWidth + PANEL_SPACING;
-            int baseX = (QuestEditorScreen.this.width - totalWidth) / 2;
-            int baseY = (QuestEditorScreen.this.height - height) / 2;
-            int panel2X = baseX + leftWidth + PANEL_SPACING;
-            int panel2Y = baseY;
-
-            int startX = panel2X + 10;
-            int startY = panel2Y + 28;
-            int scroll = (int) this.scroller.getScrollAmount();
-
-            List<JsonObject> list = getActiveList();
-            int color = Questlog.getConfig().colors.textColor | 0xFF000000;
-
-            for (int i = 0; i < list.size(); i++) {
-                JsonObject entry = list.get(i);
-                int localRowY = 4 + i * 22;
-                int rowY = startY + localRowY - scroll;
-
-                boolean rowHovered = mouseX >= 0 && mouseX <= 220 && mouseY >= localRowY && mouseY < localRowY + 22;
-                if (rowHovered) {
-                    ps.fill(startX + 2, rowY, startX + 138, rowY + 20, Questlog.getConfig().colors.hoverFillColor);
-                }
-
-                String fullType = entry.has("type") ? entry.get("type").getAsString() : "";
-                String type = fullType.replace("questlog:", "");
-                if (type.isEmpty()) {
-                    type = "unknown";
-                }
-                String text = type;
-                if (entry.has("name")) {
-                    text = entry.get("name").getAsString();
-                } else {
-                    String target = "";
-                    if (!fullType.isEmpty()) {
-                        EditorMetadata meta = getMetadata(fullType);
-                        if (meta != null && meta.targetFieldKey() != null) {
-                            String key = meta.targetFieldKey();
-                            if (entry.has(key)) {
-                                com.google.gson.JsonElement el = entry.get(key);
-                                if (el.isJsonPrimitive()) {
-                                    target = el.getAsString();
-                                } else if (el.isJsonObject() && el.getAsJsonObject().has("id")) {
-                                    target = el.getAsJsonObject().get("id").getAsString();
-                                } else {
-                                    target = el.toString();
-                                }
-                            }
-                        }
-                    }
-                    if (target.isEmpty()) {
-                        String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "command", "loot_table", "enchantment", "effect"};
-                        for (String k : keys) {
-                            if (entry.has(k)) {
-                                com.google.gson.JsonElement el = entry.get(k);
-                                if (el.isJsonPrimitive()) {
-                                    target = el.getAsString();
-                                } else if (el.isJsonObject() && el.getAsJsonObject().has("id")) {
-                                    target = el.getAsJsonObject().get("id").getAsString();
-                                } else {
-                                    target = el.toString();
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    if (!target.isEmpty()) {
-                        if (target.contains(":")) {
-                            target = target.substring(target.indexOf(":") + 1);
-                        }
-                        text = type + ": " + target;
-                    }
-                }
-
-                if (QuestEditorScreen.this.font.width(text) > 130) {
-                    text = QuestEditorScreen.this.font.plainSubstrByWidth(text, 120) + "...";
-                }
-
-                ps.drawString(QuestEditorScreen.this.font, text, startX + 8, rowY + 6, color, false);
-
-                int editX = startX + 164;
-                int dupX = startX + 182;
-                int delX = startX + 200;
-                int btnY = rowY + 2;
-
-                int localBtnY = localRowY + 2;
-                boolean editHovered = mouseX >= 164 && mouseX <= 180 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
-                boolean dupHovered = mouseX >= 182 && mouseX <= 198 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
-                boolean delHovered = mouseX >= 200 && mouseX <= 216 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
-
-                ps.blit(editHovered ? GEAR_HIGHLIGHTED : GEAR_ICON, editX, btnY, 0, 0, 16, 16, 16, 16);
-                ps.blit(dupHovered ? DUPLICATE_HIGHLIGHTED : DUPLICATE_ICON, dupX, btnY, 0, 0, 16, 16, 16, 16);
-                ps.blit(delHovered ? CROSS_HIGHLIGHTED : CROSS_ICON, delX, btnY, 0, 0, 16, 16, 16, 16);
-
-                if (editHovered) {
-                    if (Minecraft.getInstance().screen instanceof QuestEditorScreen qScreen) {
-                        qScreen.pendingTooltip = Component.translatable("questlog.editor.tooltip.edit_entry");
-                    }
-                } else if (dupHovered) {
-                    if (Minecraft.getInstance().screen instanceof QuestEditorScreen qScreen) {
-                        qScreen.pendingTooltip = Component.translatable("questlog.editor.tooltip.duplicate_entry");
-                    }
-                } else if (delHovered) {
-                    if (Minecraft.getInstance().screen instanceof QuestEditorScreen qScreen) {
-                        qScreen.pendingTooltip = Component.translatable("questlog.editor.tooltip.delete_entry");
-                    }
-                }
-            }
-        }
-
-        @Override
-        public boolean mouseClicked(double mouseX, double mouseY, int button) {
-            if (this.scroller == null) return false;
-            List<JsonObject> list = getActiveList();
-
-            for (int i = 0; i < list.size(); i++) {
-                int index = i;
-                JsonObject entry = list.get(index);
-                int rowY = 4 + i * 22;
-                int btnY = rowY + 2;
-
-                if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-                    if (mouseX >= 164 && mouseX <= 180 && mouseY >= btnY && mouseY <= btnY + 16) {
-                        QuestEditorScreen.this.saveTemporaryState();
-                        QuestEditorScreen.this.selectedEntryIndex = index;
-                        QuestEditorScreen.this.editingEntry = entry;
-                        QuestEditorScreen.this.editingType = entry.has("type") ? entry.get("type").getAsString() : "questlog:item_obtain";
-                        QuestEditorScreen.this.entryLevelsToggle = entry.has("levels") && entry.get("levels").getAsBoolean();
-                        QuestEditorScreen.this.rightPageState = RightPageState.EDIT_ENTRY;
-                        QuestEditorScreen.this.rebuildWidgets();
-                        return true;
-                    }
-                    if (mouseX >= 182 && mouseX <= 198 && mouseY >= btnY && mouseY <= btnY + 16) {
-                        QuestEditorScreen.this.saveTemporaryState();
-                        JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
-                        list.add(index + 1, copy);
-                        QuestEditorScreen.this.updateParentEntryWithChildren();
-                        QuestEditorScreen.this.rebuildWidgets();
-                        return true;
-                    }
-                    if (mouseX >= 200 && mouseX <= 216 && mouseY >= btnY && mouseY <= btnY + 16) {
-                        QuestEditorScreen.this.saveTemporaryState();
-                        list.remove(index);
-                        QuestEditorScreen.this.updateParentEntryWithChildren();
-                        QuestEditorScreen.this.rebuildWidgets();
-                        return true;
-                    }
-                } else if (button == GLFW.GLFW_MOUSE_BUTTON_2) {
-                    if (mouseX >= 0 && mouseX <= 220 && mouseY >= rowY && mouseY < rowY + 22) {
-                        List<ContextMenuItem> menuItems = new ArrayList<>();
-                        menuItems.add(new ContextMenuItem(Component.translatable("questlog.menu.edit_entry"), () -> {
-                            QuestEditorScreen.this.saveTemporaryState();
-                            QuestEditorScreen.this.selectedEntryIndex = index;
-                            QuestEditorScreen.this.editingEntry = entry;
-                            QuestEditorScreen.this.editingType = entry.has("type") ? entry.get("type").getAsString() : "questlog:item_obtain";
-                            QuestEditorScreen.this.entryLevelsToggle = entry.has("levels") && entry.get("levels").getAsBoolean();
-                            QuestEditorScreen.this.rightPageState = RightPageState.EDIT_ENTRY;
-                            QuestEditorScreen.this.rebuildWidgets();
-                        }));
-                        menuItems.add(new ContextMenuItem(Component.translatable("questlog.menu.duplicate_entry"), () -> {
-                            QuestEditorScreen.this.saveTemporaryState();
-                            JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
-                            list.add(index + 1, copy);
-                            QuestEditorScreen.this.updateParentEntryWithChildren();
-                            QuestEditorScreen.this.rebuildWidgets();
-                        }));
-                        menuItems.add(new ContextMenuItem(Component.translatable("questlog.menu.delete_entry"), () -> {
-                            QuestEditorScreen.this.saveTemporaryState();
-                            list.remove(index);
-                            QuestEditorScreen.this.updateParentEntryWithChildren();
-                            QuestEditorScreen.this.rebuildWidgets();
-                        }));
-
-                        int screenX = (int) (mouseX + this.scroller.getXOffset());
-                        int screenY = (int) (mouseY + this.scroller.getYOffset());
-                        QuestEditorScreen.this.contextMenu = new ContextMenu(screenX, screenY, menuItems, QuestEditorScreen.this.font, QuestEditorScreen.this.width, QuestEditorScreen.this.height);
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public boolean isFocused() {
-            return false;
-        }
-
-        @Override
-        public void setFocused(boolean var1) {
-        }
-
-        @Override
-        public @NotNull NarratableEntry.NarrationPriority narrationPriority() {
-            return NarratableEntry.NarrationPriority.NONE;
-        }
-
-        @Override
-        public void updateNarration(@NotNull NarrationElementOutput output) {
-        }
     }
 }

@@ -11,11 +11,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.Questlog;
+import org.infernalstudios.questlog.client.gui.AutocompleteHelper;
+import org.infernalstudios.questlog.client.gui.EditorUtils;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
 import org.infernalstudios.questlog.core.DefinitionUtil;
-import org.infernalstudios.questlog.client.gui.EditorUtils;
-import org.infernalstudios.questlog.network.packet.ChapterEditRemovePacket;
 import org.infernalstudios.questlog.network.packet.ChapterEditSavePacket;
 import org.infernalstudios.questlog.network.packet.QuestEditSavePacket;
 import org.infernalstudios.questlog.platform.Services;
@@ -37,25 +37,20 @@ public class ChapterEditorScreen extends Screen {
     private final Screen previousScreen;
     @Nullable
     private final ResourceLocation chapterToEdit;
-
+    private final AutocompleteHelper autocompleteHelper = new AutocompleteHelper();
     private NineSliceTexture bgLeft;
     private NineSliceTexture bgRight;
-
     private String tempId = "";
     private String tempTitle = "";
     private String tempIconItem = "";
     private int tempSortOrder = 0;
     private boolean tempDefault = false;
     private boolean tempHidden = false;
-
     private NoShadowEditBox idBox;
     private NoShadowEditBox titleBox;
     private NoShadowEditBox iconBox;
     private NoShadowEditBox orderBox;
-
     private int listPage = 0;
-    private int selectedSuggestionIndex = -1;
-    private String lastActiveBoxValue = "";
 
     public ChapterEditorScreen(Screen previousScreen, @Nullable ResourceLocation chapterToEdit) {
         super(Component.translatable(chapterToEdit != null ? "questlog.editor.edit_chapter" : "questlog.editor.add_chapter"));
@@ -390,14 +385,6 @@ public class ChapterEditorScreen extends Screen {
             ResourceLocation qKey = allQuests.get(i);
             JsonObject qJson = DefinitionUtil.getCachedQuest(qKey);
             String title = qJson.has("title") ? qJson.get("title").getAsString() : qKey.getPath();
-            String qChap = qJson.has("chapter") ? qJson.get("chapter").getAsString() : "main";
-            if (qChap.contains(":")) {
-                ResourceLocation rl = ResourceLocation.tryParse(qChap);
-                if (rl != null) {
-                    qChap = rl.getPath();
-                }
-            }
-            boolean inThisChapter = qChap.equals(currentChapPath);
 
             int rowY = panel2Y + 28 + (i - startIdx) * 22;
 
@@ -409,79 +396,21 @@ public class ChapterEditorScreen extends Screen {
             ps.drawString(this.font, displayText, panel2X + 10, rowY + 5, color, false);
         }
 
-        String currentVal = this.iconBox != null ? this.iconBox.getValue() : "";
-        if (this.iconBox == null || !this.iconBox.isFocused() || !currentVal.equals(this.lastActiveBoxValue)) {
-            this.selectedSuggestionIndex = -1;
-            this.lastActiveBoxValue = currentVal;
-        }
-
-        if (this.iconBox != null && this.iconBox.isFocused()) {
-            List<String> matches = getLeftSuggestions(this.iconBox);
-            if (!matches.isEmpty()) {
-                int boxX = this.iconBox.getX();
-                int boxY = this.iconBox.getY();
-                int boxW = this.iconBox.getWidth();
-                int startY = boxY + 17;
-                int rowHeight = 14;
-                int overlayHeight = matches.size() * rowHeight + 2;
-
-                ps.pose().pushPose();
-                ps.pose().translate(0, 0, 400.0F);
-
-                ps.fill(boxX, startY, boxX + boxW, startY + overlayHeight, 0xFF202020);
-                ps.fill(boxX - 1, startY, boxX, startY + overlayHeight, 0xFF505050);
-                ps.fill(boxX + boxW, startY, boxX + boxW + 1, startY + overlayHeight, 0xFF505050);
-                ps.fill(boxX, startY - 1, boxX + boxW, startY, 0xFF505050);
-                ps.fill(boxX, startY + overlayHeight, boxX + boxW, startY + overlayHeight + 1, 0xFF505050);
-
-                for (int i = 0; i < matches.size(); i++) {
-                    String match = matches.get(i);
-                    int itemY = startY + 1 + i * rowHeight;
-                    boolean hovered = mouseX >= boxX && mouseX <= boxX + boxW && mouseY >= itemY && mouseY <= itemY + rowHeight;
-                    boolean selected = hovered || this.selectedSuggestionIndex == i;
-
-                    if (selected) {
-                        ps.fill(boxX, itemY, boxX + boxW, itemY + rowHeight, 0xFF404040);
-                    }
-
-                    String drawText = match;
-                    if (this.font.width(drawText) > boxW - 10) {
-                        drawText = this.font.plainSubstrByWidth(drawText, boxW - 16) + "...";
-                    }
-                    ps.drawString(this.font, drawText, boxX + 4, itemY + 3, selected ? 0xFFFFFF00 : 0xFFFFFFFF, false);
-                }
-
-                ps.pose().popPose();
-            }
-        }
+        this.autocompleteHelper.update(this.iconBox, () -> getLeftSuggestions(this.iconBox));
+        this.autocompleteHelper.render(ps, this.font, mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-            if (this.iconBox != null && this.iconBox.isFocused()) {
-                List<String> matches = getLeftSuggestions(this.iconBox);
-                if (!matches.isEmpty()) {
-                    int boxX = this.iconBox.getX();
-                    int boxY = this.iconBox.getY();
-                    int boxW = this.iconBox.getWidth();
-                    int startY = boxY + 17;
-                    int rowHeight = 14;
-
-                    if (mouseX >= boxX && mouseX <= boxX + boxW) {
-                        for (int i = 0; i < matches.size(); i++) {
-                            int itemY = startY + 1 + i * rowHeight;
-                            if (mouseY >= itemY && mouseY <= itemY + rowHeight) {
-                                this.iconBox.setValue(matches.get(i));
-                                this.saveTemporaryState();
-                                this.iconBox.setFocused(false);
-                                this.rebuildWidgets();
-                                return true;
-                            }
-                        }
-                    }
-                }
+        if (this.autocompleteHelper.mouseClicked(mouseX, mouseY, button, val -> {
+            if (this.iconBox != null) {
+                this.iconBox.setValue(val);
+                this.saveTemporaryState();
+                this.iconBox.setFocused(false);
+                this.rebuildWidgets();
             }
+        })) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -495,30 +424,15 @@ public class ChapterEditorScreen extends Screen {
             return true;
         }
 
-        if (this.iconBox != null && this.iconBox.isFocused()) {
-            List<String> matches = getLeftSuggestions(this.iconBox);
-            if (!matches.isEmpty()) {
-                if (key == GLFW.GLFW_KEY_DOWN) {
-                    this.selectedSuggestionIndex = (this.selectedSuggestionIndex + 1) % matches.size();
-                    return true;
-                } else if (key == GLFW.GLFW_KEY_UP) {
-                    if (this.selectedSuggestionIndex <= 0) {
-                        this.selectedSuggestionIndex = matches.size() - 1;
-                    } else {
-                        this.selectedSuggestionIndex--;
-                    }
-                    return true;
-                } else if (key == GLFW.GLFW_KEY_ENTER || key == GLFW.GLFW_KEY_KP_ENTER) {
-                    if (this.selectedSuggestionIndex >= 0 && this.selectedSuggestionIndex < matches.size()) {
-                        this.iconBox.setValue(matches.get(this.selectedSuggestionIndex));
-                        this.saveTemporaryState();
-                        this.iconBox.setFocused(false);
-                        this.rebuildWidgets();
-                        this.selectedSuggestionIndex = -1;
-                        return true;
-                    }
-                }
+        if (this.autocompleteHelper.keyPressed(key, val -> {
+            if (this.iconBox != null) {
+                this.iconBox.setValue(val);
+                this.saveTemporaryState();
+                this.iconBox.setFocused(false);
+                this.rebuildWidgets();
             }
+        })) {
+            return true;
         }
 
         if (this.getFocused() != null && this.getFocused().keyPressed(key, scancode, modifiers)) {

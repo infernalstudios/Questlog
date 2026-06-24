@@ -82,7 +82,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         this.scroller = component;
     }
 
-    public QuestListEntry getHovered() {
+    public @Nullable QuestListEntry getHovered() {
         return this.hovered;
     }
 
