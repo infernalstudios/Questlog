@@ -474,7 +474,7 @@ public class QuestEditorScreen extends Screen {
                     this.currentNestedList = frame.activeList;
                     this.rebuildWidgets();
                 }
-            }).bounds(panel2X + 10, panel2Y + 8, 40, 16).build());
+            }).bounds(panel2X + 14, panel2Y + 12, 40, 16).build());
         }
 
         if (this.nestingStack.isEmpty() && this.activeTab == ActiveTab.SETTINGS) {
@@ -549,7 +549,7 @@ public class QuestEditorScreen extends Screen {
     }
 
     private void buildRightPageEditEntry(int panel2X, int panel2Y) {
-        this.entryNameBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 22, 130, 16, Component.empty());
+        this.entryNameBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 42, 130, 16, Component.empty());
         this.entryNameBox.setMaxLength(64);
         String nameVal = this.editingEntry != null && this.editingEntry.has("name") ? this.editingEntry.get("name").getAsString() : "";
         this.entryNameBox.setValue(nameVal);
@@ -584,7 +584,7 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 58, 130, 18).build());
+            }).bounds(panel2X + 15, panel2Y + 78, 130, 18).build());
 
             this.entryTargetBox = null;
             this.entryAmountBox = null;
@@ -608,12 +608,12 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 58, 130, 18).build());
+            }).bounds(panel2X + 15, panel2Y + 78, 130, 18).build());
 
             this.entryTargetBox = null;
 
             if (meta == null || meta.amountFieldKey() != null) {
-                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 94, 50, 16, Component.empty());
+                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 114, 50, 16, Component.empty());
                 this.entryAmountBox.setMaxLength(6);
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
@@ -625,7 +625,7 @@ public class QuestEditorScreen extends Screen {
             }
         } else {
             if (meta == null || meta.targetFieldKey() != null) {
-                this.entryTargetBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 58, 130, 16, Component.empty());
+                this.entryTargetBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 78, 130, 16, Component.empty());
                 this.entryTargetBox.setMaxLength(128);
                 String targetVal = getTargetFieldValue();
                 this.entryTargetBox.setValue(targetVal);
@@ -636,7 +636,7 @@ public class QuestEditorScreen extends Screen {
             }
 
             if (meta == null || meta.amountFieldKey() != null) {
-                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 94, 50, 16, Component.empty());
+                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 114, 50, 16, Component.empty());
                 this.entryAmountBox.setMaxLength(6);
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
@@ -652,7 +652,7 @@ public class QuestEditorScreen extends Screen {
             Button btnLevels = Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
                 this.entryLevelsToggle = !this.entryLevelsToggle;
                 btn.setMessage(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")));
-            }).bounds(panel2X + 75, panel2Y + 94, 70, 16).build();
+            }).bounds(panel2X + 75, panel2Y + 114, 70, 16).build();
             btnLevels.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.levels")));
             this.addRenderableWidget(btnLevels);
         }
@@ -669,6 +669,35 @@ public class QuestEditorScreen extends Screen {
             this.rightPageState = RightPageState.LIST;
             this.rebuildWidgets();
         }).bounds(panel2X + 85, panel2Y + 162, 60, 16).build());
+    }
+
+    private String getEditingTypeTitle() {
+        String type = this.editingType;
+        if (type == null) return "";
+        int colonIndex = type.indexOf(':');
+        if (colonIndex != -1) {
+            type = type.substring(colonIndex + 1);
+        }
+        String replaced = type.replace('_', ' ');
+        String[] words = replaced.split(" ");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (!word.isEmpty()) {
+                sb.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) {
+                    sb.append(word.substring(1).toLowerCase());
+                }
+            }
+            if (i < words.length - 1) {
+                sb.append(" ");
+            }
+        }
+        String title = sb.toString();
+        if (this.font != null && this.font.width(title) > 130) {
+            title = this.font.plainSubstrByWidth(title, 120) + "...";
+        }
+        return title;
     }
 
     EditorMetadata getMetadata(String typeStr) {
@@ -1210,22 +1239,24 @@ public class QuestEditorScreen extends Screen {
                 ps.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarWidth - 1, thumbY + thumbH, 0xFF808080);
             }
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY) {
-            ps.drawString(this.font, "Name (Optional):", panel2X + 15, panel2Y + 12, color, false);
+            String titleText = getEditingTypeTitle();
+            ps.drawString(this.font, titleText, panel2X + 15, panel2Y + 12, color, false);
+            ps.drawString(this.font, "Name (Optional):", panel2X + 15, panel2Y + 32, color, false);
             EditorMetadata meta = getMetadata(this.editingType);
             if (meta == null || meta.targetFieldKey() != null) {
-                ps.drawString(this.font, getTargetFieldLabel(), panel2X + 15, panel2Y + 48, color, false);
+                ps.drawString(this.font, getTargetFieldLabel(), panel2X + 15, panel2Y + 68, color, false);
             }
             if (meta == null || meta.amountFieldKey() != null) {
                 String amtLabel = this.activeTab == ActiveTab.REWARDS ?
                         (("questlog:choice".equals(this.editingType) || "choice".equals(this.editingType)) ? "Pick Count:" : "Count/Experience:")
                         : "Req Amount:";
-                ps.drawString(this.font, amtLabel, panel2X + 15, panel2Y + 84, color, false);
+                ps.drawString(this.font, amtLabel, panel2X + 15, panel2Y + 104, color, false);
             }
         } else if (this.rightPageState == RightPageState.LIST && this.activeTab != ActiveTab.SETTINGS) {
             if (!this.nestingStack.isEmpty()) {
                 String parentType = this.nestingStack.peek().editingType.replace("questlog:", "");
                 String title = parentType.toUpperCase() + " List";
-                ps.drawString(this.font, title, panel2X + 55, panel2Y + 12, color, false);
+                ps.drawString(this.font, title, panel2X + 59, panel2Y + 16, color, false);
             }
         }
 

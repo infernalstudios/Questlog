@@ -125,10 +125,10 @@ public class QuestlogScreen extends Screen {
             int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
             int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
 
-            AbstractButton editChapBtn = getEditChapBtn(tabX + 1, tabY + 34);
+            AbstractButton editChapBtn = getEditChapBtn(tabX + 3, tabY + 34);
             this.addRenderableWidget(editChapBtn);
 
-            AbstractButton addChapBtn = getAddChapBtn(tabX + 31, tabY + 34);
+            AbstractButton addChapBtn = getAddChapBtn(tabX + 33, tabY + 34);
             this.addRenderableWidget(addChapBtn);
         }
     }
