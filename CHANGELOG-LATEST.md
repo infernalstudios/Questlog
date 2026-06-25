@@ -4,6 +4,7 @@
 - Added a `questlog:choice` reward type.
 - Item rewards now support components.
 - Added a `questlog:origin` trigger for specific origins.
+- Added a `/ql reset_all_progress_and_reload` command.
 
 ### Changed
 

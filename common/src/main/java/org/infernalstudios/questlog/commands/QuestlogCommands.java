@@ -65,6 +65,13 @@ public class QuestlogCommands {
                                 .executes(QuestlogCommands::reloadQuests)
                         )
 
+                        .then(Commands.literal("reset_all_progress_and_reload")
+                                .executes(ctx -> resetAllProgressAndReload(ctx, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                .then(Commands.argument("players", EntityArgument.players())
+                                        .executes(ctx -> resetAllProgressAndReload(ctx, EntityArgument.getPlayers(ctx, "players")))
+                                )
+                        )
+
                         .then(Commands.literal("open")
                                 .executes(ctx -> open(ctx, null, Collections.singletonList(ctx.getSource().getPlayerOrException())))
                                 .then(Commands.argument("target", ResourceLocationArgument.id())
@@ -153,6 +160,43 @@ public class QuestlogCommands {
 
         ctx.getSource().sendSuccess(() -> Component.literal("Reloaded " + questCount + " quests and " + chapterCount + " chapters from config."), true);
         return questCount;
+    }
+
+    private static int resetAllProgressAndReload(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
+        DefinitionUtil.loadFromConfig();
+        int questCount = DefinitionUtil.getCachedQuestKeys().size();
+        int chapterCount = DefinitionUtil.getCachedChapterKeys().size();
+
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            manager.clearQuests();
+            manager.createAllQuests();
+
+            for (Quest quest : manager.getAllQuests()) {
+                quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
+                quest.rewards.forEach(Reward::revokeReward);
+                quest.hasSentTrigger = quest.requirements.isEmpty();
+                quest.hasSentCompletion = false;
+            }
+
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
+        }
+
+        if (ServerPlayerManager.INSTANCE != null) {
+            for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+                if (!players.contains(player)) {
+                    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+                    manager.reload();
+                    ServerPlayerManager.INSTANCE.syncPlayer(manager);
+                }
+            }
+        }
+
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully reloaded " + questCount + " quests / " + chapterCount + " chapters, and reset progress for " + players.size() + " player(s)."), true);
+        return players.size();
     }
 
     private static int open(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {
