@@ -1,0 +1,8 @@
+{
+  "title": "Kill 5 Creepers",
+  "description": "Objective to kill 5 creepers",
+  "type": "questlog:entity_kill",
+  "entity": "minecraft:creeper",
+  "required_amount": 5,
+  "name": "Kill 5 Creepers"
+}

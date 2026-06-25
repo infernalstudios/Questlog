@@ -1,0 +1,7 @@
+{
+  "title": "100 XP",
+  "description": "Reward 100 experience points",
+  "type": "questlog:experience",
+  "experience": 100,
+  "levels": false
+}

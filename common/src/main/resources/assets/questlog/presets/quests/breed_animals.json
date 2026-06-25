@@ -1,6 +1,6 @@
 {
-  "title": "Animal Husbandry",
-  "description": "Farming isn't just about crops. You need some livestock too!",
+  "title": "Breed 5 Cows",
+  "description": "Quest to breed cows with wheat",
   "icon": {
     "item": "minecraft:wheat"
   },

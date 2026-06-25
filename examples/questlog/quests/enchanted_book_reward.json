@@ -1,6 +1,6 @@
 {
-  "title": "Ancient Knowledge",
-  "description": "Obtain some ancient knowledge. Here is your reward, an ancient enchanted tome!",
+  "title": "Obtain Book for Fortune III",
+  "description": "Example of rewarding items with custom components/NBT data",
   "icon": {
     "item": "minecraft:book"
   },

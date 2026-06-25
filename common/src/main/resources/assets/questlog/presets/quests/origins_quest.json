@@ -1,6 +1,6 @@
 {
-  "title": "Origins Avian Quest",
-  "description": "Only those with the wings of an Avian may take this task. Gather feathers to build your nest.",
+  "title": "Origins Avian: Gather 32 Feathers",
+  "description": "Quest requiring the Avian origin from the Origins mod",
   "icon": {
     "item": "minecraft:feather"
   },

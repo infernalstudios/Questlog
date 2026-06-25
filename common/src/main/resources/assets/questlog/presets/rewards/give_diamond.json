@@ -1,0 +1,7 @@
+{
+  "title": "Give 1 Diamond",
+  "description": "Reward 1 diamond item",
+  "type": "questlog:item",
+  "item": "minecraft:diamond",
+  "count": 1
+}

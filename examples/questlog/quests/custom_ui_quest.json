@@ -1,6 +1,6 @@
 {
-  "title": "Custom Experience",
-  "description": "This quest shows off some of the UI customization options. Different colors, panel sizes, and more!",
+  "title": "Obtain Oak Log (Custom UI)",
+  "description": "Example of UI customization options (colors, custom backgrounds, custom sizes)",
   "icon": {
     "item": "minecraft:painting"
   },

@@ -1,0 +1,8 @@
+{
+  "title": "Kill 5 Zombies",
+  "description": "Objective to kill 5 zombies",
+  "type": "questlog:entity_kill",
+  "entity": "minecraft:zombie",
+  "required_amount": 5,
+  "name": "Kill 5 Zombies"
+}

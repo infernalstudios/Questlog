@@ -118,14 +118,17 @@ public class QuestlogScreen extends Screen {
             int listX = (this.width - listWidth) / 2 + 1 + Questlog.getConfig().gui.mainPanelX;
             int listY = (this.height - listHeight) / 2 + 1 + Questlog.getConfig().gui.mainPanelY;
 
-            int btnX = listX - 33;
+            int btnX = listX + listWidth + 17;
             AbstractButton addQuestBtn = getAddQuestBtn(btnX, listY + 5);
             this.addRenderableWidget(addQuestBtn);
 
-            AbstractButton editChapBtn = getEditChapBtn(btnX, listY + 30);
+            int tabX = listX + Questlog.getConfig().gui.chapterButtonsX;
+            int tabY = listY + listHeight + 15 + Questlog.getConfig().gui.chapterButtonsY;
+
+            AbstractButton editChapBtn = getEditChapBtn(tabX + 1, tabY + 34);
             this.addRenderableWidget(editChapBtn);
 
-            AbstractButton addChapBtn = getAddChapBtn(btnX, listY + 55);
+            AbstractButton addChapBtn = getAddChapBtn(tabX + 31, tabY + 34);
             this.addRenderableWidget(addChapBtn);
         }
     }
@@ -451,7 +454,7 @@ public class QuestlogScreen extends Screen {
         if (QuestlogClient.isEditModeActive) {
             Font font = this.minecraft != null ? this.minecraft.font : null;
             if (font != null) {
-                ps.drawString(font, Component.translatable("questlog.editor.active"), 10, this.height - 15, 0xE6AA1C | 0xFF000000, false);
+                ps.drawString(font, Component.translatable("questlog.editor.active"), 10, 10, 0xE6AA1C | 0xFF000000, false);
             }
         }
 
@@ -637,7 +640,7 @@ public class QuestlogScreen extends Screen {
             this.openContextMenu(x, y, mainItems);
         }));
 
-        for (EditorUtils.QuestPreset preset : EditorUtils.getPresets()) {
+        for (EditorUtils.EditorPreset preset : EditorUtils.getPresets("quests")) {
             items.add(new ContextMenuItem(
                 Component.literal(preset.getTitle()),
                 () -> {

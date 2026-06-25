@@ -1,0 +1,8 @@
+{
+  "title": "Obtain 10 Oak Logs",
+  "description": "Objective to obtain 10 oak logs",
+  "type": "questlog:item_obtain",
+  "item": "minecraft:oak_log",
+  "required_amount": 10,
+  "name": "Obtain 10 Oak Logs"
+}

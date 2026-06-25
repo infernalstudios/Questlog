@@ -1,0 +1,7 @@
+{
+  "title": "Visit Nether Fortress",
+  "description": "Requirement to locate/visit a Nether Fortress structure",
+  "type": "questlog:visit_structure",
+  "structure": "minecraft:fortress",
+  "name": "Visit Nether Fortress"
+}

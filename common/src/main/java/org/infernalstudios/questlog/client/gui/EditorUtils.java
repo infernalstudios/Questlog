@@ -139,13 +139,13 @@ public class EditorUtils {
         }
     }
 
-    public static class QuestPreset {
+    public static class EditorPreset {
         private final String filename;
         private final String title;
         private final String description;
         private final JsonObject json;
 
-        public QuestPreset(String filename, String title, String description, JsonObject json) {
+        public EditorPreset(String filename, String title, String description, JsonObject json) {
             this.filename = filename;
             this.title = title;
             this.description = description;
@@ -169,12 +169,13 @@ public class EditorUtils {
         }
     }
 
-    public static List<QuestPreset> getPresets() {
-        List<QuestPreset> presets = new ArrayList<>();
+    public static List<EditorPreset> getPresets(String subfolder) {
+        List<EditorPreset> presets = new ArrayList<>();
         try {
             ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+            String prefix = "presets/" + subfolder;
             Map<ResourceLocation, Resource> resources = resourceManager.listResources(
-                "presets/quests",
+                prefix,
                 loc -> loc.getNamespace().equals(Questlog.MODID) && loc.getPath().endsWith(".json")
             );
 
@@ -184,21 +185,21 @@ public class EditorUtils {
                 try {
                     JsonObject json = Util.getJsonResource(entry.getValue());
                     String filename = loc.getPath();
-                    if (filename.startsWith("presets/quests/")) {
-                        filename = filename.substring("presets/quests/".length());
+                    if (filename.startsWith(prefix + "/")) {
+                        filename = filename.substring((prefix + "/").length());
                     }
                     if (filename.endsWith(".json")) {
                         filename = filename.substring(0, filename.length() - 5);
                     }
                     String title = json.has("title") ? json.get("title").getAsString() : filename;
                     String description = json.has("description") ? json.get("description").getAsString() : "";
-                    presets.add(new QuestPreset(filename, title, description, json));
+                    presets.add(new EditorPreset(filename, title, description, json));
                 } catch (Exception e) {
-                    Questlog.LOGGER.error("Failed to load quest preset: " + loc, e);
+                    Questlog.LOGGER.error("Failed to load preset: " + loc, e);
                 }
             }
         } catch (Exception e) {
-            Questlog.LOGGER.error("Failed to list quest presets", e);
+            Questlog.LOGGER.error("Failed to list presets in " + subfolder, e);
         }
         return presets;
     }

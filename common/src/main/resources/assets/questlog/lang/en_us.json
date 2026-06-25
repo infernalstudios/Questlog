@@ -212,7 +212,8 @@
     "questlog.editor.tooltip.duplicate_entry": "Duplicate this entry.",
     "questlog.editor.tooltip.delete_entry": "Delete this entry from the list.",
     "questlog.editor.tooltip.add_entry": "Add a new entry.",
+    "questlog.editor.tooltip.presets_entry": "Add a preset entry.",
     "questlog.menu.add_quest_preset": "Add Quest from Preset",
     "questlog.menu.back": "< Back",
-    "questlog.editor.presets": "Presets..."
+    "questlog.editor.presets": "Quest Presets..."
 }

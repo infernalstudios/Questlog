@@ -1,0 +1,6 @@
+{
+  "title": "Say Hello Command",
+  "description": "Reward command to say hello",
+  "type": "questlog:command",
+  "command": "/say Hello!"
+}

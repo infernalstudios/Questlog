@@ -1,6 +1,6 @@
 {
-  "title": "Final Step",
-  "description": "The end of the line! Complete this and you've mastered the basics.",
+  "title": "Obtain 3 Diamonds (Quest 3/3)",
+  "description": "Final quest in a linear quest chain with a loot table reward",
   "icon": {
     "item": "minecraft:diamond_pickaxe"
   },

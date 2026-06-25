@@ -1,6 +1,6 @@
 {
-  "title": "Master of Tools",
-  "description": "Wooden tools only get you so far. Stone is better!",
+  "title": "Craft a Stone Pickaxe & Axe",
+  "description": "Quest to craft multiple basic tools",
   "icon": {
     "item": "minecraft:stone_pickaxe"
   },

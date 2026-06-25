@@ -1,6 +1,6 @@
 {
-  "title": "Speedrunner",
-  "description": "Obtain a diamond within 5 minutes, or fail!",
+  "title": "Obtain Diamond in Under 5 Minutes",
+  "description": "Example of quest failure conditions using statistics",
   "description_completed": "You did it! You're a true speedrunner.",
   "description_failed": "Too slow! Try again!",
   "icon": {

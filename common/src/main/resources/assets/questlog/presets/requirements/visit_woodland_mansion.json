@@ -1,0 +1,7 @@
+{
+  "title": "Visit Woodland Mansion",
+  "description": "Requirement to locate/visit a Woodland Mansion structure",
+  "type": "questlog:visit_structure",
+  "structure": "minecraft:mansion",
+  "name": "Visit Woodland Mansion"
+}

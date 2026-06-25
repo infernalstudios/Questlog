@@ -118,21 +118,21 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                 }
             }
 
-            if (screen.getFont().width(text) > 130) {
-                text = screen.getFont().plainSubstrByWidth(text, 120) + "...";
+            if (screen.getFont().width(text) > 114) {
+                text = screen.getFont().plainSubstrByWidth(text, 104) + "...";
             }
 
             ps.drawString(screen.getFont(), text, startX + 8, rowY + 6, color, false);
 
-            int editX = startX + 164;
-            int dupX = startX + 182;
-            int delX = startX + 200;
+            int editX = startX + 148;
+            int dupX = startX + 166;
+            int delX = startX + 184;
             int btnY = rowY + 2;
 
             int localBtnY = localRowY + 2;
-            boolean editHovered = mouseX >= 164 && mouseX <= 180 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
-            boolean dupHovered = mouseX >= 182 && mouseX <= 198 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
-            boolean delHovered = mouseX >= 200 && mouseX <= 216 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
+            boolean editHovered = mouseX >= 148 && mouseX <= 164 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
+            boolean dupHovered = mouseX >= 166 && mouseX <= 182 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
+            boolean delHovered = mouseX >= 184 && mouseX <= 200 && mouseY >= localBtnY && mouseY <= localBtnY + 16;
 
             ps.blit(editHovered ? QuestEditorScreen.GEAR_HIGHLIGHTED : QuestEditorScreen.GEAR_ICON, editX, btnY, 0, 0, 16, 16, 16, 16);
             ps.blit(dupHovered ? QuestEditorScreen.DUPLICATE_HIGHLIGHTED : QuestEditorScreen.DUPLICATE_ICON, dupX, btnY, 0, 0, 16, 16, 16, 16);
@@ -159,7 +159,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
             int btnY = rowY + 2;
 
             if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-                if (mouseX >= 164 && mouseX <= 180 && mouseY >= btnY && mouseY <= btnY + 16) {
+                if (mouseX >= 148 && mouseX <= 164 && mouseY >= btnY && mouseY <= btnY + 16) {
                     screen.saveTemporaryState();
                     screen.selectedEntryIndex = i;
                     screen.editingEntry = entry;
@@ -169,7 +169,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                     screen.refreshScreen();
                     return true;
                 }
-                if (mouseX >= 182 && mouseX <= 198 && mouseY >= btnY && mouseY <= btnY + 16) {
+                if (mouseX >= 166 && mouseX <= 182 && mouseY >= btnY && mouseY <= btnY + 16) {
                     screen.saveTemporaryState();
                     JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
                     list.add(i + 1, copy);
@@ -177,7 +177,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                     screen.refreshScreen();
                     return true;
                 }
-                if (mouseX >= 200 && mouseX <= 216 && mouseY >= btnY && mouseY <= btnY + 16) {
+                if (mouseX >= 184 && mouseX <= 200 && mouseY >= btnY && mouseY <= btnY + 16) {
                     screen.saveTemporaryState();
                     list.remove(i);
                     screen.updateParentEntryWithChildren();
@@ -195,6 +195,14 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                 }
             }
         }
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_2) {
+            int screenX = (int) (mouseX + this.scroller.getXOffset());
+            int screenY = (int) (mouseY + this.scroller.getYOffset());
+            screen.openEntryPresetsContextMenu(screenX, screenY);
+            return true;
+        }
+
         return false;
     }
 

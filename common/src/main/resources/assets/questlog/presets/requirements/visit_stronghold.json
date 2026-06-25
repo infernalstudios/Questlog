@@ -1,0 +1,7 @@
+{
+  "title": "Visit Stronghold",
+  "description": "Requirement to locate/visit a Stronghold structure",
+  "type": "questlog:visit_structure",
+  "structure": "minecraft:stronghold",
+  "name": "Visit Stronghold"
+}

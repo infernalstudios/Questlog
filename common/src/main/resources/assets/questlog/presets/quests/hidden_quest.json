@@ -1,6 +1,6 @@
 {
-  "title": "Secret Discovery",
-  "description": "How did you find this? You must be very curious!",
+  "title": "Hidden Quest: Find Secret Coordinates",
+  "description": "Example of hidden quests and location requirements",
   "icon": {
     "item": "minecraft:spyglass"
   },

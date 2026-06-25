@@ -1,6 +1,6 @@
 {
-  "title": "Diamond Miner",
-  "description": "DIAMONDS! Go find some deep underground, near lava.",
+  "title": "Find 5 Diamonds",
+  "description": "Quest to mine diamonds with a custom badge",
   "icon": {
     "item": "minecraft:diamond_ore"
   },

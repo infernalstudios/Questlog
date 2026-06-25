@@ -1,6 +1,6 @@
 {
-  "title": "Welcome to the Journey!",
-  "description": "Your adventure begins here. Mine some stone to get started.",
+  "title": "Mine 16 Stone (Quest 1/3)",
+  "description": "First quest in a linear quest chain",
   "icon": {
     "item": "minecraft:cobblestone"
   },

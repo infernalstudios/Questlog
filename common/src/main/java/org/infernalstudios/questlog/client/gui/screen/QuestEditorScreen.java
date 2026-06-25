@@ -50,6 +50,8 @@ public class QuestEditorScreen extends Screen {
     static final ResourceLocation PLUS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_plus_highlighted.png");
     static final ResourceLocation DUPLICATE_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate.png");
     static final ResourceLocation DUPLICATE_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_duplicate_highlighted.png");
+    static final ResourceLocation PRESET_ICON = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_preset.png");
+    static final ResourceLocation PRESET_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_preset_highlighted.png");
 
     private static final ResourceLocation TAB_OBJECTIVES_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives.png");
     private static final ResourceLocation TAB_OBJECTIVES_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives_selected.png");
@@ -326,7 +328,7 @@ public class QuestEditorScreen extends Screen {
         int bottomY = baseY + height + 10;
 
         List<ContextMenuItem> items = new ArrayList<>();
-        for (EditorUtils.QuestPreset preset : EditorUtils.getPresets()) {
+        for (EditorUtils.EditorPreset preset : EditorUtils.getPresets("quests")) {
             items.add(new ContextMenuItem(
                     Component.literal(preset.getTitle()),
                     () -> {
@@ -350,6 +352,47 @@ public class QuestEditorScreen extends Screen {
             int menuHeight = Math.min(items.size(), 8) * 18 + 6;
             this.contextMenu = new ContextMenu(panel2X, bottomY - menuHeight - 2, items, this.font, this.width, this.height);
         }
+    }
+
+    public void openEntryPresetsContextMenu(int x, int y) {
+        String subfolder = switch (this.activeTab) {
+            case OBJECTIVES -> "objectives";
+            case REQUIREMENTS -> "requirements";
+            case REWARDS -> "rewards";
+            default -> null;
+        };
+        if (subfolder == null) return;
+
+        List<ContextMenuItem> items = new ArrayList<>();
+        for (EditorUtils.EditorPreset preset : EditorUtils.getPresets(subfolder)) {
+            items.add(new ContextMenuItem(
+                    Component.literal(preset.getTitle()),
+                    () -> {
+                        try {
+                            JsonObject entryJson = preset.getJson().deepCopy();
+                            entryJson.remove("title");
+                            entryJson.remove("description");
+                            this.addEntryPreset(entryJson);
+                        } catch (Exception e) {
+                            Questlog.LOGGER.error("Failed to load entry preset in editor", e);
+                        }
+                    },
+                    preset.getDescription().isEmpty() ? null : Component.literal(preset.getDescription())
+            ));
+        }
+
+        if (!items.isEmpty()) {
+            int menuHeight = Math.min(items.size(), 8) * 18 + 6;
+            this.contextMenu = new ContextMenu(x, y - menuHeight - 2, items, this.font, this.width, this.height);
+        }
+    }
+
+    private void addEntryPreset(JsonObject entryJson) {
+        this.saveTemporaryState();
+        List<JsonObject> list = getActiveList();
+        list.add(entryJson);
+        this.updateParentEntryWithChildren();
+        this.rebuildWidgets();
     }
 
     private void buildRightPageList(int panel2X, int panel2Y) {
@@ -382,15 +425,13 @@ public class QuestEditorScreen extends Screen {
                                 case REWARDS -> TAB_REWARDS_SELECTED;
                                 case SETTINGS -> TAB_SETTINGS_SELECTED;
                             };
-                        } else if (hovered) {
-                            drawTex = switch (t) {
+                        } else {
+                            drawTex = hovered ? switch (t) {
                                 case OBJECTIVES -> TAB_OBJECTIVES_HIGHLIGHTED;
                                 case REQUIREMENTS -> TAB_REQUIREMENTS_HIGHLIGHTED;
                                 case REWARDS -> TAB_REWARDS_HIGHLIGHTED;
                                 case SETTINGS -> TAB_SETTINGS_HIGHLIGHTED;
-                            };
-                        } else {
-                            drawTex = switch (t) {
+                            } : switch (t) {
                                 case OBJECTIVES -> TAB_OBJECTIVES_TEXTURE;
                                 case REQUIREMENTS -> TAB_REQUIREMENTS_TEXTURE;
                                 case REWARDS -> TAB_REWARDS_TEXTURE;
@@ -468,7 +509,7 @@ public class QuestEditorScreen extends Screen {
             this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable(this));
             this.addRenderableWidget(this.rightScrollable);
 
-            AbstractButton btnAddEntry = createImageButton(panel2X + 72, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
+            AbstractButton btnAddEntry = createImageButton(panel2X + 60, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
                 this.saveTemporaryState();
                 this.selectedEntryIndex = -1;
                 this.editingEntry = new JsonObject();
@@ -478,6 +519,12 @@ public class QuestEditorScreen extends Screen {
             });
             btnAddEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.add_entry")));
             this.addRenderableWidget(btnAddEntry);
+
+            AbstractButton btnPresetsEntry = createImageButton(panel2X + 84, panel2Y + 162, PRESET_ICON, PRESET_HIGHLIGHTED, () -> {
+                this.openEntryPresetsContextMenu(panel2X + 84, panel2Y + 162);
+            });
+            btnPresetsEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.presets_entry")));
+            this.addRenderableWidget(btnPresetsEntry);
         }
     }
 
@@ -949,6 +996,26 @@ public class QuestEditorScreen extends Screen {
 
         EditorMetadata meta = getMetadata(this.editingType);
         if (meta == null || meta.suggestionType() == null || meta.suggestionType() == SuggestionType.NONE) {
+            return result;
+        }
+
+        if (query.startsWith("#")) {
+            Registry<?> registry = null;
+            switch (meta.suggestionType()) {
+                case BLOCK -> registry = BuiltInRegistries.BLOCK;
+                case ITEM -> registry = BuiltInRegistries.ITEM;
+                case ENTITY_TYPE -> registry = BuiltInRegistries.ENTITY_TYPE;
+            }
+            if (registry != null) {
+                String lower = query.toLowerCase();
+                for (net.minecraft.tags.TagKey<?> tagKey : registry.getTagNames().toList()) {
+                    String str = "#" + tagKey.location().toString();
+                    if (str.toLowerCase().contains(lower)) {
+                        result.add(str);
+                        if (result.size() >= 5) break;
+                    }
+                }
+            }
             return result;
         }
 

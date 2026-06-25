@@ -1,6 +1,6 @@
 {
-  "title": "Zombie Exterminator",
-  "description": "Zombies are cluttering up the place. Clear them out!",
+  "title": "Kill 25 Zombies",
+  "description": "Quest to kill a target entity type",
   "icon": {
     "item": "minecraft:zombie_head"
   },

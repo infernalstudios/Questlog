@@ -1,6 +1,6 @@
 {
-  "title": "Cooking with Gas",
-  "description": "Now that you have a furnace, it's time to smelt some iron. You'll need it for better tools!",
+  "title": "Obtain 8 Iron Ingots (Quest 2/3)",
+  "description": "Second quest in a linear quest chain",
   "icon": {
     "item": "minecraft:iron_ingot"
   },

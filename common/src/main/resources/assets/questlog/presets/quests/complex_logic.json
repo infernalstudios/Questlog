@@ -1,6 +1,6 @@
 {
-  "title": "A Choice of Skills",
-  "description": "Prove your worth through either farming or combat.",
+  "title": "Harvest 64 Wheat or Slay 10 Creepers",
+  "description": "Example of logical objectives (OR/AND/NOT) to allow alternative tasks",
   "icon": {
     "item": "minecraft:stone_hoe"
   },

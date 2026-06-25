@@ -1,0 +1,7 @@
+{
+  "title": "5 Levels",
+  "description": "Reward 5 experience levels",
+  "type": "questlog:experience",
+  "experience": 5,
+  "levels": true
+}
