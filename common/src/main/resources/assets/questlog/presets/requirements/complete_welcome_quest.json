@@ -1,0 +1,7 @@
+{
+  "title": "Complete Welcome Quest",
+  "description": "Requirement to complete the welcome quest",
+  "type": "questlog:quest_complete",
+  "quest": "questlog:linear_1_start",
+  "name": "Complete Welcome Quest"
+}

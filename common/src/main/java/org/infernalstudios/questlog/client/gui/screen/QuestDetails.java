@@ -49,14 +49,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Nullable
     private final Screen previousScreen;
-
     public Component pendingTooltip = null;
-
     private int panel1X;
     private int panel2X;
     private int panel1Y;
     private int panel2Y;
-
     @Nullable
     private QuestlogButton backButton;
     @Nullable
@@ -65,11 +62,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private ScrollableComponent description;
     @Nullable
     private ScrollableComponent info;
+    private long handCursor = 0L;
+    private boolean changedCursor = false;
 
     public QuestDetails(@Nullable Screen previousScreen, Quest quest) {
         super(quest.getDisplay().getTitle());
         this.previousScreen = previousScreen;
         this.quest = quest;
+    }
+
+    @Nullable
+    public Screen getPreviousScreen() {
+        return this.previousScreen;
     }
 
     public QuestDisplayData getDisplay() {
@@ -163,7 +167,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         Component backText = this.getDisplay().getBackButtonText();
 
         if (this.quest.isCompleted() && !this.quest.isRewarded()) {
-            backText = this.getDisplay().getCollectButtonText();
+            boolean hasIncompleteChoices = false;
+            for (Reward reward : this.quest.rewards) {
+                if (!reward.hasRewarded() && reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward && !choiceReward.canClaim()) {
+                    hasIncompleteChoices = true;
+                    break;
+                }
+            }
+            if (hasIncompleteChoices) {
+                backText = Component.translatable("questlog.reward.make_choices");
+            } else {
+                backText = this.getDisplay().getCollectButtonText();
+            }
         } else if (this.needsRead()) {
             backText = Component.translatable("questlog.button.read");
         }
@@ -193,7 +208,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         for (int i = 0; i < this.quest.rewards.size(); i++) {
             Reward reward = this.quest.rewards.get(i);
             if (!reward.hasRewarded()) {
-                Services.PLATFORM.sendPacketToServer(new QuestRewardCollectPacket(this.quest.getId(), i));
+                java.util.List<Integer> selections = java.util.Collections.emptyList();
+                if (reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward) {
+                    selections = choiceReward.getSelectedIndicesList();
+                }
+                Services.PLATFORM.sendPacketToServer(new QuestRewardCollectPacket(this.quest.getId(), i, selections));
                 SoundEvent sound = reward.getDisplay() != null ? reward.getDisplay().getClaimSound() : null;
                 if (sound != null && this.minecraft != null) {
                     this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, 1, 1));
@@ -286,14 +305,21 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null) {
                 if (style.getClickEvent() != null) {
                     isHoveringLink = true;
-                    GLFW.glfwSetCursor(window, GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR));
+                    if (!this.changedCursor) {
+                        if (this.handCursor == 0L) {
+                            this.handCursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR);
+                        }
+                        GLFW.glfwSetCursor(window, this.handCursor);
+                        this.changedCursor = true;
+                    }
                 }
                 this.renderHoverEffect(ps, style, mouseX, mouseY);
             }
         }
 
-        if (!isHoveringLink) {
+        if (!isHoveringLink && this.changedCursor) {
             GLFW.glfwSetCursor(window, 0L);
+            this.changedCursor = false;
         }
     }
 
@@ -401,16 +427,46 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super.tick();
 
         boolean isShowingCollect = this.backButton != null &&
-                this.backButton.getMessage().equals(this.getDisplay().getCollectButtonText());
+                (this.backButton.getMessage().equals(this.getDisplay().getCollectButtonText()) ||
+                        this.backButton.getMessage().equals(Component.translatable("questlog.reward.make_choices")));
 
         if (isShowingCollect && this.quest.isRewarded()) {
             this.rebuildWidgets();
+        } else if (this.backButton != null && isShowingCollect) {
+            boolean canClaim = true;
+            for (Reward reward : this.quest.rewards) {
+                if (!reward.hasRewarded() && reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward && !choiceReward.canClaim()) {
+                    canClaim = false;
+                    break;
+                }
+            }
+            this.backButton.active = canClaim;
+            Component expectedText = canClaim ? this.getDisplay().getCollectButtonText() : Component.translatable("questlog.reward.make_choices");
+            if (!this.backButton.getMessage().equals(expectedText)) {
+                this.backButton.setMessage(expectedText);
+                int rightBoundary = this.panel1X + this.getDisplay().getLeftPanelWidth() + (showDetails ? this.getDisplay().getRightPanelWidth() : 0);
+                this.updateButtonLayout(rightBoundary);
+            }
         }
 
         if (this.backButton != null && !this.needsRead() &&
                 this.backButton.getMessage().equals(Component.translatable("questlog.button.read"))) {
             this.rebuildWidgets();
         }
+    }
+
+    @Override
+    public void removed() {
+        if (this.changedCursor) {
+            long window = this.minecraft.getWindow().getWindow();
+            GLFW.glfwSetCursor(window, 0L);
+            this.changedCursor = false;
+        }
+        if (this.handCursor != 0L) {
+            GLFW.glfwDestroyCursor(this.handCursor);
+            this.handCursor = 0L;
+        }
+        super.removed();
     }
 
     @Override

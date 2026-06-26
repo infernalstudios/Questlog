@@ -1,0 +1,7 @@
+{
+  "title": "Enter the Nether",
+  "description": "Requirement to enter the Nether dimension",
+  "type": "questlog:visit_dimension",
+  "dimension": "minecraft:the_nether",
+  "name": "Enter the Nether"
+}

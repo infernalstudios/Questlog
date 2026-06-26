@@ -1,0 +1,30 @@
+{
+  "title": "Origins Avian: Gather 32 Feathers",
+  "description": "Quest requiring the Avian origin from the Origins mod",
+  "icon": {
+    "item": "minecraft:feather"
+  },
+  "chapter": "main",
+  "order": 1,
+  "requirements": [
+    {
+      "type": "questlog:origin",
+      "origin": "origins:avian"
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:feather",
+      "required_amount": 32,
+      "name": "Gather 32 Feathers"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:chicken_spawn_egg",
+      "count": 2
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "title": "Mine 10 Iron Ore",
+  "description": "Objective to mine 10 iron ore",
+  "type": "questlog:block_mine",
+  "block": "minecraft:iron_ore",
+  "required_amount": 10,
+  "name": "Mine 10 Iron Ore"
+}

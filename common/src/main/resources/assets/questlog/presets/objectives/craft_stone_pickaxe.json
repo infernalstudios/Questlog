@@ -1,0 +1,8 @@
+{
+  "title": "Craft Stone Pickaxe",
+  "description": "Objective to craft a stone pickaxe",
+  "type": "questlog:item_craft",
+  "item": "minecraft:stone_pickaxe",
+  "required_amount": 1,
+  "name": "Craft a Stone Pickaxe"
+}

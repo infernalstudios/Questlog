@@ -16,6 +16,7 @@ public class ObjectiveDisplayData {
     private final Component name;
     @Nullable
     private Objective objective;
+    private int indentLevel = 0;
 
     public ObjectiveDisplayData(JsonObject data) {
         String name = JsonUtils.getOrDefault(data, "name", (String) null);
@@ -27,6 +28,14 @@ public class ObjectiveDisplayData {
         }
 
         this.icon = JsonUtils.getIcon(data, "icon");
+    }
+
+    public int getIndentLevel() {
+        return this.indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
     }
 
     private Component generateSmartName(JsonObject data) {

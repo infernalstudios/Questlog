@@ -1,0 +1,8 @@
+{
+  "title": "Mine 1 Diamond",
+  "description": "Objective to mine 1 diamond",
+  "type": "questlog:block_mine",
+  "block": "minecraft:diamond_ore",
+  "required_amount": 1,
+  "name": "Mine 1 Diamond"
+}

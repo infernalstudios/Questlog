@@ -1,0 +1,21 @@
+{
+  "title": "Visit the Nether",
+  "description": "Quest to travel to another dimension",
+  "icon": {
+    "item": "minecraft:flint_and_steel"
+  },
+  "objectives": [
+    {
+      "type": "questlog:visit_dimension",
+      "dimension": "minecraft:the_nether",
+      "required_amount": 1,
+      "name": "Visit the Nether"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 500
+    }
+  ]
+}

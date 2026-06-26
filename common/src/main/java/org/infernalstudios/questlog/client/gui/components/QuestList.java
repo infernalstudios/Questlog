@@ -105,6 +105,11 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
     }
 
     @Nullable
+    public QuestListEntry getHovered() {
+        return this.hovered;
+    }
+
+    @Nullable
     public QuestListEntry getFocused() {
         return (QuestListEntry) super.getFocused();
     }
@@ -216,6 +221,10 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         protected QuestListEntry(QuestList list, Quest quest) {
             this.list = list;
             this.quest = quest;
+        }
+
+        public Quest getQuest() {
+            return this.quest;
         }
 
         public void render(

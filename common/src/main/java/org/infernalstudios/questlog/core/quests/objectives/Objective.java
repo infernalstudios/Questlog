@@ -9,6 +9,8 @@ import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
 
     private final ObjectiveDisplayData display;
@@ -92,5 +94,16 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
 
     public boolean isReadObjective() {
         return false;
+    }
+
+    public void forceSetUnits(int units) {
+        this.units = Math.min(units, this.requiredAmount);
+        if (this.getParent() != null) {
+            this.getParent().markForUpdate();
+        }
+    }
+
+    public List<Objective> getChildren() {
+        return List.of();
     }
 }

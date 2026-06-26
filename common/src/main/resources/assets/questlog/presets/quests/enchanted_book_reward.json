@@ -1,0 +1,31 @@
+{
+  "title": "Obtain Book for Fortune III",
+  "description": "Example of rewarding items with custom components/NBT data",
+  "icon": {
+    "item": "minecraft:book"
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:book",
+      "required_amount": 1,
+      "name": "Bring 1 Book"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": {
+        "id": "minecraft:enchanted_book",
+        "components": {
+          "minecraft:stored_enchantments": {
+            "levels": {
+              "minecraft:fortune": 3
+            }
+          }
+        }
+      },
+      "count": 1
+    }
+  ]
+}

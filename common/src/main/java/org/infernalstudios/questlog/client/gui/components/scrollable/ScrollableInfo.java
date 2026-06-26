@@ -1,6 +1,7 @@
 package org.infernalstudios.questlog.client.gui.components.scrollable;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import org.infernalstudios.questlog.client.gui.components.InfoEntry;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
@@ -9,11 +10,12 @@ import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScrollableInfo implements Scrollable {
+public class ScrollableInfo implements Scrollable, GuiEventListener {
     private final QuestDetails questDetails;
     private final QuestDisplayData display;
     private List<InfoEntry> rewards;
@@ -71,5 +73,27 @@ public class ScrollableInfo implements Scrollable {
     @Override
     public void setScrollableComponent(ScrollableComponent parent) {
         this.parent = parent;
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button != GLFW.GLFW_MOUSE_BUTTON_1) return false;
+        if (!questDetails.quest.isCompleted()) return false;
+
+        List<InfoEntry> entries = this.getEntries();
+        int index = (int) (mouseY / InfoEntry.INFO_ENTRY_HEIGHT);
+        if (index >= 0 && index < entries.size()) {
+            return entries.get(index).handleChoiceClick();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isFocused() {
+        return false;
+    }
+
+    @Override
+    public void setFocused(boolean focused) {
     }
 }

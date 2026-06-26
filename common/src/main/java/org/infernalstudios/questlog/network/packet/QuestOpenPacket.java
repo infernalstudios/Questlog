@@ -1,7 +1,7 @@
 package org.infernalstudios.questlog.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
-import org.infernalstudios.questlog.QuestlogClientEvents;
+import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 
 public record QuestOpenPacket(String target) {
@@ -12,7 +12,7 @@ public record QuestOpenPacket(String target) {
     }
 
     public static void handle(QuestOpenPacket packet, IPacketContext ctx) {
-        QuestlogClientEvents.handleQuestOpenPacket(packet);
+        ClientPacketHandler.handle(packet, ctx);
     }
 
     public void encode(FriendlyByteBuf buf) {

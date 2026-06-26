@@ -14,6 +14,7 @@ public class QuestlogClient {
     );
 
     public static boolean isEditModeActive = false;
+    public static java.util.List<net.minecraft.resources.ResourceLocation> ALL_ADVANCEMENTS = new java.util.ArrayList<>();
     private static QuestManager QUEST_MANAGER_INSTANCE;
 
     /**

@@ -1,0 +1,28 @@
+{
+  "title": "Obtain 3 Diamonds (Quest 3/3)",
+  "description": "Final quest in a linear quest chain with a loot table reward",
+  "icon": {
+    "item": "minecraft:diamond_pickaxe"
+  },
+  "requirements": [
+    {
+      "type": "questlog:quest_complete",
+      "quest": "questlog:linear_2_followup"
+    }
+  ],
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:diamond",
+      "required_amount": 3,
+      "name": "Obtain 3 Diamonds"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:loot_table",
+      "loot_table": "minecraft:chests/end_city_treasure",
+      "name": "End City Treasure"
+    }
+  ]
+}

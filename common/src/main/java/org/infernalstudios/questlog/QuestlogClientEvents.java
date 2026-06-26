@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestAddedToast;
 import org.infernalstudios.questlog.client.gui.components.toasts.QuestCompletedToast;
@@ -15,9 +14,7 @@ import org.infernalstudios.questlog.client.gui.screen.QuestlogScreen;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.event.events.QuestEvent;
-import org.infernalstudios.questlog.network.packet.QuestDefinitionPacket;
-import org.infernalstudios.questlog.network.packet.QuestOpenPacket;
-import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
+import org.infernalstudios.questlog.network.ClientPacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +46,12 @@ public class QuestlogClientEvents {
 
     public static void onClientPlayerLogin() {
         QuestlogClient.getLocal();
-        QuestDefinitionPacket.handleDeferred();
-        QuestSyncPacket.handleDeferred();
+        ClientPacketHandler.handleDeferredDefinitions();
+        ClientPacketHandler.handleDeferredSync();
     }
 
     public static void onClientPlayerLogout() {
+        QuestlogClient.isEditModeActive = false;
         QuestlogClient.destroyLocal();
         Questlog.EVENTS.removeAllListeners();
         QuestToastState.addedToasts.clear();
@@ -101,25 +99,6 @@ public class QuestlogClientEvents {
                 }
             }
         }
-    }
-
-    public static void handleQuestOpenPacket(QuestOpenPacket packet) {
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null) return;
-
-        String target = packet.target();
-        if (target != null && !target.isEmpty()) {
-            ResourceLocation id = ResourceLocation.tryParse(target);
-            if (id != null) {
-                Quest quest = QuestlogClient.getLocal().getQuest(id);
-                if (quest != null) {
-                    mc.setScreen(new QuestDetails(mc.screen, quest));
-                    return;
-                }
-            }
-        }
-
-        mc.setScreen(new QuestlogScreen(mc.screen));
     }
 
     private static void displayQueuedPopups() {

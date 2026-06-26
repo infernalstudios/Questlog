@@ -21,9 +21,18 @@ import java.util.Map;
 public class QuestManager {
     private final Map<ResourceLocation, Quest> quests = new LinkedHashMap<>();
     public Player player;
+    private boolean editMode = false;
 
     public QuestManager(Player player) {
         this.player = player;
+    }
+
+    public boolean isEditMode() {
+        return this.editMode;
+    }
+
+    public void setEditMode(boolean editMode) {
+        this.editMode = editMode;
     }
 
     public void addQuest(Quest quest) {
@@ -94,9 +103,25 @@ public class QuestManager {
                     Questlog.LOGGER.error("=====================================================");
                     Questlog.LOGGER.error(" QUESTLOG ERROR: Failed to load quest '{}'", id);
                     Questlog.LOGGER.error(" The JSON file has a syntax error, typo, or missing field.");
-                    Questlog.LOGGER.error(" Skipping this quest...");
                     Questlog.LOGGER.error(" Exception Details: ", e);
                     Questlog.LOGGER.error("=====================================================");
+                    try {
+                        JsonObject fallbackDef = new JsonObject();
+                        fallbackDef.addProperty("title", "Broken Quest (" + id.getPath() + ")");
+                        String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+                        if (e.getCause() != null) {
+                            errorMsg += "\nCaused by: " + e.getCause().getMessage();
+                        }
+                        fallbackDef.addProperty("description", "This quest failed to load properly. Edit it to fix errors.\n\nError details:\n" + errorMsg);
+                        fallbackDef.addProperty("chapter", definition != null && definition.has("chapter") ? definition.get("chapter").getAsString() : "main");
+                        quest = Quest.create(fallbackDef, id, this);
+                        CompoundTag data = new CompoundTag();
+                        quest.writeInitialData(data);
+                        quest.deserialize(data);
+                        this.addQuest(quest);
+                    } catch (Exception fallbackEx) {
+                        Questlog.LOGGER.error("Fallback load failed for quest '{}'", id, fallbackEx);
+                    }
                 }
             }
         }

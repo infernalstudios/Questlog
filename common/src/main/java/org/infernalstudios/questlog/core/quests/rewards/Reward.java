@@ -16,6 +16,8 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
     private final boolean autoClaim;
     private Quest parent;
     private boolean rewarded = false;
+    @Nullable
+    private ChoiceReward container;
 
     public Reward(JsonObject definition) {
         if (definition.has("auto_claim")) {
@@ -83,5 +85,25 @@ public abstract class Reward implements NbtSaveable, WithDisplayData<RewardDispl
     @Override
     public void deserialize(CompoundTag data) {
         this.rewarded = data.getBoolean("rewarded");
+    }
+
+    public void setContainer(@Nullable ChoiceReward container) {
+        this.container = container;
+    }
+
+    @Nullable
+    public ChoiceReward getContainer() {
+        return this.container;
+    }
+
+    public boolean isSelected() {
+        if (this.container != null) {
+            return this.container.isChoiceSelected(this);
+        }
+        return false;
+    }
+
+    public void setRewarded(boolean rewarded) {
+        this.rewarded = rewarded;
     }
 }

@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.core;
 
+import net.minecraft.advancements.Advancement;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.resources.ResourceLocation;
@@ -8,15 +9,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.infernalstudios.questlog.network.packet.QuestEditModePacket;
 import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 import org.infernalstudios.questlog.platform.Services;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ServerPlayerManager {
 
@@ -70,6 +70,8 @@ public class ServerPlayerManager {
             data.put(quest.getId().toString(), quest.serialize());
         }
 
+        data.putBoolean("edit_mode", questManager.isEditMode());
+
         File playerDataFile = this.getPlayerDataFile(questManager.player);
 
         try {
@@ -122,6 +124,13 @@ public class ServerPlayerManager {
 
         boolean shouldSave = false;
         questManager.reload();
+
+        if (data.contains("edit_mode")) {
+            questManager.setEditMode(data.getBoolean("edit_mode"));
+        } else {
+            questManager.setEditMode(false);
+        }
+
         for (Quest quest : questManager.getAllQuests()) {
             if (data.contains(quest.getId().toString())) {
                 CompoundTag questData = data.getCompound(quest.getId().toString());
@@ -158,7 +167,13 @@ public class ServerPlayerManager {
                 }
             }
 
-            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data));
+            List<ResourceLocation> advancements = new ArrayList<>();
+            for (Advancement advancement : serverPlayer.getServer().getAdvancements().getAllAdvancements()) {
+                advancements.add(advancement.getId());
+            }
+
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestSyncPacket(definitions, chapterDefinitions, data, advancements));
+            Services.PLATFORM.sendPacketToClient(serverPlayer, new QuestEditModePacket(questManager.isEditMode()));
         }
     }
 

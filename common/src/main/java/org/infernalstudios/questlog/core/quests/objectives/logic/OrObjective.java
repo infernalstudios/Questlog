@@ -114,4 +114,21 @@ public class OrObjective extends Objective {
         data.put("children", list);
         return data;
     }
+
+    @Override
+    public List<Objective> getChildren() {
+        return this.children;
+    }
+
+    @Override
+    public void forceSetUnits(int units) {
+        super.forceSetUnits(units);
+        if (units == 0) {
+            for (Objective child : this.children) {
+                child.forceSetUnits(0);
+            }
+        } else if (!this.children.isEmpty()) {
+            this.children.get(0).forceSetUnits(this.children.get(0).getRequiredAmount());
+        }
+    }
 }

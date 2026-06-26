@@ -2,9 +2,7 @@ package org.infernalstudios.questlog.network.packet;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
-import org.infernalstudios.questlog.QuestlogClient;
-import org.infernalstudios.questlog.core.QuestManager;
+import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 
 public class QuestRemovePacket {
@@ -16,15 +14,15 @@ public class QuestRemovePacket {
         this.id = id;
     }
 
+    public ResourceLocation id() { return this.id; }
+
     public static QuestRemovePacket decode(FriendlyByteBuf buf) {
         ResourceLocation id = buf.readResourceLocation();
         return new QuestRemovePacket(id);
     }
 
     public static void handle(QuestRemovePacket packet, IPacketContext ctx) {
-        Questlog.LOGGER.trace("Received remove packet for quest {}", packet.id.toString());
-        QuestManager manager = QuestlogClient.getLocal();
-        manager.removeQuest(packet.id);
+        ClientPacketHandler.handle(packet, ctx);
     }
 
     public void encode(FriendlyByteBuf buf) {

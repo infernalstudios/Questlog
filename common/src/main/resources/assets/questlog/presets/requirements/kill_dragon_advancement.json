@@ -1,0 +1,7 @@
+{
+  "title": "Kill Ender Dragon (Advancement)",
+  "description": "Requirement to complete the 'Free the End' advancement",
+  "type": "questlog:advancement",
+  "advancement": "minecraft:end/kill_dragon",
+  "name": "Free the End Advancement"
+}

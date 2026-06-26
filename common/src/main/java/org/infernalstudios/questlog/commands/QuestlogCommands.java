@@ -65,6 +65,13 @@ public class QuestlogCommands {
                                 .executes(QuestlogCommands::reloadQuests)
                         )
 
+                        .then(Commands.literal("reset_all_progress_and_reload")
+                                .executes(ctx -> resetAllProgressAndReload(ctx, Collections.singletonList(ctx.getSource().getPlayerOrException())))
+                                .then(Commands.argument("players", EntityArgument.players())
+                                        .executes(ctx -> resetAllProgressAndReload(ctx, EntityArgument.getPlayers(ctx, "players")))
+                                )
+                        )
+
                         .then(Commands.literal("open")
                                 .executes(ctx -> open(ctx, null, Collections.singletonList(ctx.getSource().getPlayerOrException())))
                                 .then(Commands.argument("target", ResourceLocationArgument.id())
@@ -125,6 +132,7 @@ public class QuestlogCommands {
                                 )
                         )
                         .then(Commands.literal("edit_mode")
+                                .executes(ctx -> toggleEditMode(ctx, null))
                                 .then(Commands.argument("enabled", BoolArgumentType.bool())
                                         .executes(ctx -> setEditMode(ctx, BoolArgumentType.getBool(ctx, "enabled"), null))
                                         .then(Commands.argument("player", EntityArgument.player())
@@ -154,6 +162,43 @@ public class QuestlogCommands {
         return questCount;
     }
 
+    private static int resetAllProgressAndReload(CommandContext<CommandSourceStack> ctx, Collection<ServerPlayer> players) {
+        DefinitionUtil.loadFromConfig();
+        int questCount = DefinitionUtil.getCachedQuestKeys().size();
+        int chapterCount = DefinitionUtil.getCachedChapterKeys().size();
+
+        for (ServerPlayer player : players) {
+            QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+            manager.clearQuests();
+            manager.createAllQuests();
+
+            for (Quest quest : manager.getAllQuests()) {
+                quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
+                quest.rewards.forEach(Reward::revokeReward);
+                quest.hasSentTrigger = quest.requirements.isEmpty();
+                quest.hasSentCompletion = false;
+            }
+
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
+        }
+
+        if (ServerPlayerManager.INSTANCE != null) {
+            for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) {
+                if (!players.contains(player)) {
+                    QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+                    manager.reload();
+                    ServerPlayerManager.INSTANCE.syncPlayer(manager);
+                }
+            }
+        }
+
+        ctx.getSource().sendSuccess(() -> Component.literal("Successfully reloaded " + questCount + " quests / " + chapterCount + " chapters, and reset progress for " + players.size() + " player(s)."), true);
+        return players.size();
+    }
+
     private static int open(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {
         for (ServerPlayer player : players) {
             Services.PLATFORM.sendPacketToClient(player, new QuestOpenPacket(target == null ? "" : target));
@@ -164,9 +209,18 @@ public class QuestlogCommands {
 
     private static int setEditMode(CommandContext<CommandSourceStack> ctx, boolean enabled, ServerPlayer target) throws CommandSyntaxException {
         ServerPlayer player = target != null ? target : ctx.getSource().getPlayerOrException();
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+        manager.setEditMode(enabled);
+        ServerPlayerManager.INSTANCE.save(manager);
         Services.PLATFORM.sendPacketToClient(player, new QuestEditModePacket(enabled));
         ctx.getSource().sendSuccess(() -> Component.literal("Edit mode for " + player.getName().getString() + " set to " + enabled), true);
         return 1;
+    }
+
+    private static int toggleEditMode(CommandContext<CommandSourceStack> ctx, ServerPlayer target) throws CommandSyntaxException {
+        ServerPlayer player = target != null ? target : ctx.getSource().getPlayerOrException();
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+        return setEditMode(ctx, !manager.isEditMode(), player);
     }
 
     private static int trigger(CommandContext<CommandSourceStack> ctx, String target, Collection<ServerPlayer> players) {
@@ -177,10 +231,12 @@ public class QuestlogCommands {
 
             for (Quest quest : affectedQuests) {
                 if (!quest.isTriggered()) {
-                    quest.requirements.forEach(trigger -> trigger.setUnits(trigger.getRequiredAmount()));
+                    quest.requirements.forEach(trigger -> trigger.forceSetUnits(trigger.getRequiredAmount()));
                     count++;
                 }
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         if (count == 0) {
@@ -202,17 +258,19 @@ public class QuestlogCommands {
 
             for (Quest quest : affectedQuests) {
                 if (complete) {
-                    quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-                    quest.failureConditions.forEach(obj -> obj.setUnits(0)); // clear fails if force completed
+                    quest.objectives.forEach(obj -> obj.forceSetUnits(obj.getRequiredAmount()));
+                    quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
                 } else {
-                    quest.requirements.forEach(trigger -> trigger.setUnits(0));
-                    quest.objectives.forEach(obj -> obj.setUnits(0));
-                    quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                    quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                    quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                    quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
                     quest.rewards.forEach(Reward::revokeReward);
                     quest.hasSentTrigger = quest.requirements.isEmpty();
                     quest.hasSentCompletion = false;
                 }
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
             modified += affectedQuests.size();
         }
 
@@ -231,13 +289,15 @@ public class QuestlogCommands {
         for (ServerPlayer player : players) {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
             for (Quest quest : manager.getAllQuests()) {
-                quest.requirements.forEach(trigger -> trigger.setUnits(0));
-                quest.objectives.forEach(obj -> obj.setUnits(0));
-                quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                quest.requirements.forEach(trigger -> trigger.forceSetUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(0));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
                 quest.rewards.forEach(Reward::revokeReward);
                 quest.hasSentTrigger = quest.requirements.isEmpty();
                 quest.hasSentCompletion = false;
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         ctx.getSource().sendSuccess(() -> Component.literal("Successfully reset all quest progress for " + players.size() + " player(s)."), true);
@@ -248,9 +308,11 @@ public class QuestlogCommands {
         for (ServerPlayer player : players) {
             QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
             for (Quest quest : manager.getAllQuests()) {
-                quest.objectives.forEach(obj -> obj.setUnits(obj.getRequiredAmount()));
-                quest.failureConditions.forEach(obj -> obj.setUnits(0));
+                quest.objectives.forEach(obj -> obj.forceSetUnits(obj.getRequiredAmount()));
+                quest.failureConditions.forEach(obj -> obj.forceSetUnits(0));
             }
+            ServerPlayerManager.INSTANCE.save(manager);
+            ServerPlayerManager.INSTANCE.syncPlayer(manager);
         }
 
         ctx.getSource().sendSuccess(() -> Component.literal("Successfully completed all quests for " + players.size() + " player(s)."), true);

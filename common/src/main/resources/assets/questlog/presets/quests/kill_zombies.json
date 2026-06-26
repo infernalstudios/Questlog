@@ -1,0 +1,22 @@
+{
+  "title": "Kill 25 Zombies",
+  "description": "Quest to kill a target entity type",
+  "icon": {
+    "item": "minecraft:zombie_head"
+  },
+  "objectives": [
+    {
+      "type": "questlog:entity_kill",
+      "entity": "minecraft:zombie",
+      "required_amount": 25,
+      "name": "Kill 25 Zombies"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:rotten_flesh",
+      "count": 64
+    }
+  ]
+}

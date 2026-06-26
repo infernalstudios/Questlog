@@ -1,0 +1,28 @@
+{
+  "title": "Mine 16 Stone (Quest 1/3)",
+  "description": "First quest in a linear quest chain",
+  "icon": {
+    "item": "minecraft:cobblestone"
+  },
+  "objectives": [
+    {
+      "type": "questlog:block_mine",
+      "block": "minecraft:stone",
+      "required_amount": 16,
+      "name": "Mine 16 Stone"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:item",
+      "item": "minecraft:furnace",
+      "count": 1
+    },
+    {
+      "type": "questlog:experience",
+      "experience": 50
+    }
+  ],
+  "toast_on_unlock": true,
+  "toast_on_complete": true
+}

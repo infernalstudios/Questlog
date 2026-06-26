@@ -36,6 +36,15 @@ public class DefinitionUtil {
         return QUEST_DEFINITION_CACHE.get(path);
     }
 
+    public static synchronized void putCachedQuest(ResourceLocation path, JsonObject definition) {
+        QUEST_DEFINITION_CACHE.put(path, definition);
+    }
+
+    public static synchronized void clearClientCaches() {
+        QUEST_DEFINITION_CACHE.clear();
+        CHAPTER_DEFINITION_CACHE.clear();
+    }
+
     public static List<ResourceLocation> getCachedChapterKeys() {
         List<ResourceLocation> keys = new ArrayList<>(CHAPTER_DEFINITION_CACHE.keySet());
         keys.sort((a, b) -> {
@@ -111,14 +120,35 @@ public class DefinitionUtil {
             paths.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".json"))
                     .forEach(path -> {
+                        Path relative = dir.relativize(path);
+                        String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
+                        ResourceLocation id = new ResourceLocation(Questlog.MODID, resourcePath);
                         try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
                             JsonObject json = GSON.fromJson(reader, JsonObject.class);
-                            Path relative = dir.relativize(path);
-                            String resourcePath = relative.toString().replace(File.separatorChar, '/').replace(".json", "");
-                            ResourceLocation id = new ResourceLocation(Questlog.MODID, resourcePath);
                             cache.put(id, json);
                         } catch (Exception e) {
                             Questlog.LOGGER.error("Failed to parse file: {}", path, e);
+                            if (cache == QUEST_DEFINITION_CACHE) {
+                                String chapterVal = "main";
+                                try {
+                                    String content = Files.readString(path, StandardCharsets.UTF_8);
+                                    java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"chapter\"\\s*:\\s*\"([^\"]+)\"").matcher(content);
+                                    if (m.find()) {
+                                        chapterVal = m.group(1);
+                                    }
+                                } catch (Exception ignored) {
+                                }
+
+                                String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+                                if (e.getCause() != null) {
+                                    errorMsg += "\nCaused by: " + e.getCause().getMessage();
+                                }
+                                JsonObject fallback = new JsonObject();
+                                fallback.addProperty("title", "Broken Quest (" + id.getPath() + ")");
+                                fallback.addProperty("description", "This quest failed to load properly. Edit it to fix errors.\n\nError details:\n" + errorMsg);
+                                fallback.addProperty("chapter", chapterVal);
+                                cache.put(id, fallback);
+                            }
                         }
                     });
         } catch (IOException e) {

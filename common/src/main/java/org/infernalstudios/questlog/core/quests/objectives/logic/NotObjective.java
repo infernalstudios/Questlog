@@ -5,8 +5,9 @@ import net.minecraft.nbt.CompoundTag;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.QuestObjectiveRegistry;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.event.QuestlogEventBus;
 import org.infernalstudios.questlog.util.JsonUtils;
+
+import java.util.List;
 
 public class NotObjective extends Objective {
     private final Objective child;
@@ -78,5 +79,20 @@ public class NotObjective extends Objective {
         CompoundTag data = super.serialize();
         data.put("child", this.child.serialize());
         return data;
+    }
+
+    @Override
+    public List<Objective> getChildren() {
+        return List.of(this.child);
+    }
+
+    @Override
+    public void forceSetUnits(int units) {
+        super.forceSetUnits(units);
+        if (units == 0) {
+            this.child.forceSetUnits(this.child.getRequiredAmount());
+        } else {
+            this.child.forceSetUnits(0);
+        }
     }
 }

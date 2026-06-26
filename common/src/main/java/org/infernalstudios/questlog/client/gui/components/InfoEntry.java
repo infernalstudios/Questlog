@@ -5,11 +5,15 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
 import org.infernalstudios.questlog.core.quests.display.ObjectiveDisplayData;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.display.RewardDisplayData;
+import org.infernalstudios.questlog.core.quests.rewards.ChoiceReward;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,10 +50,13 @@ public class InfoEntry implements Renderable, GuiEventListener {
         Blittable icon = isReward ? rewardData.getIcon() : objectiveData.getIcon();
         Component name = isReward ? rewardData.getName() : objectiveData.getName();
 
-        if (icon != null) icon.blit(ps, this.x, this.y + 4);
+        int indent = isReward ? rewardData.getIndentLevel() * 12 : objectiveData.getIndentLevel() * 12;
+        int currentX = this.x + indent;
 
-        int textX = this.x + (icon != null ? 20 : 0);
-        int maxWidth = questDetails.getDisplay().getRightPanelWidth() - 36 - 15 - (icon != null ? 20 : 0);
+        if (icon != null) icon.blit(ps, currentX, this.y + 4);
+
+        int textX = currentX + (icon != null ? 20 : 0);
+        int maxWidth = questDetails.getDisplay().getRightPanelWidth() - 36 - 15 - (icon != null ? 20 : 0) - indent;
 
         Font font = Minecraft.getInstance().font;
         Component renderedName = name;
@@ -60,9 +67,12 @@ public class InfoEntry implements Renderable, GuiEventListener {
             truncated = true;
         }
 
-        ps.drawString(font, renderedName, textX, this.y + 2, questDetails.getPalette().textColor(), false);
+        boolean isSubReward = isReward && rewardData.getReward() != null && rewardData.getReward().getContainer() != null;
+        int nameY = isSubReward ? this.y + 9 : this.y + 2;
 
-        if (truncated && mouseX >= textX && mouseX <= textX + font.width(renderedName) && mouseY >= this.y + 2 && mouseY <= this.y + 2 + font.lineHeight) {
+        ps.drawString(font, renderedName, textX, nameY, questDetails.getPalette().textColor(), false);
+
+        if (truncated && mouseX >= textX && mouseX <= textX + font.width(renderedName) && mouseY >= nameY && mouseY <= nameY + font.lineHeight) {
             this.questDetails.pendingTooltip = name;
         }
 
@@ -74,6 +84,9 @@ public class InfoEntry implements Renderable, GuiEventListener {
     }
 
     private void drawRewardStatus(GuiGraphics ps, int textX) {
+        if (rewardData.getReward() != null && rewardData.getReward().getContainer() != null) {
+            return;
+        }
         Component status = rewardData.hasRewarded() ?
                 (display != null ? display.getCollectedText() : Component.translatable("questlog.reward.collected")) :
                 (display != null ? display.getUncollectedText() : Component.translatable("questlog.reward.uncollected"));
@@ -94,5 +107,22 @@ public class InfoEntry implements Renderable, GuiEventListener {
 
     @Override
     public void setFocused(boolean var1) {
+    }
+
+    public boolean handleChoiceClick() {
+        if (this.rewardData != null) {
+            Reward reward = this.rewardData.getReward();
+            if (reward != null && reward.getContainer() != null) {
+                ChoiceReward choiceReward = reward.getContainer();
+                if (!choiceReward.hasRewarded()) {
+                    choiceReward.toggleChoice(reward);
+                    Minecraft.getInstance().getSoundManager().play(
+                            SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F)
+                    );
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
