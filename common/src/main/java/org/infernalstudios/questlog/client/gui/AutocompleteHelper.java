@@ -131,6 +131,11 @@ public class AutocompleteHelper {
                 this.clear();
                 return true;
             }
+        } else if (key == GLFW.GLFW_KEY_TAB) {
+            int idx = Math.max(this.selectedSuggestionIndex, 0);
+            onSelected.accept(this.currentMatches.get(idx));
+            this.clear();
+            return true;
         }
 
         return false;

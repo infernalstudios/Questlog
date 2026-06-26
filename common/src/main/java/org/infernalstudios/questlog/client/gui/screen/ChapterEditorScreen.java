@@ -295,6 +295,7 @@ public class ChapterEditorScreen extends Screen {
         json.addProperty("default_chapter", this.tempDefault);
         json.addProperty("hidden", this.tempHidden);
 
+        DefinitionUtil.putCachedChapter(rl, json);
         Services.PLATFORM.sendPacketToServer(new ChapterEditSavePacket(rl, json.toString()));
 
         if (this.minecraft != null) {
@@ -378,8 +379,6 @@ public class ChapterEditorScreen extends Screen {
         int itemsPerPage = 5;
         int startIdx = this.listPage * itemsPerPage;
         int endIdx = Math.min(startIdx + itemsPerPage, allQuests.size());
-
-        String currentChapPath = this.chapterToEdit != null ? this.chapterToEdit.getPath() : "";
 
         for (int i = startIdx; i < endIdx; i++) {
             ResourceLocation qKey = allQuests.get(i);

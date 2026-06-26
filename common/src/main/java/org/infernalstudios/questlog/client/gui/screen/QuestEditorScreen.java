@@ -694,7 +694,7 @@ public class QuestEditorScreen extends Screen {
             }
         }
         String title = sb.toString();
-        if (this.font != null && this.font.width(title) > 130) {
+        if (this.font.width(title) > 130) {
             title = this.font.plainSubstrByWidth(title, 120) + "...";
         }
         return title;
@@ -1038,7 +1038,7 @@ public class QuestEditorScreen extends Screen {
             if (registry != null) {
                 String lower = query.toLowerCase();
                 for (net.minecraft.tags.TagKey<?> tagKey : registry.getTagNames().toList()) {
-                    String str = "#" + tagKey.location().toString();
+                    String str = "#" + tagKey.location();
                     if (str.toLowerCase().contains(lower)) {
                         result.add(str);
                         if (result.size() >= 5) break;
@@ -1138,9 +1138,9 @@ public class QuestEditorScreen extends Screen {
         } else if (box == this.chapterBox) {
             String lower = val.toLowerCase();
             for (ResourceLocation rl : DefinitionUtil.getCachedChapterKeys()) {
-                String str = rl.toString();
-                if (lower.isEmpty() || str.toLowerCase().contains(lower)) {
-                    result.add(str);
+                String path = rl.getPath();
+                if (lower.isEmpty() || path.toLowerCase().contains(lower)) {
+                    result.add(path);
                     if (result.size() >= 5) break;
                 }
             }
