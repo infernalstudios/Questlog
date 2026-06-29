@@ -4,7 +4,7 @@
   "icon": {
     "item": "minecraft:stone_hoe"
   },
-  "requirements": [],
+  "prerequisites": [],
   "objectives": [
     {
       "type": "questlog:or",

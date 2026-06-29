@@ -6,7 +6,7 @@
   },
   "chapter": "main",
   "order": 1,
-  "requirements": [
+  "prerequisites": [
     {
       "type": "questlog:origin",
       "origin": "origins:avian"

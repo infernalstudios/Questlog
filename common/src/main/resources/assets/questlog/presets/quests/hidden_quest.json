@@ -1,11 +1,11 @@
 {
   "title": "Hidden Quest: Find Secret Coordinates",
-  "description": "Example of hidden quests and location requirements",
+  "description": "Example of hidden quests and location prerequisites",
   "icon": {
     "item": "minecraft:spyglass"
   },
   "hidden": true,
-  "requirements": [
+  "prerequisites": [
     {
       "type": "questlog:visit_position",
       "bounds": {

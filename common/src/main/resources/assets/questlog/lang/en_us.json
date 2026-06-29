@@ -15,6 +15,7 @@
     "questlog.reward.collect": "Collect Rewards",
     "questlog.reward.collected": "Collected",
     "questlog.reward.uncollected": "Uncollected",
+    "questlog.reward.reset": "Reset Quest",
     "questlog.gui.open": "Open Questlog",
     "questlog.gui.open_notification": "Open Questlog (%s)",
     "questlog.no_quests": "No Quests Available",
@@ -179,7 +180,7 @@
     "questlog.editor.details_default": "Details Open by Default",
     "questlog.editor.details_disabled": "Disable Details Button",
     "questlog.editor.objectives": "Objectives",
-    "questlog.editor.requirements": "Requirements",
+    "questlog.editor.prerequisites": "Prerequisites",
     "questlog.editor.rewards": "Rewards",
     "questlog.editor.settings": "Settings",
 
@@ -193,8 +194,11 @@
     "questlog.editor.tooltip.include_in_main": "If enabled, the quest will be shown in the main chapter list in addition to its assigned chapter.",
     "questlog.editor.tooltip.details_default": "If enabled, opening this quest's chapter will display this quest's details page by default.",
     "questlog.editor.tooltip.details_disabled": "If enabled, players will not be able to open the details page for this quest.",
+    "questlog.editor.tooltip.repeatable": "If enabled, this quest can be reset and recompleted infinitely after completion.",
+    "questlog.editor.tooltip.global": "If enabled, completing this quest will complete it for all players on the server.",
     "questlog.editor.tooltip.entry_name": "A custom display name for this specific objective or reward (optional).",
     "questlog.editor.tooltip.entry_target": "The target registry key, tag, or value for this entry (e.g., minecraft:stone).",
+    "questlog.editor.tooltip.entry_target.bounds": "Target block position (x, y, z) or bounding volume (minX, minY, minZ, maxX, maxY, maxZ).",
     "questlog.editor.tooltip.entry_amount": "The required count, amount, or experience points.",
     "questlog.editor.tooltip.levels": "If enabled, the reward/objective value specifies levels instead of experience points.",
 

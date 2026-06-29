@@ -44,6 +44,8 @@ public class QuestDisplayData {
 
     private final boolean disableDetailsButton;
     private final boolean detailsOpenByDefault;
+    private final boolean repeatable;
+    private final boolean global;
 
     private final ResourceLocation bgTexture;
     private final ResourceLocation rightPanelTexture;
@@ -166,6 +168,8 @@ public class QuestDisplayData {
 
         this.disableDetailsButton = JsonUtils.getOrDefault(data, "disable_details_button", false);
         this.detailsOpenByDefault = JsonUtils.getOrDefault(data, "details_open_by_default", false);
+        this.repeatable = JsonUtils.getOrDefault(data, "repeatable", false);
+        this.global = JsonUtils.getOrDefault(data, "global", false);
 
         this.leftPanelXOffset = JsonUtils.getOrDefault(data, "left_panel_x_offset", 0);
         this.leftPanelYOffset = JsonUtils.getOrDefault(data, "left_panel_y_offset", 0);
@@ -409,6 +413,14 @@ public class QuestDisplayData {
 
     public boolean isHidden() {
         return this.hidden;
+    }
+
+    public boolean isRepeatable() {
+        return this.repeatable;
+    }
+
+    public boolean isGlobal() {
+        return this.global;
     }
 
     public Palette getPalette() {

@@ -1,6 +1,6 @@
 {
   "title": "Acquire Diamond (Advancement)",
-  "description": "Requirement to complete the 'Diamonds!' advancement",
+  "description": "Prerequisite to complete the 'Diamonds!' advancement",
   "type": "questlog:advancement",
   "advancement": "minecraft:story/mine_diamond",
   "name": "Acquire Diamond Advancement"

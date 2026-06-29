@@ -4,7 +4,7 @@
   "icon": {
     "item": "minecraft:wheat"
   },
-  "requirements": [],
+  "prerequisites": [],
   "objectives": [
     {
       "type": "questlog:entity_breed",

@@ -24,9 +24,9 @@ public class NotObjective extends Objective {
     }
 
     @Override
-    public void markAsRequirement() {
-        super.markAsRequirement();
-        this.child.markAsRequirement();
+    public void markAsPrerequisite() {
+        super.markAsPrerequisite();
+        this.child.markAsPrerequisite();
     }
 
     @Override

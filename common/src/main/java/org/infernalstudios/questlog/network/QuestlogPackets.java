@@ -26,6 +26,7 @@ public class QuestlogPackets {
             .add(new RegisteredPacket<>(new ResourceLocation(Questlog.MODID, "edit_remove"), QuestEditRemovePacket.class, QuestEditRemovePacket.DIRECTION, QuestEditRemovePacket::encode, QuestEditRemovePacket::decode, QuestEditRemovePacket::handle))
             .add(new RegisteredPacket<>(new ResourceLocation(Questlog.MODID, "chapter_edit_save"), ChapterEditSavePacket.class, ChapterEditSavePacket.DIRECTION, ChapterEditSavePacket::encode, ChapterEditSavePacket::decode, ChapterEditSavePacket::handle))
             .add(new RegisteredPacket<>(new ResourceLocation(Questlog.MODID, "chapter_edit_remove"), ChapterEditRemovePacket.class, ChapterEditRemovePacket.DIRECTION, ChapterEditRemovePacket::encode, ChapterEditRemovePacket::decode, ChapterEditRemovePacket::handle))
+            .add(new RegisteredPacket<>(new ResourceLocation(Questlog.MODID, "reset"), QuestResetPacket.class, QuestResetPacket.DIRECTION, QuestResetPacket::encode, QuestResetPacket::decode, QuestResetPacket::handle))
             .build();
 
     public record RegisteredPacket<T>(ResourceLocation id, Class<T> clazz, IPacketContext.Direction direction,

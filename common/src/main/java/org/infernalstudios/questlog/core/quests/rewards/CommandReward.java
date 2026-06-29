@@ -27,7 +27,13 @@ public class CommandReward extends Reward {
                 .withPermission(this.permissionLevel)
                 .withSuppressedOutput();
 
-        Objects.requireNonNull(player.getServer()).getCommands().performPrefixedCommand(source, this.command);
+        String formattedCommand = this.command
+                .replace("{player}", player.getGameProfile().getName())
+                .replace("%player%", player.getGameProfile().getName())
+                .replaceAll("(?<!\\w)@p(?!\\w)", player.getGameProfile().getName())
+                .replaceAll("(?<!\\w)@s(?!\\w)", player.getGameProfile().getName());
+
+        Objects.requireNonNull(player.getServer()).getCommands().performPrefixedCommand(source, formattedCommand);
 
         super.applyReward(player);
     }

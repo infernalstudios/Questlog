@@ -168,6 +168,10 @@ public class QuestManager {
                     QuestlogEvents.onQuestCompleted(new QuestEvent.Completed(this.player, quest, true));
                     Questlog.LOGGER.trace("Sent quest completed event for {}", id);
                 }
+
+                if (quest.isGlobal() && ServerPlayerManager.INSTANCE != null) {
+                    ServerPlayerManager.INSTANCE.onGlobalQuestUpdated(quest);
+                }
             }
         }
     }

@@ -95,7 +95,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                     }
                 }
                 if (target.isEmpty()) {
-                    String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "command", "loot_table", "enchantment", "effect"};
+                    String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "command", "loot_table", "enchantment", "effect", "bounds"};
                     for (String k : keys) {
                         if (entry.has(k)) {
                             com.google.gson.JsonElement el = entry.get(k);

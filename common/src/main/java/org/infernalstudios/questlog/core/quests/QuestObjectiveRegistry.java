@@ -80,7 +80,7 @@ public class QuestObjectiveRegistry {
         register(new ResourceLocation("questlog", "visit_dimension"), VisitDimensionObjective::new,
                 new EditorMetadata("dimension", "Dimension:", "required_amount", EditorMetadata.SuggestionType.DIMENSION));
         register(new ResourceLocation("questlog", "visit_position"), VisitPositionObjective::new,
-                new EditorMetadata(null, null, "required_amount"));
+                new EditorMetadata("bounds", "Position / Bounds:", null));
         register(new ResourceLocation("questlog", "visit_structure"), VisitStructureObjective::new,
                 new EditorMetadata("structure", "Structure ID:", "required_amount", EditorMetadata.SuggestionType.STRUCTURE));
         register(new ResourceLocation("questlog", "quest_complete"), QuestCompleteObjective::new,

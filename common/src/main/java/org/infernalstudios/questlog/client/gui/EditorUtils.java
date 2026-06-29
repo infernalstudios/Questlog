@@ -138,31 +138,39 @@ public class EditorUtils {
 
     public static List<EditorPreset> getPresets(String subfolder) {
         List<EditorPreset> presets = new ArrayList<>();
+        List<String> subfolders = new ArrayList<>();
+        subfolders.add(subfolder);
+        if ("prerequisites".equals(subfolder)) {
+            subfolders.add("requirements");
+        }
+
         try {
             ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-            String prefix = "presets/" + subfolder;
-            Map<ResourceLocation, Resource> resources = resourceManager.listResources(
-                    prefix,
-                    loc -> loc.getNamespace().equals(Questlog.MODID) && loc.getPath().endsWith(".json")
-            );
+            for (String sub : subfolders) {
+                String prefix = "presets/" + sub;
+                Map<ResourceLocation, Resource> resources = resourceManager.listResources(
+                        prefix,
+                        loc -> loc.getNamespace().equals(Questlog.MODID) && loc.getPath().endsWith(".json")
+                );
 
-            Map<ResourceLocation, Resource> sortedResources = new TreeMap<>(resources);
-            for (Map.Entry<ResourceLocation, Resource> entry : sortedResources.entrySet()) {
-                ResourceLocation loc = entry.getKey();
-                try {
-                    JsonObject json = Util.getJsonResource(entry.getValue());
-                    String filename = loc.getPath();
-                    if (filename.startsWith(prefix + "/")) {
-                        filename = filename.substring((prefix + "/").length());
+                Map<ResourceLocation, Resource> sortedResources = new TreeMap<>(resources);
+                for (Map.Entry<ResourceLocation, Resource> entry : sortedResources.entrySet()) {
+                    ResourceLocation loc = entry.getKey();
+                    try {
+                        JsonObject json = Util.getJsonResource(entry.getValue());
+                        String filename = loc.getPath();
+                        if (filename.startsWith(prefix + "/")) {
+                            filename = filename.substring((prefix + "/").length());
+                        }
+                        if (filename.endsWith(".json")) {
+                            filename = filename.substring(0, filename.length() - 5);
+                        }
+                        String title = json.has("title") ? json.get("title").getAsString() : filename;
+                        String description = json.has("description") ? json.get("description").getAsString() : "";
+                        presets.add(new EditorPreset(filename, title, description, json));
+                    } catch (Exception e) {
+                        Questlog.LOGGER.error("Failed to load preset: {}", loc, e);
                     }
-                    if (filename.endsWith(".json")) {
-                        filename = filename.substring(0, filename.length() - 5);
-                    }
-                    String title = json.has("title") ? json.get("title").getAsString() : filename;
-                    String description = json.has("description") ? json.get("description").getAsString() : "";
-                    presets.add(new EditorPreset(filename, title, description, json));
-                } catch (Exception e) {
-                    Questlog.LOGGER.error("Failed to load preset: {}", loc, e);
                 }
             }
         } catch (Exception e) {

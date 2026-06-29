@@ -124,12 +124,15 @@ public class QuestlogMigrator {
                             newQuestData.putBoolean("completed", oldQuestData.getBoolean("completed"));
                         }
 
-                        // Migrate "triggers" -> "requirements"
+                        // Migrate "triggers" / "requirements" -> "prerequisites"
                         if (oldQuestData.contains("triggers", Tag.TAG_LIST)) {
-                            newQuestData.put("requirements", oldQuestData.getList("triggers", Tag.TAG_COMPOUND).copy());
+                            newQuestData.put("prerequisites", oldQuestData.getList("triggers", Tag.TAG_COMPOUND).copy());
                             migratedThisQuest = true;
+                        } else if (oldQuestData.contains("prerequisites", Tag.TAG_LIST)) {
+                            newQuestData.put("prerequisites", oldQuestData.getList("prerequisites", Tag.TAG_COMPOUND).copy());
                         } else if (oldQuestData.contains("requirements", Tag.TAG_LIST)) {
-                            newQuestData.put("requirements", oldQuestData.getList("requirements", Tag.TAG_COMPOUND).copy());
+                            newQuestData.put("prerequisites", oldQuestData.getList("requirements", Tag.TAG_COMPOUND).copy());
+                            migratedThisQuest = true;
                         }
 
                         // Copy remaining unchanged lists
@@ -163,8 +166,12 @@ public class QuestlogMigrator {
     private static JsonObject convertQuestFormat(JsonObject oldQuest) {
         JsonObject newQuest = new JsonObject();
 
-        if (oldQuest.has("triggers") && oldQuest.get("triggers").isJsonArray()) {
-            newQuest.add("requirements", convertObjectives(oldQuest.getAsJsonArray("triggers")));
+        if (oldQuest.has("prerequisites") && oldQuest.get("prerequisites").isJsonArray()) {
+            newQuest.add("prerequisites", convertObjectives(oldQuest.getAsJsonArray("prerequisites")));
+        } else if (oldQuest.has("requirements") && oldQuest.get("requirements").isJsonArray()) {
+            newQuest.add("prerequisites", convertObjectives(oldQuest.getAsJsonArray("requirements")));
+        } else if (oldQuest.has("triggers") && oldQuest.get("triggers").isJsonArray()) {
+            newQuest.add("prerequisites", convertObjectives(oldQuest.getAsJsonArray("triggers")));
         }
 
         if (oldQuest.has("objectives") && oldQuest.get("objectives").isJsonArray()) {

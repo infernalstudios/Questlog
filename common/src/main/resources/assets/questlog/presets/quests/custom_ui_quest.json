@@ -4,7 +4,7 @@
   "icon": {
     "item": "minecraft:painting"
   },
-  "requirements": [],
+  "prerequisites": [],
   "objectives": [
     {
       "type": "questlog:item_obtain",

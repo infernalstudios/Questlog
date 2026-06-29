@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
-    public final List<Objective> requirements;
+    public final List<Objective> prerequisites;
     public final List<Objective> objectives;
     public final List<Objective> failureConditions;
     public final List<Reward> rewards;
@@ -30,33 +30,39 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     private final ResourceLocation id;
     public boolean hasSentCompletion = false;
     public boolean hasSentTrigger = false;
+    private boolean repeatable = false;
+    private boolean global = false;
 
     public Quest(
             QuestDisplayData display,
-            List<Objective> requirements,
+            List<Objective> prerequisites,
             List<Objective> objectives,
             List<Objective> failureConditions,
             List<Reward> rewards,
             ResourceLocation id,
-            QuestManager manager
+            QuestManager manager,
+            boolean repeatable,
+            boolean global
     ) {
         this.display = display;
-        this.requirements = requirements;
+        this.prerequisites = prerequisites;
         this.objectives = objectives;
         this.failureConditions = failureConditions;
         this.rewards = rewards;
         this.id = id;
         this.manager = manager;
+        this.repeatable = repeatable;
+        this.global = global;
 
-        if (this.requirements.isEmpty()) {
+        if (this.prerequisites.isEmpty()) {
             this.hasSentTrigger = true;
         }
 
-        this.requirements.forEach(requirement -> {
-            requirement.markAsRequirement();
-            requirement.setParent(this);
+        this.prerequisites.forEach(prerequisite -> {
+            prerequisite.markAsPrerequisite();
+            prerequisite.setParent(this);
             if (!this.manager.isClient()) {
-                requirement.registerEventListeners();
+                prerequisite.registerEventListeners();
             }
         });
         this.objectives.forEach(objective -> {
@@ -77,14 +83,16 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
 
     public static Quest create(JsonObject definition, ResourceLocation id, QuestManager manager) {
         QuestDisplayData display = new QuestDisplayData(definition);
-        List<Objective> requirements = new ArrayList<>();
+        List<Objective> prerequisites = new ArrayList<>();
         List<Objective> objectives = new ArrayList<>();
         List<Objective> failureConditions = new ArrayList<>();
         List<Reward> rewards = new ArrayList<>();
 
-        for (JsonElement reqElement : JsonUtils.getOrDefault(definition, "requirements", new JsonArray())) {
+        JsonArray reqArray = definition.has("prerequisites") ? definition.getAsJsonArray("prerequisites")
+                : (definition.has("requirements") ? definition.getAsJsonArray("requirements") : new JsonArray());
+        for (JsonElement reqElement : reqArray) {
             if (reqElement.isJsonObject()) {
-                requirements.add(QuestObjectiveRegistry.create(reqElement.getAsJsonObject()));
+                prerequisites.add(QuestObjectiveRegistry.create(reqElement.getAsJsonObject()));
             }
         }
 
@@ -106,11 +114,32 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
             }
         }
 
-        return new Quest(display, requirements, objectives, failureConditions, rewards, id, manager);
+        boolean repeatable = JsonUtils.getOrDefault(definition, "repeatable", false);
+        boolean global = JsonUtils.getOrDefault(definition, "global", false);
+
+        return new Quest(display, prerequisites, objectives, failureConditions, rewards, id, manager, repeatable, global);
     }
 
     public ResourceLocation getId() {
         return this.id;
+    }
+
+    public boolean isRepeatable() {
+        return this.repeatable;
+    }
+
+    public boolean isGlobal() {
+        return this.global;
+    }
+
+    public void resetProgress() {
+        this.prerequisites.forEach(trigger -> trigger.forceSetUnits(0));
+        this.objectives.forEach(obj -> obj.forceSetUnits(0));
+        this.failureConditions.forEach(obj -> obj.forceSetUnits(0));
+        this.rewards.forEach(Reward::revokeReward);
+        this.hasSentTrigger = this.prerequisites.isEmpty();
+        this.hasSentCompletion = false;
+        this.markForUpdate();
     }
 
     @Override
@@ -119,7 +148,7 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     }
 
     public boolean isTriggered() {
-        for (Objective req : this.requirements) {
+        for (Objective req : this.prerequisites) {
             if (!req.isCompleted()) {
                 return false;
             }
@@ -159,12 +188,14 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     public void writeInitialData(CompoundTag data) {
         data.putBoolean("completed", this.hasSentCompletion);
         data.putBoolean("triggered", this.hasSentTrigger);
+        data.putBoolean("repeatable", this.repeatable);
+        data.putBoolean("global", this.global);
 
         data.put(
-                "requirements",
-                Util.toNbtList(this.requirements, requirement -> {
+                "prerequisites",
+                Util.toNbtList(this.prerequisites, prerequisite -> {
                     CompoundTag tag = new CompoundTag();
-                    requirement.writeInitialData(tag);
+                    prerequisite.writeInitialData(tag);
                     return tag;
                 })
         );
@@ -201,14 +232,21 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     public void deserialize(CompoundTag data) {
         this.hasSentCompletion = data.getBoolean("completed");
         this.hasSentTrigger = data.getBoolean("triggered");
+        if (data.contains("repeatable")) {
+            this.repeatable = data.getBoolean("repeatable");
+        }
+        if (data.contains("global")) {
+            this.global = data.getBoolean("global");
+        }
 
-        if (this.requirements.isEmpty()) {
+        if (this.prerequisites.isEmpty()) {
             this.hasSentTrigger = true;
         }
 
-        List<Tag> reqData = data.getList("requirements", Tag.TAG_COMPOUND);
-        for (int i = 0; i < Math.min(reqData.size(), this.requirements.size()); i++) {
-            this.requirements.get(i).deserialize((CompoundTag) reqData.get(i));
+        List<Tag> reqData = data.contains("prerequisites") ? data.getList("prerequisites", Tag.TAG_COMPOUND)
+                : data.getList("requirements", Tag.TAG_COMPOUND);
+        for (int i = 0; i < Math.min(reqData.size(), this.prerequisites.size()); i++) {
+            this.prerequisites.get(i).deserialize((CompoundTag) reqData.get(i));
         }
 
         List<Tag> objectiveData = data.getList("objectives", Tag.TAG_COMPOUND);
@@ -232,7 +270,9 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("completed", this.hasSentCompletion);
         tag.putBoolean("triggered", this.hasSentTrigger);
-        tag.put("requirements", Util.toNbtList(this.requirements, Objective::serialize));
+        tag.putBoolean("repeatable", this.repeatable);
+        tag.putBoolean("global", this.global);
+        tag.put("prerequisites", Util.toNbtList(this.prerequisites, Objective::serialize));
         tag.put("objectives", Util.toNbtList(this.objectives, Objective::serialize));
         tag.put("failures", Util.toNbtList(this.failureConditions, Objective::serialize));
         tag.put("rewards", Util.toNbtList(this.rewards, Reward::serialize));

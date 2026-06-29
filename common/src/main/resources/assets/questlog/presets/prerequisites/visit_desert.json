@@ -1,6 +1,6 @@
 {
   "title": "Visit Desert Biome",
-  "description": "Requirement to visit/find a Desert biome",
+  "description": "Prerequisite to visit/find a Desert biome",
   "type": "questlog:visit_biome",
   "biome": "minecraft:desert",
   "name": "Visit Desert Biome"
