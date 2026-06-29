@@ -27,6 +27,7 @@ public class QuestlogPacketsFabric {
         PayloadTypeRegistry.playC2S().register(QuestEditRemovePacket.TYPE, QuestEditRemovePacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(ChapterEditSavePacket.TYPE, ChapterEditSavePacket.STREAM_CODEC);
         PayloadTypeRegistry.playC2S().register(ChapterEditRemovePacket.TYPE, ChapterEditRemovePacket.STREAM_CODEC);
+        PayloadTypeRegistry.playC2S().register(QuestResetPacket.TYPE, QuestResetPacket.STREAM_CODEC);
 
         // Register Server Receivers
         registerServerReceivers();
@@ -50,6 +51,7 @@ public class QuestlogPacketsFabric {
         ServerPlayNetworking.registerGlobalReceiver(QuestEditRemovePacket.TYPE, (payload, context) -> context.server().execute(() -> QuestEditRemovePacket.handle(payload, createServerContext(context.player()))));
         ServerPlayNetworking.registerGlobalReceiver(ChapterEditSavePacket.TYPE, (payload, context) -> context.server().execute(() -> ChapterEditSavePacket.handle(payload, createServerContext(context.player()))));
         ServerPlayNetworking.registerGlobalReceiver(ChapterEditRemovePacket.TYPE, (payload, context) -> context.server().execute(() -> ChapterEditRemovePacket.handle(payload, createServerContext(context.player()))));
+        ServerPlayNetworking.registerGlobalReceiver(QuestResetPacket.TYPE, (payload, context) -> context.server().execute(() -> QuestResetPacket.handle(payload, createServerContext(context.player()))));
     }
 
     private static IPacketContext createClientContext() {

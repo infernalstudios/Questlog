@@ -57,9 +57,9 @@ public class QuestEditorScreen extends Screen {
     private static final ResourceLocation TAB_OBJECTIVES_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives_selected.png");
     private static final ResourceLocation TAB_OBJECTIVES_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_objectives_highlighted.png");
 
-    private static final ResourceLocation TAB_REQUIREMENTS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_requirements.png");
-    private static final ResourceLocation TAB_REQUIREMENTS_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_requirements_selected.png");
-    private static final ResourceLocation TAB_REQUIREMENTS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_requirements_highlighted.png");
+    private static final ResourceLocation TAB_PREREQUISITES_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_prerequisites.png");
+    private static final ResourceLocation TAB_PREREQUISITES_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_prerequisites_selected.png");
+    private static final ResourceLocation TAB_PREREQUISITES_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_prerequisites_highlighted.png");
 
     private static final ResourceLocation TAB_REWARDS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_rewards.png");
     private static final ResourceLocation TAB_REWARDS_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_rewards_selected.png");
@@ -71,7 +71,7 @@ public class QuestEditorScreen extends Screen {
     final List<net.minecraft.client.gui.components.AbstractWidget> leftFields = new ArrayList<>();
     private final Screen previousScreen;
     private final List<JsonObject> tempObjectives = new ArrayList<>();
-    private final List<JsonObject> tempRequirements = new ArrayList<>();
+    private final List<JsonObject> tempPrerequisites = new ArrayList<>();
     private final List<JsonObject> tempRewards = new ArrayList<>();
     private final Stack<NestingFrame> nestingStack = new Stack<>();
     private final AutocompleteHelper autocompleteHelper = new AutocompleteHelper();
@@ -109,7 +109,9 @@ public class QuestEditorScreen extends Screen {
     private boolean tempIncludeInMain = true;
     private boolean tempDetailsDefault = false;
     private boolean tempDetailsDisabled = false;
-    private ActiveTab activeTab = ActiveTab.REQUIREMENTS;
+    private boolean tempRepeatable = false;
+    private boolean tempGlobal = false;
+    private ActiveTab activeTab = ActiveTab.PREREQUISITES;
     private int listPage = 0;
     private String typeSearchQuery = "";
     private boolean tempSearchFocused = false;
@@ -167,8 +169,10 @@ public class QuestEditorScreen extends Screen {
             this.tempIncludeInMain = true;
             this.tempDetailsDefault = false;
             this.tempDetailsDisabled = false;
+            this.tempRepeatable = false;
+            this.tempGlobal = false;
             this.tempObjectives.clear();
-            this.tempRequirements.clear();
+            this.tempPrerequisites.clear();
             this.tempRewards.clear();
         }
     }
@@ -189,9 +193,11 @@ public class QuestEditorScreen extends Screen {
         this.tempIncludeInMain = !definition.has("include_in_main") || definition.get("include_in_main").getAsBoolean();
         this.tempDetailsDefault = definition.has("details_default") && definition.get("details_default").getAsBoolean();
         this.tempDetailsDisabled = definition.has("details_disabled") && definition.get("details_disabled").getAsBoolean();
+        this.tempRepeatable = definition.has("repeatable") && definition.get("repeatable").getAsBoolean();
+        this.tempGlobal = definition.has("global") && definition.get("global").getAsBoolean();
 
         this.loadList(definition.getAsJsonArray("objectives"), this.tempObjectives);
-        this.loadList(definition.getAsJsonArray("requirements"), this.tempRequirements);
+        this.loadList(definition.has("prerequisites") ? definition.getAsJsonArray("prerequisites") : definition.getAsJsonArray("requirements"), this.tempPrerequisites);
         this.loadList(definition.getAsJsonArray("failures"), null);
         this.loadList(definition.getAsJsonArray("rewards"), this.tempRewards);
     }
@@ -357,7 +363,7 @@ public class QuestEditorScreen extends Screen {
     public void openEntryPresetsContextMenu(int x, int y) {
         String subfolder = switch (this.activeTab) {
             case OBJECTIVES -> "objectives";
-            case REQUIREMENTS -> "requirements";
+            case PREREQUISITES -> "prerequisites";
             case REWARDS -> "rewards";
             default -> null;
         };
@@ -408,7 +414,7 @@ public class QuestEditorScreen extends Screen {
 
                 Component tooltipText = switch (t) {
                     case OBJECTIVES -> Component.translatable("questlog.editor.objectives");
-                    case REQUIREMENTS -> Component.translatable("questlog.editor.requirements");
+                    case PREREQUISITES -> Component.translatable("questlog.editor.prerequisites");
                     case REWARDS -> Component.translatable("questlog.editor.rewards");
                     case SETTINGS -> Component.translatable("questlog.editor.settings");
                 };
@@ -421,19 +427,19 @@ public class QuestEditorScreen extends Screen {
                         if (isCurrentTab) {
                             drawTex = switch (t) {
                                 case OBJECTIVES -> TAB_OBJECTIVES_SELECTED;
-                                case REQUIREMENTS -> TAB_REQUIREMENTS_SELECTED;
+                                case PREREQUISITES -> TAB_PREREQUISITES_SELECTED;
                                 case REWARDS -> TAB_REWARDS_SELECTED;
                                 case SETTINGS -> TAB_SETTINGS_SELECTED;
                             };
                         } else {
                             drawTex = hovered ? switch (t) {
                                 case OBJECTIVES -> TAB_OBJECTIVES_HIGHLIGHTED;
-                                case REQUIREMENTS -> TAB_REQUIREMENTS_HIGHLIGHTED;
+                                case PREREQUISITES -> TAB_PREREQUISITES_HIGHLIGHTED;
                                 case REWARDS -> TAB_REWARDS_HIGHLIGHTED;
                                 case SETTINGS -> TAB_SETTINGS_HIGHLIGHTED;
                             } : switch (t) {
                                 case OBJECTIVES -> TAB_OBJECTIVES_TEXTURE;
-                                case REQUIREMENTS -> TAB_REQUIREMENTS_TEXTURE;
+                                case PREREQUISITES -> TAB_PREREQUISITES_TEXTURE;
                                 case REWARDS -> TAB_REWARDS_TEXTURE;
                                 case SETTINGS -> TAB_SETTINGS_TEXTURE;
                             };
@@ -481,30 +487,44 @@ public class QuestEditorScreen extends Screen {
             Button btnHidden = Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
                 this.tempHidden = !this.tempHidden;
                 btn.setMessage(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 36, 140, 18).build();
+            }).bounds(panel2X + 10, panel2Y + 30, 140, 16).build();
             btnHidden.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.hidden")));
             this.addRenderableWidget(btnHidden);
 
             Button btnIncludeMain = Button.builder(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")), btn -> {
                 this.tempIncludeInMain = !this.tempIncludeInMain;
                 btn.setMessage(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 62, 140, 18).build();
+            }).bounds(panel2X + 10, panel2Y + 50, 140, 16).build();
             btnIncludeMain.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.include_in_main")));
             this.addRenderableWidget(btnIncludeMain);
 
             Button btnDetailsDefault = Button.builder(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")), btn -> {
                 this.tempDetailsDefault = !this.tempDetailsDefault;
                 btn.setMessage(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 88, 140, 18).build();
+            }).bounds(panel2X + 10, panel2Y + 70, 140, 16).build();
             btnDetailsDefault.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_default")));
             this.addRenderableWidget(btnDetailsDefault);
 
             Button btnDetailsDisabled = Button.builder(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")), btn -> {
                 this.tempDetailsDisabled = !this.tempDetailsDisabled;
                 btn.setMessage(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 114, 140, 18).build();
+            }).bounds(panel2X + 10, panel2Y + 90, 140, 16).build();
             btnDetailsDisabled.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_disabled")));
             this.addRenderableWidget(btnDetailsDisabled);
+
+            Button btnRepeatable = Button.builder(Component.literal("Repeatable: " + (this.tempRepeatable ? "True" : "False")), btn -> {
+                this.tempRepeatable = !this.tempRepeatable;
+                btn.setMessage(Component.literal("Repeatable: " + (this.tempRepeatable ? "True" : "False")));
+            }).bounds(panel2X + 10, panel2Y + 110, 140, 16).build();
+            btnRepeatable.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.repeatable")));
+            this.addRenderableWidget(btnRepeatable);
+
+            Button btnGlobal = Button.builder(Component.literal("Global: " + (this.tempGlobal ? "True" : "False")), btn -> {
+                this.tempGlobal = !this.tempGlobal;
+                btn.setMessage(Component.literal("Global: " + (this.tempGlobal ? "True" : "False")));
+            }).bounds(panel2X + 10, panel2Y + 130, 140, 16).build();
+            btnGlobal.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.global")));
+            this.addRenderableWidget(btnGlobal);
         } else {
             this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable(this));
             this.addRenderableWidget(this.rightScrollable);
@@ -629,7 +649,8 @@ public class QuestEditorScreen extends Screen {
                 this.entryTargetBox.setMaxLength(128);
                 String targetVal = getTargetFieldValue();
                 this.entryTargetBox.setValue(targetVal);
-                this.entryTargetBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_target")));
+                String tooltipKey = (meta != null && "bounds".equals(meta.targetFieldKey())) ? "questlog.editor.tooltip.entry_target.bounds" : "questlog.editor.tooltip.entry_target";
+                this.entryTargetBox.setTooltip(Tooltip.create(Component.translatable(tooltipKey)));
                 this.addRenderableWidget(this.entryTargetBox);
             } else {
                 this.entryTargetBox = null;
@@ -728,7 +749,7 @@ public class QuestEditorScreen extends Screen {
                 return el.isJsonPrimitive() ? el.getAsString() : el.toString();
             }
         }
-        String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table"};
+        String[] keys = new String[]{"block", "item", "entity", "biome", "dimension", "structure", "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table", "bounds"};
         for (String k : keys) {
             if (this.editingEntry.has(k)) {
                 com.google.gson.JsonElement el = this.editingEntry.get(k);
@@ -781,7 +802,7 @@ public class QuestEditorScreen extends Screen {
 
         String[] allKeys = new String[]{
                 "block", "item", "entity", "biome", "dimension", "structure",
-                "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table",
+                "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table", "bounds",
                 "required_amount", "count", "experience", "levels", "pick_count"
         };
         for (String k : allKeys) {
@@ -809,7 +830,7 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry.addProperty("levels", this.entryLevelsToggle);
             }
         } else {
-            if (this.activeTab == ActiveTab.OBJECTIVES || this.activeTab == ActiveTab.REQUIREMENTS) {
+            if (this.activeTab == ActiveTab.OBJECTIVES || this.activeTab == ActiveTab.PREREQUISITES) {
                 this.editingEntry.addProperty("required_amount", amount);
             }
         }
@@ -833,8 +854,8 @@ public class QuestEditorScreen extends Screen {
         }
         if (this.activeTab == ActiveTab.OBJECTIVES) {
             return this.tempObjectives;
-        } else if (this.activeTab == ActiveTab.REQUIREMENTS) {
-            return this.tempRequirements;
+        } else if (this.activeTab == ActiveTab.PREREQUISITES) {
+            return this.tempPrerequisites;
         } else {
             return this.tempRewards;
         }
@@ -952,6 +973,12 @@ public class QuestEditorScreen extends Screen {
         if (this.tempDetailsDisabled) {
             json.addProperty("details_disabled", true);
         }
+        if (this.tempRepeatable) {
+            json.addProperty("repeatable", true);
+        }
+        if (this.tempGlobal) {
+            json.addProperty("global", true);
+        }
 
         JsonArray objArr = new JsonArray();
         for (JsonObject o : this.tempObjectives) {
@@ -960,10 +987,10 @@ public class QuestEditorScreen extends Screen {
         json.add("objectives", objArr);
 
         JsonArray reqArr = new JsonArray();
-        for (JsonObject r : this.tempRequirements) {
+        for (JsonObject r : this.tempPrerequisites) {
             reqArr.add(r);
         }
-        json.add("requirements", reqArr);
+        json.add("prerequisites", reqArr);
 
         JsonArray rewArr = new JsonArray();
         for (JsonObject rw : this.tempRewards) {
@@ -1465,7 +1492,7 @@ public class QuestEditorScreen extends Screen {
     }
 
     private enum ActiveTab {
-        REQUIREMENTS,
+        PREREQUISITES,
         OBJECTIVES,
         REWARDS,
         SETTINGS

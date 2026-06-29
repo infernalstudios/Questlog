@@ -5,13 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - UNRELEASED
+## [3.1.0] - 2026-06-29
 
 ### Added
 
-- Added an in-game config screen.
+- Added `repeatable` quests.
+- Added `global` quests.
+
+### Changed
+
+- Renamed `requirements` to `prerequisites`.
+    - Existing quests should still function as expected.
+
+### Fixed
+
+- Fixed issues with `visit_position` quests.
+- Fixed issues with player name placeholders in command rewards.
+
+## [3.0.0] - 2026-06-25
+
+### Added
+
+- Added an in-game quest editor.
 - Added a `questlog:choice` reward type.
-- Item rewards now support components.
+- Item rewards now support NBT tags.
+- Added a `questlog:origin` objective for specific Origins mod origins.
+- Added a `questlog:and` objective type.
+- Added a `/ql reset_all_progress_and_reload` command.
 
 ### Changed
 

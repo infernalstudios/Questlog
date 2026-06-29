@@ -16,7 +16,7 @@ public class VisitPositionObjective extends Objective {
 
     public VisitPositionObjective(JsonObject definition) {
         super(definition);
-        this.bounds = Util.bbFromJson(JsonUtils.getObject(definition, "bounds"));
+        this.bounds = Util.bbFromJson(definition.get("bounds"));
     }
 
     @Override
@@ -27,7 +27,7 @@ public class VisitPositionObjective extends Objective {
 
     private void onPlayerMove(TriggerPlayerEvent.Tick event) {
         if (this.isCompleted() || this.getParent() == null) return;
-        if (event.player instanceof ServerPlayer player && this.getParent().manager.player.equals(player) && --ticksUntilCheck <= 0) {
+        if (event.player instanceof ServerPlayer player && this.getParent().manager.player != null && this.getParent().manager.player.getUUID().equals(player.getUUID()) && --ticksUntilCheck <= 0) {
             if (this.bounds.isInside(event.player.blockPosition())) {
                 this.setUnits(this.getUnits() + 1);
             }

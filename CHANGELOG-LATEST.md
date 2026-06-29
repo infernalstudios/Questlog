@@ -1,19 +1,14 @@
 ### Added
 
-- Added an in-game config screen.
-- Added a `questlog:choice` reward type.
-- Item rewards now support components.
-- Added a `questlog:origin` trigger for specific origins.
-- Added a `/ql reset_all_progress_and_reload` command.
+- Added `repeatable` quests.
+- Added `global` quests.
 
 ### Changed
 
-- `/ql edit_mode` status now persists on a per-world basis.
-- `/ql edit_mode` (with no additional arguments) now toggles edit mode on/off.
+- Renamed `requirements` to `prerequisites`.
+    - Existing quests should still function as expected.
 
 ### Fixed
 
-- Fixed issues with quest progress not properly resetting.
-- Fixed nested objectives not displaying child objectives.
-- Fixed issues with Cursors Extended.
-- Fixed background double rendering.
+- Fixed issues with `visit_position` quests.
+- Fixed issues with player name placeholders in command rewards.

@@ -6,7 +6,7 @@
   "icon": {
     "item": "minecraft:diamond"
   },
-  "requirements": [],
+  "prerequisites": [],
   "objectives": [
     {
       "type": "questlog:item_obtain",

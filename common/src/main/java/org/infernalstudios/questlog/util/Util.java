@@ -63,13 +63,66 @@ public final class Util {
     }
 
     public static BoundingBox bbFromJson(JsonElement json) {
+        if (json == null || json.isJsonNull()) {
+            return new BoundingBox(0, 0, 0, 0, 0, 0);
+        }
+        if (json.isJsonPrimitive()) {
+            String str = json.getAsString().trim();
+            if (str.startsWith("{") && str.endsWith("}")) {
+                try {
+                    return bbFromJson(com.google.gson.JsonParser.parseString(str));
+                } catch (Exception ignored) {
+                }
+            }
+            String cleanStr = str.replaceAll("[^0-9,\\-\\s]", "").trim();
+            String[] parts = cleanStr.split("[,\\s]+");
+            if (parts.length >= 6) {
+                try {
+                    int x1 = Integer.parseInt(parts[0]);
+                    int y1 = Integer.parseInt(parts[1]);
+                    int z1 = Integer.parseInt(parts[2]);
+                    int x2 = Integer.parseInt(parts[3]);
+                    int y2 = Integer.parseInt(parts[4]);
+                    int z2 = Integer.parseInt(parts[5]);
+                    return new BoundingBox(Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2), Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
+                } catch (NumberFormatException ignored) {
+                }
+            } else if (parts.length >= 3) {
+                try {
+                    int x = Integer.parseInt(parts[0]);
+                    int y = Integer.parseInt(parts[1]);
+                    int z = Integer.parseInt(parts[2]);
+                    return new BoundingBox(x, y, z, x, y, z);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+            return new BoundingBox(0, 0, 0, 0, 0, 0);
+        }
+        if (json.isJsonArray()) {
+            com.google.gson.JsonArray arr = json.getAsJsonArray();
+            if (arr.size() >= 6) {
+                int x1 = arr.get(0).getAsInt();
+                int y1 = arr.get(1).getAsInt();
+                int z1 = arr.get(2).getAsInt();
+                int x2 = arr.get(3).getAsInt();
+                int y2 = arr.get(4).getAsInt();
+                int z2 = arr.get(5).getAsInt();
+                return new BoundingBox(Math.min(x1, x2), Math.min(y1, y2), Math.min(z1, z2), Math.max(x1, x2), Math.max(y1, y2), Math.max(z1, z2));
+            } else if (arr.size() >= 3) {
+                int x = arr.get(0).getAsInt();
+                int y = arr.get(1).getAsInt();
+                int z = arr.get(2).getAsInt();
+                return new BoundingBox(x, y, z, x, y, z);
+            }
+            return new BoundingBox(0, 0, 0, 0, 0, 0);
+        }
         if (json instanceof JsonObject jsonObject) {
             int x1 = getIntOrDefault(jsonObject, new String[]{"x1", "minX", "min_x", "x"}, Integer.MIN_VALUE);
             int y1 = getIntOrDefault(jsonObject, new String[]{"y1", "minY", "min_y", "y"}, Integer.MIN_VALUE);
             int z1 = getIntOrDefault(jsonObject, new String[]{"z1", "minZ", "min_z", "z"}, Integer.MIN_VALUE);
-            int x2 = getIntOrDefault(jsonObject, new String[]{"x2", "maxX", "max_x"}, Integer.MAX_VALUE);
-            int y2 = getIntOrDefault(jsonObject, new String[]{"y2", "maxY", "max_y"}, Integer.MAX_VALUE);
-            int z2 = getIntOrDefault(jsonObject, new String[]{"z2", "maxZ", "max_z"}, Integer.MAX_VALUE);
+            int x2 = getIntOrDefault(jsonObject, new String[]{"x2", "maxX", "max_x"}, x1 != Integer.MIN_VALUE ? x1 : Integer.MAX_VALUE);
+            int y2 = getIntOrDefault(jsonObject, new String[]{"y2", "maxY", "max_y"}, y1 != Integer.MIN_VALUE ? y1 : Integer.MAX_VALUE);
+            int z2 = getIntOrDefault(jsonObject, new String[]{"z2", "maxZ", "max_z"}, z1 != Integer.MIN_VALUE ? z1 : Integer.MAX_VALUE);
 
             if (x1 > x2) {
                 int temp = x1;

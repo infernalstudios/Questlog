@@ -136,12 +136,17 @@ public class ServerPlayerManager {
             questManager.setEditMode(false);
         }
 
+        CompoundTag globalData = this.loadGlobalData();
         for (Quest quest : questManager.getAllQuests()) {
             if (data.contains(quest.getId().toString())) {
                 CompoundTag questData = data.getCompound(quest.getId().toString());
                 quest.deserialize(questData);
             } else {
                 shouldSave = true;
+            }
+
+            if (quest.isGlobal() && globalData.contains(quest.getId().toString())) {
+                quest.deserialize(globalData.getCompound(quest.getId().toString()));
             }
         }
 
@@ -150,6 +155,75 @@ public class ServerPlayerManager {
         }
 
         this.syncPlayer(questManager);
+    }
+
+    private boolean isSyncingGlobal = false;
+
+    private File getGlobalDataFile() {
+        Path playerDataPath = this.server.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR);
+        return new File(playerDataPath.toFile(), "global_quests.questlog.dat");
+    }
+
+    private CompoundTag loadGlobalData() {
+        File file = getGlobalDataFile();
+        if (!file.exists()) return new CompoundTag();
+        try {
+            return NbtIo.readCompressed(file.toPath(), NbtAccounter.unlimitedHeap());
+        } catch (IOException e) {
+            Questlog.LOGGER.error("Failed to load global quest data", e);
+            return new CompoundTag();
+        }
+    }
+
+    private void saveGlobalData(CompoundTag tag) {
+        File file = getGlobalDataFile();
+        try {
+            NbtIo.writeCompressed(tag, file.toPath());
+        } catch (IOException e) {
+            Questlog.LOGGER.error("Failed to save global quest data", e);
+        }
+    }
+
+    public void onGlobalQuestUpdated(Quest sourceQuest) {
+        if (isSyncingGlobal) return;
+        isSyncingGlobal = true;
+        try {
+            ResourceLocation id = sourceQuest.getId();
+            CompoundTag serialized = sourceQuest.serialize();
+
+            CompoundTag globalTag = loadGlobalData();
+            globalTag.put(id.toString(), serialized);
+            saveGlobalData(globalTag);
+
+            for (QuestManager manager : this.questManagers.values()) {
+                Quest q = manager.getQuest(id);
+                if (q != null) {
+                    q.deserialize(serialized);
+                    manager.sync(id);
+                }
+            }
+        } finally {
+            isSyncingGlobal = false;
+        }
+    }
+
+    public void resetGlobalQuest(ResourceLocation id) {
+        if (isSyncingGlobal) return;
+        isSyncingGlobal = true;
+        try {
+            CompoundTag globalTag = loadGlobalData();
+            for (QuestManager manager : this.questManagers.values()) {
+                Quest q = manager.getQuest(id);
+                if (q != null) {
+                    q.resetProgress();
+                    globalTag.put(id.toString(), q.serialize());
+                }
+            }
+            saveGlobalData(globalTag);
+            this.save();
+        } finally {
+            isSyncingGlobal = false;
+        }
     }
 
     public void syncPlayer(QuestManager questManager) {

@@ -36,10 +36,10 @@ public class AndObjective extends Objective {
     }
 
     @Override
-    public void markAsRequirement() {
-        super.markAsRequirement();
+    public void markAsPrerequisite() {
+        super.markAsPrerequisite();
         for (Objective child : children) {
-            child.markAsRequirement();
+            child.markAsPrerequisite();
         }
     }
 

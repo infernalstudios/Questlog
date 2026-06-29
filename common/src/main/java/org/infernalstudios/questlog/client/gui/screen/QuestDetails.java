@@ -179,6 +179,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             } else {
                 backText = this.getDisplay().getCollectButtonText();
             }
+        } else if (this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
+            backText = Component.translatable("questlog.reward.reset");
         } else if (this.needsRead()) {
             backText = Component.translatable("questlog.button.read");
         }
@@ -197,6 +199,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void handlePrimaryAction() {
         if (this.quest.isCompleted() && !this.quest.isRewarded()) {
             this.claimAllRewards();
+        } else if (this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
+            Services.PLATFORM.sendPacketToServer(new org.infernalstudios.questlog.network.packet.QuestResetPacket(this.quest.getId()));
         } else if (this.needsRead()) {
             Services.PLATFORM.sendPacketToServer(new QuestReadPacket(this.quest.getId()));
         } else if (this.minecraft != null) {
@@ -450,6 +454,11 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         if (this.backButton != null && !this.needsRead() &&
                 this.backButton.getMessage().equals(Component.translatable("questlog.button.read"))) {
+            this.rebuildWidgets();
+        }
+
+        if (this.backButton != null && !this.quest.isCompleted() &&
+                this.backButton.getMessage().equals(Component.translatable("questlog.reward.reset"))) {
             this.rebuildWidgets();
         }
     }
