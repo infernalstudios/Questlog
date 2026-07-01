@@ -68,13 +68,66 @@ public class QuestEditorScreen extends Screen {
     private static final ResourceLocation TAB_SETTINGS_TEXTURE = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings.png");
     private static final ResourceLocation TAB_SETTINGS_SELECTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings_selected.png");
     private static final ResourceLocation TAB_SETTINGS_HIGHLIGHTED = ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "textures/gui/editor_tab_settings_highlighted.png");
+    private static final List<BoolFieldDef> BOOL_FIELDS = List.of(
+            new BoolFieldDef("hidden", false, "Hidden", "questlog.editor.tooltip.hidden"),
+            new BoolFieldDef("include_in_main", true, "In Main Chapter", "questlog.editor.tooltip.include_in_main"),
+            new BoolFieldDef("details_open_by_default", false, "Details Default", "questlog.editor.tooltip.details_default"),
+            new BoolFieldDef("disable_details_button", false, "Details Disabled", "questlog.editor.tooltip.details_disabled"),
+            new BoolFieldDef("repeatable", false, "Repeatable", "questlog.editor.tooltip.repeatable"),
+            new BoolFieldDef("global", false, "Global", "questlog.editor.tooltip.global"),
+            new BoolFieldDef("translatable", false, "Translatable", "questlog.editor.tooltip.advanced.translatable"),
+            new BoolFieldDef("toast_on_unlock", true, "Toast On Unlock", "questlog.editor.tooltip.advanced.toast_on_unlock"),
+            new BoolFieldDef("toast_on_complete", true, "Toast On Complete", "questlog.editor.tooltip.advanced.toast_on_complete"),
+            new BoolFieldDef("show_popup_on_unlock", false, "Show Popup On Unlock", "questlog.editor.tooltip.advanced.show_popup_on_unlock")
+    );
+    private static final List<TextFieldDef> TEXT_FIELDS = List.of(
+            new TextFieldDef("left_panel_width", "275", true, false, "questlog.editor.advanced.left_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
+            new TextFieldDef("right_panel_width", "170", true, false, "questlog.editor.advanced.right_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
+            new TextFieldDef("panel_height", "166", true, false, "questlog.editor.advanced.panel_height", "questlog.editor.tooltip.advanced.panel_size"),
+            new TextFieldDef("left_panel_x_offset", "0", true, false, "questlog.editor.advanced.left_panel_x_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+            new TextFieldDef("left_panel_y_offset", "0", true, false, "questlog.editor.advanced.left_panel_y_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+            new TextFieldDef("right_panel_x_offset", "0", true, false, "questlog.editor.advanced.right_panel_x_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+            new TextFieldDef("right_panel_y_offset", "0", true, false, "questlog.editor.advanced.right_panel_y_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+
+            new TextFieldDef("background_texture", "questlog:textures/gui/quest_page.png", false, false, "questlog.editor.advanced.background_texture", "questlog.editor.tooltip.advanced.background_texture"),
+            new TextFieldDef("right_panel_texture", "", false, false, "questlog.editor.advanced.right_panel_texture", "questlog.editor.tooltip.advanced.right_panel_texture"),
+            new TextFieldDef("peripheral_texture", "questlog:textures/gui/quest_peripherals.png", false, false, "questlog.editor.advanced.peripheral_texture", "questlog.editor.tooltip.advanced.peripheral_texture"),
+
+            new TextFieldDef("overlay", "", false, false, "questlog.editor.advanced.overlay", "questlog.editor.tooltip.advanced.overlay"),
+            new TextFieldDef("overlay_width", "", true, false, "questlog.editor.advanced.overlay_width", "questlog.editor.tooltip.advanced.overlay_size"),
+            new TextFieldDef("overlay_height", "", true, false, "questlog.editor.advanced.overlay_height", "questlog.editor.tooltip.advanced.overlay_size"),
+            new TextFieldDef("overlay_x_offset", "0", true, false, "questlog.editor.advanced.overlay_x_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+            new TextFieldDef("overlay_y_offset", "0", true, false, "questlog.editor.advanced.overlay_y_offset", "questlog.editor.tooltip.advanced.panel_offset"),
+
+            new TextFieldDef("completed_sound", "", false, false, "questlog.editor.advanced.completed_sound", "questlog.editor.tooltip.advanced.sound"),
+            new TextFieldDef("triggered_sound", "", false, false, "questlog.editor.advanced.triggered_sound", "questlog.editor.tooltip.advanced.sound"),
+
+            new TextFieldDef("text_color", "", false, false, "questlog.editor.advanced.text_color", "questlog.editor.tooltip.advanced.color"),
+            new TextFieldDef("completed_text_color", "", false, false, "questlog.editor.advanced.completed_text_color", "questlog.editor.tooltip.advanced.color"),
+            new TextFieldDef("hovered_text_color", "", false, false, "questlog.editor.advanced.hovered_text_color", "questlog.editor.tooltip.advanced.color"),
+            new TextFieldDef("title_color", "", false, false, "questlog.editor.advanced.title_color", "questlog.editor.tooltip.advanced.color"),
+            new TextFieldDef("progress_text_color", "", false, false, "questlog.editor.advanced.progress_text_color", "questlog.editor.tooltip.advanced.color"),
+
+            new TextFieldDef("back_button_text", "", false, false, "questlog.editor.advanced.back_button_text", "questlog.editor.tooltip.advanced.button_text"),
+            new TextFieldDef("collect_button_text", "", false, false, "questlog.editor.advanced.collect_button_text", "questlog.editor.tooltip.advanced.button_text"),
+            new TextFieldDef("uncollected_text", "", false, false, "questlog.editor.advanced.uncollected_text", "questlog.editor.tooltip.advanced.button_text"),
+            new TextFieldDef("collected_text", "", false, false, "questlog.editor.advanced.collected_text", "questlog.editor.tooltip.advanced.button_text"),
+
+            new TextFieldDef("description_completed", "", false, true, "questlog.editor.advanced.description_completed", "questlog.editor.tooltip.advanced.description_variant"),
+            new TextFieldDef("description_failed", "", false, true, "questlog.editor.advanced.description_failed", "questlog.editor.tooltip.advanced.description_variant")
+    );
     final List<net.minecraft.client.gui.components.AbstractWidget> leftFields = new ArrayList<>();
+    final List<net.minecraft.client.gui.components.AbstractWidget> settingsFields = new ArrayList<>();
+    final List<String> settingsLabels = new ArrayList<>();
+    final List<Integer> settingsRowHeights = new ArrayList<>();
     private final Screen previousScreen;
     private final List<JsonObject> tempObjectives = new ArrayList<>();
     private final List<JsonObject> tempPrerequisites = new ArrayList<>();
     private final List<JsonObject> tempRewards = new ArrayList<>();
     private final Stack<NestingFrame> nestingStack = new Stack<>();
     private final AutocompleteHelper autocompleteHelper = new AutocompleteHelper();
+    private final Map<String, Boolean> tempBooleans = new LinkedHashMap<>();
+    private final Map<String, String> tempTexts = new LinkedHashMap<>();
     public Component pendingTooltip = null;
     @Nullable
     Quest questToEdit;
@@ -96,6 +149,8 @@ public class QuestEditorScreen extends Screen {
     private List<JsonObject> currentNestedList = null;
     @Nullable
     private JsonObject presetJson;
+    @Nullable
+    private JsonObject originalDefinition;
     private NineSliceTexture bgLeft;
     private NineSliceTexture bgRight;
     private int typeListScroll = 0;
@@ -105,18 +160,13 @@ public class QuestEditorScreen extends Screen {
     private String tempIconItem = "";
     private String tempChapter = "";
     private int tempSortOrder = 0;
-    private boolean tempHidden = false;
-    private boolean tempIncludeInMain = true;
-    private boolean tempDetailsDefault = false;
-    private boolean tempDetailsDisabled = false;
-    private boolean tempRepeatable = false;
-    private boolean tempGlobal = false;
     private ActiveTab activeTab = ActiveTab.PREREQUISITES;
     private int listPage = 0;
     private String typeSearchQuery = "";
     private boolean tempSearchFocused = false;
     private ScrollableComponent leftScrollable;
     private ScrollableComponent rightScrollable;
+    private ScrollableComponent settingsScrollable;
     private NoShadowEditBox typeSearchBox;
     private NoShadowEditBox entryNameBox;
     private NoShadowEditBox entryAmountBox;
@@ -143,10 +193,18 @@ public class QuestEditorScreen extends Screen {
     }
 
     private void loadQuestData() {
+        for (BoolFieldDef def : BOOL_FIELDS) {
+            this.tempBooleans.put(def.key(), def.defaultValue());
+        }
+        for (TextFieldDef def : TEXT_FIELDS) {
+            this.tempTexts.put(def.key(), def.defaultValue());
+        }
+
         if (this.questToEdit != null) {
             this.tempId = this.questToEdit.getId().toString();
             try {
                 JsonObject definition = DefinitionUtil.getCachedQuest(this.questToEdit.getId());
+                this.originalDefinition = definition.deepCopy();
                 this.loadFromDefinition(definition);
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to load quest definition for editing", e);
@@ -154,6 +212,7 @@ public class QuestEditorScreen extends Screen {
         } else if (this.presetJson != null) {
             this.tempId = "questlog:new_quest_" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
             try {
+                this.originalDefinition = this.presetJson.deepCopy();
                 this.loadFromDefinition(this.presetJson);
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to load quest preset definition", e);
@@ -165,15 +224,10 @@ public class QuestEditorScreen extends Screen {
             this.tempIconItem = "minecraft:knowledge_book";
             this.tempChapter = "main";
             this.tempSortOrder = 0;
-            this.tempHidden = false;
-            this.tempIncludeInMain = true;
-            this.tempDetailsDefault = false;
-            this.tempDetailsDisabled = false;
-            this.tempRepeatable = false;
-            this.tempGlobal = false;
             this.tempObjectives.clear();
             this.tempPrerequisites.clear();
             this.tempRewards.clear();
+            this.originalDefinition = null;
         }
     }
 
@@ -187,14 +241,19 @@ public class QuestEditorScreen extends Screen {
         }
 
         this.tempChapter = definition.has("chapter") ? definition.get("chapter").getAsString() : "main";
-        this.tempSortOrder = definition.has("order") ? definition.get("order").getAsInt() : 0;
+        this.tempSortOrder = definition.has("sort_order") ? definition.get("sort_order").getAsInt() : 0;
 
-        this.tempHidden = definition.has("hidden") && definition.get("hidden").getAsBoolean();
-        this.tempIncludeInMain = !definition.has("include_in_main") || definition.get("include_in_main").getAsBoolean();
-        this.tempDetailsDefault = definition.has("details_default") && definition.get("details_default").getAsBoolean();
-        this.tempDetailsDisabled = definition.has("details_disabled") && definition.get("details_disabled").getAsBoolean();
-        this.tempRepeatable = definition.has("repeatable") && definition.get("repeatable").getAsBoolean();
-        this.tempGlobal = definition.has("global") && definition.get("global").getAsBoolean();
+        for (BoolFieldDef def : BOOL_FIELDS) {
+            this.tempBooleans.put(def.key(), definition.has(def.key()) ? definition.get(def.key()).getAsBoolean() : def.defaultValue());
+        }
+        for (TextFieldDef def : TEXT_FIELDS) {
+            if (definition.has(def.key()) && !definition.get(def.key()).isJsonNull()) {
+                JsonElement el = definition.get(def.key());
+                this.tempTexts.put(def.key(), el.isJsonPrimitive() ? el.getAsString() : el.toString());
+            } else {
+                this.tempTexts.put(def.key(), def.defaultValue());
+            }
+        }
 
         this.loadList(definition.getAsJsonArray("objectives"), this.tempObjectives);
         this.loadList(definition.has("prerequisites") ? definition.getAsJsonArray("prerequisites") : definition.getAsJsonArray("requirements"), this.tempPrerequisites);
@@ -246,7 +305,7 @@ public class QuestEditorScreen extends Screen {
         this.titleBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.title")));
 
         this.descriptionBox = new MultiLineEditBox(this.font, panel1X + 15, panel1Y + 86, 195, 54, Component.empty(), Component.empty());
-        this.descriptionBox.setCharacterLimit(256);
+        this.descriptionBox.setCharacterLimit(Integer.MAX_VALUE);
         this.descriptionBox.setValue(this.tempDescription);
         this.descriptionBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.description")));
 
@@ -484,47 +543,7 @@ public class QuestEditorScreen extends Screen {
         }
 
         if (this.nestingStack.isEmpty() && this.activeTab == ActiveTab.SETTINGS) {
-            Button btnHidden = Button.builder(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")), btn -> {
-                this.tempHidden = !this.tempHidden;
-                btn.setMessage(Component.literal("Hidden: " + (this.tempHidden ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 30, 140, 16).build();
-            btnHidden.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.hidden")));
-            this.addRenderableWidget(btnHidden);
-
-            Button btnIncludeMain = Button.builder(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")), btn -> {
-                this.tempIncludeInMain = !this.tempIncludeInMain;
-                btn.setMessage(Component.literal("In Main Chapter: " + (this.tempIncludeInMain ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 50, 140, 16).build();
-            btnIncludeMain.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.include_in_main")));
-            this.addRenderableWidget(btnIncludeMain);
-
-            Button btnDetailsDefault = Button.builder(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")), btn -> {
-                this.tempDetailsDefault = !this.tempDetailsDefault;
-                btn.setMessage(Component.literal("Details Default: " + (this.tempDetailsDefault ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 70, 140, 16).build();
-            btnDetailsDefault.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_default")));
-            this.addRenderableWidget(btnDetailsDefault);
-
-            Button btnDetailsDisabled = Button.builder(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")), btn -> {
-                this.tempDetailsDisabled = !this.tempDetailsDisabled;
-                btn.setMessage(Component.literal("Details Disabled: " + (this.tempDetailsDisabled ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 90, 140, 16).build();
-            btnDetailsDisabled.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.details_disabled")));
-            this.addRenderableWidget(btnDetailsDisabled);
-
-            Button btnRepeatable = Button.builder(Component.literal("Repeatable: " + (this.tempRepeatable ? "True" : "False")), btn -> {
-                this.tempRepeatable = !this.tempRepeatable;
-                btn.setMessage(Component.literal("Repeatable: " + (this.tempRepeatable ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 110, 140, 16).build();
-            btnRepeatable.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.repeatable")));
-            this.addRenderableWidget(btnRepeatable);
-
-            Button btnGlobal = Button.builder(Component.literal("Global: " + (this.tempGlobal ? "True" : "False")), btn -> {
-                this.tempGlobal = !this.tempGlobal;
-                btn.setMessage(Component.literal("Global: " + (this.tempGlobal ? "True" : "False")));
-            }).bounds(panel2X + 10, panel2Y + 130, 140, 16).build();
-            btnGlobal.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.global")));
-            this.addRenderableWidget(btnGlobal);
+            this.buildSettingsPanel(panel2X, panel2Y);
         } else {
             this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable(this));
             this.addRenderableWidget(this.rightScrollable);
@@ -546,6 +565,59 @@ public class QuestEditorScreen extends Screen {
             btnPresetsEntry.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.presets_entry")));
             this.addRenderableWidget(btnPresetsEntry);
         }
+    }
+
+    private void buildSettingsPanel(int panel2X, int panel2Y) {
+        this.settingsFields.clear();
+        this.settingsLabels.clear();
+        this.settingsRowHeights.clear();
+
+        for (BoolFieldDef def : BOOL_FIELDS) {
+            boolean current = this.tempBooleans.getOrDefault(def.key(), def.defaultValue());
+            Button toggle = Button.builder(Component.literal(def.label() + ": " + (current ? "True" : "False")), btn -> {
+                boolean next = !this.tempBooleans.getOrDefault(def.key(), def.defaultValue());
+                this.tempBooleans.put(def.key(), next);
+                btn.setMessage(Component.literal(def.label() + ": " + (next ? "True" : "False")));
+            }).bounds(0, 0, 107, 16).build();
+            if (def.tooltipKey() != null) {
+                toggle.setTooltip(Tooltip.create(Component.translatable(def.tooltipKey())));
+            }
+            this.settingsFields.add(toggle);
+            this.settingsLabels.add(null);
+            this.settingsRowHeights.add(18);
+        }
+
+        for (TextFieldDef def : TEXT_FIELDS) {
+            if (def.longText()) {
+                // Paragraph-length fields (e.g. alternate descriptions) get a taller, scrollable multi-line box,
+                // matching the main description field, instead of a single-line box.
+                MultiLineEditBox box = new MultiLineEditBox(this.font, 0, 0, 107, 40, Component.empty(), Component.empty());
+                box.setCharacterLimit(Integer.MAX_VALUE);
+                box.setValue(this.tempTexts.getOrDefault(def.key(), def.defaultValue()));
+                if (def.tooltipKey() != null) {
+                    box.setTooltip(Tooltip.create(Component.translatable(def.tooltipKey())));
+                }
+                this.settingsFields.add(box);
+                this.settingsLabels.add(def.labelKey());
+                this.settingsRowHeights.add(56);
+            } else {
+                NoShadowEditBox box = new NoShadowEditBox(this.font, 0, 0, 107, 14, Component.empty());
+                box.setMaxLength(def.numeric() ? 8 : 256);
+                if (def.numeric()) {
+                    box.setFilter(s -> s.isEmpty() || s.matches("-?\\d*"));
+                }
+                box.setValue(this.tempTexts.getOrDefault(def.key(), def.defaultValue()));
+                if (def.tooltipKey() != null) {
+                    box.setTooltip(Tooltip.create(Component.translatable(def.tooltipKey())));
+                }
+                this.settingsFields.add(box);
+                this.settingsLabels.add(def.labelKey());
+                this.settingsRowHeights.add(27);
+            }
+        }
+
+        this.settingsScrollable = new ScrollableComponent(panel2X + 18, panel2Y + 28, 132, 152, new SettingsPanelScrollable(this));
+        this.addRenderableWidget(this.settingsScrollable);
     }
 
     private void buildRightPageSelectType(int panel2X, int panel2Y) {
@@ -947,37 +1019,78 @@ public class QuestEditorScreen extends Screen {
         } else {
             this.tempSearchFocused = false;
         }
+
+        for (int i = 0; i < TEXT_FIELDS.size(); i++) {
+            int widgetIndex = BOOL_FIELDS.size() + i;
+            if (widgetIndex >= this.settingsFields.size()) continue;
+            net.minecraft.client.gui.components.AbstractWidget widget = this.settingsFields.get(widgetIndex);
+            if (widget instanceof NoShadowEditBox box) {
+                this.tempTexts.put(TEXT_FIELDS.get(i).key(), box.getValue());
+            } else if (widget instanceof MultiLineEditBox box) {
+                this.tempTexts.put(TEXT_FIELDS.get(i).key(), box.getValue());
+            }
+        }
+    }
+
+    private void setBooleanFlag(JsonObject json, String key, boolean value, boolean defaultValue) {
+        if (value == defaultValue) {
+            json.remove(key);
+        } else {
+            json.addProperty(key, value);
+        }
+    }
+
+    private void setStringOrRemove(JsonObject json, String key, String value, String defaultValue) {
+        String trimmed = value == null ? "" : value.trim();
+        if (trimmed.isEmpty() || trimmed.equals(defaultValue)) {
+            json.remove(key);
+        } else {
+            json.addProperty(key, trimmed);
+        }
+    }
+
+    private void setIntOrRemove(JsonObject json, String key, String value, String defaultValue) {
+        String trimmed = value == null ? "" : value.trim();
+        if (trimmed.isEmpty()) {
+            json.remove(key);
+            return;
+        }
+        try {
+            int parsed = Integer.parseInt(trimmed);
+            if (String.valueOf(parsed).equals(defaultValue)) {
+                json.remove(key);
+            } else {
+                json.addProperty(key, parsed);
+            }
+        } catch (NumberFormatException e) {
+            json.remove(key);
+        }
     }
 
     private void saveQuestToServer() {
-        JsonObject json = new JsonObject();
+        JsonObject json = this.originalDefinition != null ? this.originalDefinition.deepCopy() : new JsonObject();
+
         json.addProperty("title", this.tempTitle);
         json.addProperty("description", this.tempDescription);
 
-        JsonObject iconObj = new JsonObject();
+        JsonObject iconObj = json.has("icon") && json.get("icon").isJsonObject() ? json.getAsJsonObject("icon") : new JsonObject();
         iconObj.addProperty("item", this.tempIconItem);
         json.add("icon", iconObj);
 
         json.addProperty("chapter", this.tempChapter);
-        json.addProperty("order", this.tempSortOrder);
+        json.addProperty("sort_order", this.tempSortOrder);
+        json.remove("order");
 
-        if (this.tempHidden) {
-            json.addProperty("hidden", true);
+        for (BoolFieldDef def : BOOL_FIELDS) {
+            setBooleanFlag(json, def.key(), this.tempBooleans.getOrDefault(def.key(), def.defaultValue()), def.defaultValue());
         }
-        if (!this.tempIncludeInMain) {
-            json.addProperty("include_in_main", false);
-        }
-        if (this.tempDetailsDefault) {
-            json.addProperty("details_default", true);
-        }
-        if (this.tempDetailsDisabled) {
-            json.addProperty("details_disabled", true);
-        }
-        if (this.tempRepeatable) {
-            json.addProperty("repeatable", true);
-        }
-        if (this.tempGlobal) {
-            json.addProperty("global", true);
+        for (TextFieldDef def : TEXT_FIELDS) {
+            String value = this.tempTexts.getOrDefault(def.key(), def.defaultValue());
+            if (def.numeric()) {
+                setIntOrRemove(json, def.key(), value, def.defaultValue());
+            } else {
+                setStringOrRemove(json, def.key(), value, def.defaultValue());
+            }
         }
 
         JsonArray objArr = new JsonArray();
@@ -991,6 +1104,7 @@ public class QuestEditorScreen extends Screen {
             reqArr.add(r);
         }
         json.add("prerequisites", reqArr);
+        json.remove("requirements");
 
         JsonArray rewArr = new JsonArray();
         for (JsonObject rw : this.tempRewards) {
@@ -1211,8 +1325,6 @@ public class QuestEditorScreen extends Screen {
         int baseX = (this.width - totalWidth) / 2;
         int baseY = (this.height - height) / 2;
 
-        int panel1X = baseX;
-        int panel1Y = baseY;
         int panel2X = baseX + leftWidth + PANEL_SPACING;
         int panel2Y = baseY;
 
@@ -1416,6 +1528,11 @@ public class QuestEditorScreen extends Screen {
                 return true;
             }
         }
+        if (this.settingsScrollable != null && this.settingsScrollable.isMouseOver(mouseX, mouseY)) {
+            if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, amount)) {
+                return true;
+            }
+        }
         if (this.rightPageState == RightPageState.SELECT_TYPE) {
             int count = getCount();
             int maxScroll = Math.max(0, count - 7);
@@ -1496,6 +1613,13 @@ public class QuestEditorScreen extends Screen {
         OBJECTIVES,
         REWARDS,
         SETTINGS
+    }
+
+    private record BoolFieldDef(String key, boolean defaultValue, String label, @Nullable String tooltipKey) {
+    }
+
+    private record TextFieldDef(String key, String defaultValue, boolean numeric, boolean longText, String labelKey,
+                                @Nullable String tooltipKey) {
     }
 
     private record NestingFrame(JsonObject parentEntry, List<JsonObject> activeList, int selectedEntryIndex,
