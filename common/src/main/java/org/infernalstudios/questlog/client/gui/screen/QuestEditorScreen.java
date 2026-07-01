@@ -1527,7 +1527,7 @@ public class QuestEditorScreen extends Screen {
             }
         }
         if (this.settingsScrollable != null && this.settingsScrollable.isMouseOver(mouseX, mouseY)) {
-            if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, amount)) {
+            if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
                 return true;
             }
         }
