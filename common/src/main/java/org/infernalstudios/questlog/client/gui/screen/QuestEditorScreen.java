@@ -596,8 +596,6 @@ public class QuestEditorScreen extends Screen {
 
         for (TextFieldDef def : TEXT_FIELDS) {
             if (def.longText()) {
-                // Paragraph-length fields (e.g. alternate descriptions) get a taller, scrollable multi-line box,
-                // matching the main description field, instead of a single-line box.
                 MultiLineEditBox box = new MultiLineEditBox(this.font, 0, 0, 107, 40, Component.empty(), Component.empty());
                 box.setCharacterLimit(Integer.MAX_VALUE);
                 box.setValue(this.tempTexts.getOrDefault(def.key(), def.defaultValue()));
