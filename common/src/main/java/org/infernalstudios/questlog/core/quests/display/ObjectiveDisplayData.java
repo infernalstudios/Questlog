@@ -18,14 +18,6 @@ public class ObjectiveDisplayData {
     private Objective objective;
     private int indentLevel = 0;
 
-    public int getIndentLevel() {
-        return this.indentLevel;
-    }
-
-    public void setIndentLevel(int indentLevel) {
-        this.indentLevel = indentLevel;
-    }
-
     public ObjectiveDisplayData(JsonObject data) {
         String name = JsonUtils.getOrDefault(data, "name", (String) null);
 
@@ -38,6 +30,14 @@ public class ObjectiveDisplayData {
         this.icon = JsonUtils.getIcon(data, "icon");
     }
 
+    public int getIndentLevel() {
+        return this.indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
+    }
+
     private Component generateSmartName(JsonObject data) {
         String typeStr = JsonUtils.getOrDefault(data, "type", "");
         if (typeStr.isEmpty()) return Component.translatable("questlog.objective.default");
@@ -48,9 +48,19 @@ public class ObjectiveDisplayData {
         if (type != null) {
             String path = type.getPath();
 
-            if (data.has("item") && data.get("item").isJsonPrimitive()) {
-                String itemStr = data.get("item").getAsString();
-                if (!itemStr.startsWith("#")) {
+            if (data.has("item")) {
+                String itemStr = null;
+                if (data.get("item").isJsonPrimitive()) {
+                    itemStr = data.get("item").getAsString();
+                } else if (data.get("item").isJsonObject()) {
+                    JsonObject itemObj = data.getAsJsonObject("item");
+                    if (itemObj.has("id") && itemObj.get("id").isJsonPrimitive()) {
+                        itemStr = itemObj.get("id").getAsString();
+                    } else if (itemObj.has("item") && itemObj.get("item").isJsonPrimitive()) {
+                        itemStr = itemObj.get("item").getAsString();
+                    }
+                }
+                if (itemStr != null && !itemStr.startsWith("#")) {
                     ResourceLocation itemId = ResourceLocation.tryParse(itemStr);
                     if (itemId != null && BuiltInRegistries.ITEM.containsKey(itemId)) {
                         return Component.translatable("questlog.objective.default." + path, BuiltInRegistries.ITEM.get(itemId).getDescription());
@@ -64,9 +74,19 @@ public class ObjectiveDisplayData {
                         return Component.translatable("questlog.objective.default." + path, BuiltInRegistries.BLOCK.get(blockId).getName());
                     }
                 }
-            } else if (data.has("entity") && data.get("entity").isJsonPrimitive()) {
-                String entityStr = data.get("entity").getAsString();
-                if (!entityStr.startsWith("#")) {
+            } else if (data.has("entity")) {
+                String entityStr = null;
+                if (data.get("entity").isJsonPrimitive()) {
+                    entityStr = data.get("entity").getAsString();
+                } else if (data.get("entity").isJsonObject()) {
+                    JsonObject entityObj = data.getAsJsonObject("entity");
+                    if (entityObj.has("id") && entityObj.get("id").isJsonPrimitive()) {
+                        entityStr = entityObj.get("id").getAsString();
+                    } else if (entityObj.has("type") && entityObj.get("type").isJsonPrimitive()) {
+                        entityStr = entityObj.get("type").getAsString();
+                    }
+                }
+                if (entityStr != null && !entityStr.startsWith("#")) {
                     ResourceLocation entityId = ResourceLocation.tryParse(entityStr);
                     if (entityId != null && BuiltInRegistries.ENTITY_TYPE.containsKey(entityId)) {
                         return Component.translatable("questlog.objective.default." + path, BuiltInRegistries.ENTITY_TYPE.get(entityId).getDescription());

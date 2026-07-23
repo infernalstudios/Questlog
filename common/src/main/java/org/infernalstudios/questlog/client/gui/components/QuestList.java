@@ -49,22 +49,37 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         this.children.sort((a, b) -> {
             Quest qa = a.quest;
             Quest qb = b.quest;
-            if (qa.isCompleted() && !qb.isCompleted()) {
-                return 1;
-            } else if (!qa.isCompleted() && qb.isCompleted()) {
-                return -1;
-            } else if (!qa.isRewarded() && qb.isRewarded()) {
-                return -1;
-            } else if (qa.isRewarded() && !qb.isRewarded()) {
-                return 1;
-            } else {
+
+            if (QuestlogClient.isEditModeActive) {
                 int orderA = qa.getDisplay().getSortOrder();
                 int orderB = qb.getDisplay().getSortOrder();
                 if (orderA != orderB) {
                     return Integer.compare(orderA, orderB);
                 }
-                return qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
+                int titleComp = qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
+                if (titleComp != 0) {
+                    return titleComp;
+                }
+                return qa.getId().compareTo(qb.getId());
             }
+
+            int tierA = !qa.isCompleted() ? 0 : (!qa.isRewarded() ? 1 : 2);
+            int tierB = !qb.isCompleted() ? 0 : (!qb.isRewarded() ? 1 : 2);
+
+            if (tierA != tierB) {
+                return Integer.compare(tierA, tierB);
+            }
+
+            int orderA = qa.getDisplay().getSortOrder();
+            int orderB = qb.getDisplay().getSortOrder();
+            if (orderA != orderB) {
+                return Integer.compare(orderA, orderB);
+            }
+            int titleComp = qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
+            if (titleComp != 0) {
+                return titleComp;
+            }
+            return qa.getId().compareTo(qb.getId());
         });
     }
 
@@ -143,12 +158,7 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
         return null;
     }
 
-    protected int getMaxPosition() {
-        return this.getItemCount() * this.itemHeight;
-    }
-
     // Renderers
-
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         this.hovered = this.isMouseOver(mouseX, mouseY) ? this.getEntryAtPosition(mouseX, mouseY) : null;
         this.renderList(ps, mouseX, mouseY, partialTicks);

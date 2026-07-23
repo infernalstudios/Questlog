@@ -84,7 +84,7 @@ public class QuestDisplayData {
 
         String title = JsonUtils.getString(data, "title");
         this.title = translatable ? Component.translatable(title) : Component.literal(title);
-        this.sortOrder = JsonUtils.getOrDefault(data, "sort_order", 0);
+        this.sortOrder = JsonUtils.getOrDefault(data, "sort_order", JsonUtils.getOrDefault(data, "order", 0));
 
         Component parsedDescription = parseDescription(data.get("description"), translatable);
         if (parsedDescription == null) {
@@ -180,10 +180,13 @@ public class QuestDisplayData {
                 parsedDescription = Component.Serializer.fromJson(descriptionElement, RegistryAccess.EMPTY);
             } else if (descriptionElement.isJsonPrimitive()) {
                 String rawStr = descriptionElement.getAsString();
-                if (rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) {
-                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
-                } else if (rawStr.startsWith("{") && rawStr.endsWith("}")) {
-                    parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                if ((rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) ||
+                    (rawStr.startsWith("{") && rawStr.endsWith("}"))) {
+                    try {
+                        parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
+                    } catch (Exception ignored) {
+                        parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
+                    }
                 } else {
                     parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
                 }

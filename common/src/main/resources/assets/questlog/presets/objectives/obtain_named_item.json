@@ -1,0 +1,11 @@
+{
+  "title": "Obtain Magic Feather",
+  "description": "Objective requiring a feather with custom name components",
+  "type": "questlog:item_obtain",
+  "item": "minecraft:feather",
+  "components": {
+    "minecraft:custom_name": "'Magic Feather'"
+  },
+  "required_amount": 1,
+  "name": "Obtain Magic Feather"
+}

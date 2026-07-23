@@ -1,0 +1,30 @@
+{
+  "title": "Magic Feather",
+  "description": "Obtain a special renamed feather with component requirements",
+  "icon": {
+    "item": {
+      "id": "minecraft:feather",
+      "components": {
+        "minecraft:custom_name": "'Magic Feather'"
+      }
+    }
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:feather",
+      "components": {
+        "minecraft:custom_name": "'Magic Feather'"
+      },
+      "required_amount": 1,
+      "name": "Obtain Magic Feather"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 100,
+      "levels": false
+    }
+  ]
+}

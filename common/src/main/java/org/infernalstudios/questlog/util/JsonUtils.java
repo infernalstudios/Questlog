@@ -4,6 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Texture;
@@ -87,10 +89,16 @@ public class JsonUtils {
                 }
                 return new Texture(ResourceLocation.parse(JsonUtils.getString(icon, "texture")), 16, 16, 0, 0, 16, 16);
             } else if (icon.has("item")) {
-                if (!icon.get("item").isJsonPrimitive()) {
-                    throw new IllegalArgumentException("Field icon.item must be a string");
+                if (icon.get("item").isJsonPrimitive()) {
+                    return new ItemRenderable(ResourceLocation.parse(JsonUtils.getString(icon, "item")));
+                } else if (icon.get("item").isJsonObject()) {
+                    ItemStack parsed = ItemReward.parseItemStack(icon.get("item"), null);
+                    if (!parsed.isEmpty()) {
+                        return new ItemRenderable(parsed);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Field icon.item must be a string or item object");
                 }
-                return new ItemRenderable(ResourceLocation.parse(JsonUtils.getString(icon, "item")));
             }
         }
         return null;

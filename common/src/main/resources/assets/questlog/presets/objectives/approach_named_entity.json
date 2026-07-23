@@ -1,0 +1,10 @@
+{
+  "title": "Approach Elder Villager",
+  "description": "Objective requiring approaching an entity custom named Elder Villager",
+  "type": "questlog:entity_approach",
+  "entity": "minecraft:villager",
+  "custom_name": "Elder Villager",
+  "range": 5,
+  "required_amount": 1,
+  "name": "Approach Elder Villager"
+}

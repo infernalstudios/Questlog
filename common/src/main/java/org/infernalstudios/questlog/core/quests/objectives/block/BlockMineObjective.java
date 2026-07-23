@@ -1,41 +1,45 @@
 package org.infernalstudios.questlog.core.quests.objectives.block;
 
+import com.evandev.triggers.Triggers;
+import com.evandev.triggers.event.events.TriggerBlockEvent;
 import com.google.gson.JsonObject;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import com.evandev.triggers.event.events.TriggerBlockEvent;
-import org.infernalstudios.questlog.util.CachedRegistryPredicate;
-import org.infernalstudios.questlog.util.JsonUtils;
+import org.infernalstudios.questlog.util.ItemMatcher;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockMineObjective extends AbstractBlockObjective {
 
     @Nullable
-    private final CachedRegistryPredicate<Item> item;
+    private final ItemMatcher itemMatcher;
 
     public BlockMineObjective(JsonObject definition) {
         super(definition);
-        if (definition.has("item")) {
-            this.item = CachedRegistryPredicate.item(JsonUtils.getString(definition, "item"));
+        if (definition.has("item") || definition.has("components")) {
+            this.itemMatcher = ItemMatcher.fromDefinition(definition);
         } else {
-            this.item = null;
+            this.itemMatcher = null;
         }
     }
 
     private boolean testItem(ItemStack stack) {
-        if (this.item == null) {
+        if (this.itemMatcher == null) {
             return true;
         }
 
-        return this.item.test(stack.getItem());
+        HolderLookup.Provider registries = null;
+        if (this.getParent() != null && this.getParent().manager != null && this.getParent().manager.player != null) {
+            registries = this.getParent().manager.player.level().registryAccess();
+        }
+        return this.itemMatcher.test(stack, registries);
     }
 
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        com.evandev.triggers.Triggers.EVENTS.addListener(this::onBlockDestroy);
+        Triggers.EVENTS.addListener(this::onBlockDestroy);
     }
 
     private void onBlockDestroy(TriggerBlockEvent.Break event) {

@@ -1,32 +1,31 @@
 package org.infernalstudios.questlog.core.quests.objectives.entity;
 
 import com.google.gson.JsonObject;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.util.CachedRegistryPredicate;
-import org.infernalstudios.questlog.util.JsonUtils;
+import org.infernalstudios.questlog.util.EntityMatcher;
 
 public abstract class AbstractEntityObjective extends Objective {
 
-    private final CachedRegistryPredicate<EntityType<?>> entity;
+    private final EntityMatcher entityMatcher;
 
     public AbstractEntityObjective(JsonObject definition) {
         super(definition);
-        this.entity = new CachedRegistryPredicate<>(
-                JsonUtils.getString(definition, "entity"),
-                BuiltInRegistries.ENTITY_TYPE,
-                Object::equals,
-                (tag, entity) -> entity.is(tag)
-        );
+        this.entityMatcher = EntityMatcher.fromDefinition(definition);
     }
 
     protected boolean test(EntityType<?> entity) {
-        return this.entity.test(entity);
+        return this.entityMatcher.test(entity);
     }
 
     protected boolean test(Entity entity) {
-        return this.test(entity.getType());
+        HolderLookup.Provider registries = null;
+        if (this.getParent() != null && this.getParent().manager != null && this.getParent().manager.player != null) {
+            registries = this.getParent().manager.player.level().registryAccess();
+        }
+        return this.entityMatcher.test(entity, registries);
     }
 }
+

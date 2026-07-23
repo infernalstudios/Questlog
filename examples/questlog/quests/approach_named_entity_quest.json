@@ -1,0 +1,24 @@
+{
+  "title": "Meeting the Elder",
+  "description": "Find and approach the famous villager named Elder Villager",
+  "icon": {
+    "texture": "minecraft:textures/item/emerald.png"
+  },
+  "objectives": [
+    {
+      "type": "questlog:entity_approach",
+      "entity": "minecraft:villager",
+      "custom_name": "Elder Villager",
+      "range": 5,
+      "required_amount": 1,
+      "name": "Approach Elder Villager"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 200,
+      "levels": false
+    }
+  ]
+}
