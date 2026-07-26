@@ -197,6 +197,7 @@
     "questlog.editor.tooltip.repeatable": "If enabled, this quest can be reset and recompleted infinitely after completion.",
     "questlog.editor.tooltip.global": "If enabled, completing this quest will complete it for all players on the server.",
     "questlog.editor.tooltip.entry_name": "A custom display name for this specific objective or reward (optional).",
+    "questlog.editor.tooltip.entry_icon": "An optional custom icon for this specific objective or reward (item ID, texture path, or icon object).",
     "questlog.editor.tooltip.entry_target": "The target registry key, tag, or value for this entry (e.g., minecraft:stone).",
     "questlog.editor.tooltip.entry_target.bounds": "Target block position (x, y, z) or bounding volume (minX, minY, minZ, maxX, maxY, maxZ).",
     "questlog.editor.tooltip.entry_amount": "The required count, amount, or experience points.",

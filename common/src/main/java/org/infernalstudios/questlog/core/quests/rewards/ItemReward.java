@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.CachedValue;
 import org.infernalstudios.questlog.util.JsonUtils;
@@ -29,19 +30,6 @@ public class ItemReward extends Reward {
         });
     }
 
-    public ItemStack getStack() {
-        return this.stack.get();
-    }
-
-    @Override
-    public void applyReward(ServerPlayer player) {
-        ItemStack itemStack = this.stack.get();
-        if (!itemStack.isEmpty()) {
-            Util.giveToPlayer(player, itemStack.copy());
-        }
-        super.applyReward(player);
-    }
-
     public static ItemStack parseItemStack(@Nullable JsonElement element) {
         if (element == null || element.isJsonNull()) {
             return ItemStack.EMPTY;
@@ -53,12 +41,37 @@ public class ItemReward extends Reward {
         }
         if (element.isJsonObject()) {
             try {
-                return ItemStack.CODEC.parse(JsonOps.INSTANCE, element)
+                ItemStack stack = ItemStack.CODEC.parse(JsonOps.INSTANCE, element)
                         .result().orElse(ItemStack.EMPTY);
+                if (!stack.isEmpty()) {
+                    return stack;
+                }
             } catch (Exception e) {
                 Questlog.LOGGER.error("Failed to parse ItemStack from JSON", e);
             }
+
+            JsonObject obj = element.getAsJsonObject();
+            String idStr = obj.has("id") && obj.get("id").isJsonPrimitive() ? obj.get("id").getAsString() : (obj.has("item") && obj.get("item").isJsonPrimitive() ? obj.get("item").getAsString() : null);
+            if (idStr != null) {
+                Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(idStr));
+                if (item != Items.AIR) {
+                    return new ItemStack(item);
+                }
+            }
         }
         return ItemStack.EMPTY;
+    }
+
+    public ItemStack getStack() {
+        return this.stack.get();
+    }
+
+    @Override
+    public void applyReward(ServerPlayer player) {
+        ItemStack itemStack = this.stack.get();
+        if (!itemStack.isEmpty()) {
+            Util.giveToPlayer(player, itemStack.copy());
+        }
+        super.applyReward(player);
     }
 }

@@ -145,6 +145,8 @@ public class QuestEditorScreen extends Screen {
     NoShadowEditBox chapterBox;
     NoShadowEditBox orderBox;
     NoShadowEditBox entryTargetBox;
+    NoShadowEditBox entryNbtBox;
+    NoShadowEditBox entryIconBox;
     private List<JsonObject> currentNestedList = null;
     @Nullable
     private JsonObject presetJson;
@@ -157,18 +159,21 @@ public class QuestEditorScreen extends Screen {
     private String tempTitle = "";
     private String tempDescription = "";
     private String tempIconItem = "";
+    @Nullable
+    private JsonElement originalIconItem = null;
     private String tempChapter = "";
     private int tempSortOrder = 0;
-    private ActiveTab activeTab = ActiveTab.PREREQUISITES;
+    ActiveTab activeTab = ActiveTab.PREREQUISITES;
     private int listPage = 0;
     private String typeSearchQuery = "";
     private boolean tempSearchFocused = false;
     private ScrollableComponent leftScrollable;
     private ScrollableComponent rightScrollable;
     private ScrollableComponent settingsScrollable;
+    private ScrollableComponent editEntryScrollable;
     private NoShadowEditBox typeSearchBox;
-    private NoShadowEditBox entryNameBox;
-    private NoShadowEditBox entryAmountBox;
+    NoShadowEditBox entryNameBox;
+    NoShadowEditBox entryAmountBox;
 
     public QuestEditorScreen(Screen previousScreen) {
         this(previousScreen, null, null);
@@ -221,6 +226,7 @@ public class QuestEditorScreen extends Screen {
             this.tempTitle = "New Quest";
             this.tempDescription = "Describe your quest here...";
             this.tempIconItem = "minecraft:knowledge_book";
+            this.originalIconItem = null;
             this.tempChapter = "main";
             this.tempSortOrder = 0;
             this.tempObjectives.clear();
@@ -234,9 +240,22 @@ public class QuestEditorScreen extends Screen {
         this.tempTitle = definition.has("title") ? definition.get("title").getAsString() : "";
         this.tempDescription = definition.has("description") ? definition.get("description").getAsString() : "";
 
+        this.originalIconItem = null;
         if (definition.has("icon") && definition.get("icon").isJsonObject()) {
             JsonObject iconObj = definition.getAsJsonObject("icon");
-            this.tempIconItem = iconObj.has("item") ? iconObj.get("item").getAsString() : "";
+            if (iconObj.has("item")) {
+                JsonElement itemEl = iconObj.get("item");
+                if (itemEl.isJsonPrimitive()) {
+                    this.tempIconItem = itemEl.getAsString();
+                } else if (itemEl.isJsonObject()) {
+                    this.tempIconItem = extractItemIdString(itemEl);
+                    this.originalIconItem = itemEl;
+                } else {
+                    this.tempIconItem = "";
+                }
+            } else {
+                this.tempIconItem = "";
+            }
         }
 
         this.tempChapter = definition.has("chapter") ? definition.get("chapter").getAsString() : "main";
@@ -258,6 +277,21 @@ public class QuestEditorScreen extends Screen {
         this.loadList(definition.has("prerequisites") ? definition.getAsJsonArray("prerequisites") : definition.getAsJsonArray("requirements"), this.tempPrerequisites);
         this.loadList(definition.getAsJsonArray("failures"), null);
         this.loadList(definition.getAsJsonArray("rewards"), this.tempRewards);
+    }
+
+    private static String extractItemIdString(JsonElement itemEl) {
+        if (itemEl.isJsonPrimitive()) {
+            return itemEl.getAsString();
+        }
+        if (itemEl.isJsonObject()) {
+            JsonObject itemObj = itemEl.getAsJsonObject();
+            if (itemObj.has("id") && itemObj.get("id").isJsonPrimitive()) {
+                return itemObj.get("id").getAsString();
+            } else if (itemObj.has("item") && itemObj.get("item").isJsonPrimitive()) {
+                return itemObj.get("item").getAsString();
+            }
+        }
+        return "";
     }
 
     private void loadList(@Nullable JsonArray array, List<JsonObject> target) {
@@ -646,12 +680,11 @@ public class QuestEditorScreen extends Screen {
     }
 
     private void buildRightPageEditEntry(int panel2X, int panel2Y) {
-        this.entryNameBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 42, 130, 16, Component.empty());
+        this.entryNameBox = new NoShadowEditBox(this.font, 0, 0, 125, 14, Component.empty());
         this.entryNameBox.setMaxLength(64);
         String nameVal = this.editingEntry != null && this.editingEntry.has("name") ? this.editingEntry.get("name").getAsString() : "";
         this.entryNameBox.setValue(nameVal);
         this.entryNameBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_name")));
-        this.addRenderableWidget(this.entryNameBox);
 
         EditorMetadata meta = getMetadata(this.editingType);
 
@@ -681,9 +714,10 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 78, 130, 18).build());
+            }).bounds(panel2X + 15, panel2Y + 62, 130, 16).build());
 
             this.entryTargetBox = null;
+            this.entryNbtBox = null;
             this.entryAmountBox = null;
         } else if (isChoice) {
             this.addRenderableWidget(Button.builder(Component.literal("Edit Choices"), btn -> {
@@ -705,42 +739,53 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 78, 130, 18).build());
+            }).bounds(panel2X + 15, panel2Y + 62, 130, 16).build());
 
             this.entryTargetBox = null;
+            this.entryNbtBox = null;
 
             if (meta == null || meta.amountFieldKey() != null) {
-                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 114, 50, 16, Component.empty());
+                this.entryAmountBox = new NoShadowEditBox(this.font, 0, 0, 50, 14, Component.empty());
                 this.entryAmountBox.setMaxLength(6);
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
                 this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
-                this.addRenderableWidget(this.entryAmountBox);
             } else {
                 this.entryAmountBox = null;
             }
         } else {
             if (meta == null || meta.targetFieldKey() != null) {
-                this.entryTargetBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 78, 130, 16, Component.empty());
+                this.entryTargetBox = new NoShadowEditBox(this.font, 0, 0, 125, 14, Component.empty());
                 this.entryTargetBox.setMaxLength(128);
                 String targetVal = getTargetFieldValue();
                 this.entryTargetBox.setValue(targetVal);
                 String tooltipKey = (meta != null && "bounds".equals(meta.targetFieldKey())) ? "questlog.editor.tooltip.entry_target.bounds" : "questlog.editor.tooltip.entry_target";
                 this.entryTargetBox.setTooltip(Tooltip.create(Component.translatable(tooltipKey)));
-                this.addRenderableWidget(this.entryTargetBox);
             } else {
                 this.entryTargetBox = null;
             }
 
+            if (supportsNbtField(this.editingType)) {
+                this.entryNbtBox = new NoShadowEditBox(this.font, 0, 0, 125, 14, Component.empty());
+                this.entryNbtBox.setMaxLength(512);
+                String nbtVal = getNbtFieldValue();
+                this.entryNbtBox.setValue(nbtVal);
+                String nbtTooltip = isEntityObjective(this.editingType) ?
+                        "The entity's required custom name, or a full entity predicate JSON object." :
+                        "An SNBT string of NBT tag matching rules, e.g.:\n{display:{Name:'{\"text\":\"Magic Feather\"}'}}";
+                this.entryNbtBox.setTooltip(Tooltip.create(Component.literal(nbtTooltip)));
+            } else {
+                this.entryNbtBox = null;
+            }
+
             if (meta == null || meta.amountFieldKey() != null) {
-                this.entryAmountBox = new NoShadowEditBox(this.font, panel2X + 15, panel2Y + 114, 50, 16, Component.empty());
+                this.entryAmountBox = new NoShadowEditBox(this.font, 0, 0, 50, 14, Component.empty());
                 this.entryAmountBox.setMaxLength(6);
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
                 this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
-                this.addRenderableWidget(this.entryAmountBox);
             } else {
                 this.entryAmountBox = null;
             }
@@ -750,10 +795,19 @@ public class QuestEditorScreen extends Screen {
             Button btnLevels = Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
                 this.entryLevelsToggle = !this.entryLevelsToggle;
                 btn.setMessage(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")));
-            }).bounds(panel2X + 75, panel2Y + 114, 70, 16).build();
+            }).bounds(panel2X + 75, panel2Y + 84, 70, 14).build();
             btnLevels.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.levels")));
             this.addRenderableWidget(btnLevels);
         }
+
+        this.entryIconBox = new NoShadowEditBox(this.font, 0, 0, 125, 14, Component.empty());
+        this.entryIconBox.setMaxLength(128);
+        String iconVal = getIconFieldValue();
+        this.entryIconBox.setValue(iconVal);
+        this.entryIconBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_icon")));
+
+        this.editEntryScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 140, 130, new EditEntryPanelScrollable(this));
+        this.addRenderableWidget(this.editEntryScrollable);
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.cancel"), btn -> {
             this.saveTemporaryState();
@@ -808,7 +862,7 @@ public class QuestEditorScreen extends Screen {
         }
     }
 
-    private String getTargetFieldLabel() {
+    String getTargetFieldLabel() {
         EditorMetadata meta = getMetadata(this.editingType);
         if (meta != null && meta.targetFieldLabel() != null) {
             return meta.targetFieldLabel();
@@ -857,11 +911,86 @@ public class QuestEditorScreen extends Screen {
         return 1;
     }
 
+    private String getIconFieldValue() {
+        if (this.editingEntry == null || !this.editingEntry.has("icon")) return "";
+        com.google.gson.JsonElement el = this.editingEntry.get("icon");
+        if (el.isJsonPrimitive()) {
+            return el.getAsString();
+        } else if (el.isJsonObject()) {
+            JsonObject obj = el.getAsJsonObject();
+            if (obj.has("item")) {
+                com.google.gson.JsonElement itemEl = obj.get("item");
+                return itemEl.isJsonPrimitive() ? itemEl.getAsString() : itemEl.toString();
+            } else if (obj.has("texture")) {
+                return obj.get("texture").getAsString();
+            }
+            return obj.toString();
+        }
+        return "";
+    }
+
+    private boolean supportsNbtField(String type) {
+        if (type == null) return false;
+        String t = type.replace("questlog:", "");
+        return t.contains("item") || t.contains("entity") || t.contains("mob") || t.contains("approach") || t.contains("kill") || t.contains("death") || t.contains("breed") || t.contains("tame") || t.contains("block");
+    }
+
+    boolean isEntityObjective(String type) {
+        if (type == null) return false;
+        String t = type.replace("questlog:", "");
+        return t.contains("entity") || t.contains("mob") || t.contains("approach") || t.contains("kill") || t.contains("death") || t.contains("breed") || t.contains("tame");
+    }
+
+    private String getNbtFieldValue() {
+        if (this.editingEntry == null) return "";
+        if (this.editingEntry.has("nbt")) {
+            com.google.gson.JsonElement el = this.editingEntry.get("nbt");
+            return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+        }
+        if (this.editingEntry.has("custom_name")) {
+            com.google.gson.JsonElement el = this.editingEntry.get("custom_name");
+            return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+        }
+        if (this.editingEntry.has("entity_name")) {
+            com.google.gson.JsonElement el = this.editingEntry.get("entity_name");
+            return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+        }
+        if (this.editingEntry.has("predicate")) {
+            com.google.gson.JsonElement el = this.editingEntry.get("predicate");
+            return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+        }
+        if (this.editingEntry.has("item") && this.editingEntry.get("item").isJsonObject()) {
+            JsonObject itemObj = this.editingEntry.getAsJsonObject("item");
+            if (itemObj.has("nbt")) {
+                com.google.gson.JsonElement el = itemObj.get("nbt");
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+            }
+        }
+        if (this.editingEntry.has("entity") && this.editingEntry.get("entity").isJsonObject()) {
+            JsonObject entityObj = this.editingEntry.getAsJsonObject("entity");
+            if (entityObj.has("custom_name")) {
+                com.google.gson.JsonElement el = entityObj.get("custom_name");
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+            }
+            if (entityObj.has("name")) {
+                com.google.gson.JsonElement el = entityObj.get("name");
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+            }
+            if (entityObj.has("predicate")) {
+                com.google.gson.JsonElement el = entityObj.get("predicate");
+                return el.isJsonPrimitive() ? el.getAsString() : el.toString();
+            }
+        }
+        return "";
+    }
+
     private void saveEditingEntry() {
         if (this.editingEntry == null) return;
 
         String name = this.entryNameBox != null ? this.entryNameBox.getValue() : "";
         String target = this.entryTargetBox != null ? this.entryTargetBox.getValue() : "";
+        String nbt = this.entryNbtBox != null ? this.entryNbtBox.getValue().trim() : "";
+        String icon = this.entryIconBox != null ? this.entryIconBox.getValue().trim() : "";
         int amount = 1;
         if (this.entryAmountBox != null) {
             try {
@@ -875,6 +1004,52 @@ public class QuestEditorScreen extends Screen {
             this.editingEntry.addProperty("name", name);
         } else {
             this.editingEntry.remove("name");
+        }
+
+        this.editingEntry.remove("icon");
+        if (!icon.isEmpty()) {
+            if (icon.startsWith("{") && icon.endsWith("}")) {
+                try {
+                    com.google.gson.JsonElement parsed = JsonParser.parseString(icon);
+                    this.editingEntry.add("icon", parsed);
+                } catch (Exception e) {
+                    JsonObject iconObj = new JsonObject();
+                    iconObj.addProperty("item", icon);
+                    this.editingEntry.add("icon", iconObj);
+                }
+            } else if (icon.contains("textures/") || icon.endsWith(".png")) {
+                JsonObject iconObj = new JsonObject();
+                iconObj.addProperty("texture", icon);
+                this.editingEntry.add("icon", iconObj);
+            } else {
+                JsonObject iconObj = new JsonObject();
+                iconObj.addProperty("item", icon);
+                this.editingEntry.add("icon", iconObj);
+            }
+        }
+
+        this.editingEntry.remove("nbt");
+        this.editingEntry.remove("custom_name");
+        this.editingEntry.remove("entity_name");
+        this.editingEntry.remove("predicate");
+
+        if (!nbt.isEmpty()) {
+            if (isEntityObjective(this.editingType)) {
+                boolean parsedAsObject = false;
+                try {
+                    com.google.gson.JsonElement parsed = JsonParser.parseString(nbt);
+                    if (parsed.isJsonObject()) {
+                        this.editingEntry.add("predicate", parsed);
+                        parsedAsObject = true;
+                    }
+                } catch (Exception ignored) {
+                }
+                if (!parsedAsObject) {
+                    this.editingEntry.addProperty("custom_name", nbt);
+                }
+            } else {
+                this.editingEntry.addProperty("nbt", nbt);
+            }
         }
 
         String[] allKeys = new String[]{
@@ -1079,7 +1254,11 @@ public class QuestEditorScreen extends Screen {
         json.addProperty("description", this.tempDescription);
 
         JsonObject iconObj = json.has("icon") && json.get("icon").isJsonObject() ? json.getAsJsonObject("icon") : new JsonObject();
-        iconObj.addProperty("item", this.tempIconItem);
+        if (this.originalIconItem != null && this.tempIconItem.equals(extractItemIdString(this.originalIconItem))) {
+            iconObj.add("item", this.originalIconItem);
+        } else {
+            iconObj.addProperty("item", this.tempIconItem);
+        }
         json.add("icon", iconObj);
 
         json.addProperty("chapter", this.tempChapter);
@@ -1274,7 +1453,7 @@ public class QuestEditorScreen extends Screen {
         List<String> result = new ArrayList<>();
         String val = box.getValue();
 
-        if (box == this.iconBox) {
+        if (box == this.iconBox || box == this.entryIconBox) {
             if (val.length() < 2) return result;
             String lower = val.toLowerCase();
             for (ResourceLocation rl : BuiltInRegistries.ITEM.keySet()) {
@@ -1389,17 +1568,6 @@ public class QuestEditorScreen extends Screen {
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY) {
             String titleText = getEditingTypeTitle();
             ps.drawString(this.font, titleText, panel2X + 15, panel2Y + 12, color, false);
-            ps.drawString(this.font, "Name (Optional):", panel2X + 15, panel2Y + 32, color, false);
-            EditorMetadata meta = getMetadata(this.editingType);
-            if (meta == null || meta.targetFieldKey() != null) {
-                ps.drawString(this.font, getTargetFieldLabel(), panel2X + 15, panel2Y + 68, color, false);
-            }
-            if (meta == null || meta.amountFieldKey() != null) {
-                String amtLabel = this.activeTab == ActiveTab.REWARDS ?
-                        (("questlog:choice".equals(this.editingType) || "choice".equals(this.editingType)) ? "Pick Count:" : "Count/Experience:")
-                        : "Req Amount:";
-                ps.drawString(this.font, amtLabel, panel2X + 15, panel2Y + 104, color, false);
-            }
         } else if (this.rightPageState == RightPageState.LIST && this.activeTab != ActiveTab.SETTINGS) {
             if (!this.nestingStack.isEmpty()) {
                 String parentType = this.nestingStack.peek().editingType.replace("questlog:", "");
@@ -1420,6 +1588,12 @@ public class QuestEditorScreen extends Screen {
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryTargetBox != null && this.entryTargetBox.isFocused()) {
             activeBox = this.entryTargetBox;
             suggestionProvider = () -> getSuggestions(this.entryTargetBox.getValue());
+        } else if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryNbtBox != null && this.entryNbtBox.isFocused()) {
+            activeBox = this.entryNbtBox;
+            suggestionProvider = () -> getSuggestions(this.entryNbtBox.getValue());
+        } else if (this.rightPageState == RightPageState.EDIT_ENTRY && this.entryIconBox != null && this.entryIconBox.isFocused()) {
+            activeBox = this.entryIconBox;
+            suggestionProvider = () -> getLeftSuggestions(this.entryIconBox);
         }
 
         this.autocompleteHelper.update(activeBox, suggestionProvider != null ? suggestionProvider : Collections::emptyList);
@@ -1477,7 +1651,7 @@ public class QuestEditorScreen extends Screen {
             if (box != null) {
                 box.setValue(val);
                 this.saveTemporaryState();
-                if (box == this.entryTargetBox) {
+                if (box == this.entryTargetBox || box == this.entryNbtBox || box == this.entryIconBox) {
                     this.saveEditingEntry();
                 }
                 box.setFocused(false);
@@ -1590,7 +1764,7 @@ public class QuestEditorScreen extends Screen {
             if (box != null) {
                 box.setValue(val);
                 this.saveTemporaryState();
-                if (box == this.entryTargetBox) {
+                if (box == this.entryTargetBox || box == this.entryNbtBox || box == this.entryIconBox) {
                     this.saveEditingEntry();
                 }
                 box.setFocused(false);
@@ -1617,7 +1791,7 @@ public class QuestEditorScreen extends Screen {
         EDIT_ENTRY
     }
 
-    private enum ActiveTab {
+    enum ActiveTab {
         PREREQUISITES,
         OBJECTIVES,
         REWARDS,

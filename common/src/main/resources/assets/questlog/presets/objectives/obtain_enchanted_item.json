@@ -1,0 +1,9 @@
+{
+  "title": "Obtain Sharpness Diamond Sword",
+  "description": "Objective requiring a Diamond Sword enchanted with Sharpness",
+  "type": "questlog:item_obtain",
+  "item": "minecraft:diamond_sword",
+  "nbt": "{Enchantments:[{id:\"minecraft:sharpness\",lvl:5s}]}",
+  "required_amount": 1,
+  "name": "Obtain Sharpness V Diamond Sword"
+}

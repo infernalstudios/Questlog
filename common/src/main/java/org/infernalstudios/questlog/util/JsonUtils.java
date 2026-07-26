@@ -4,12 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
 import org.infernalstudios.questlog.util.texture.Blittable;
 import org.infernalstudios.questlog.util.texture.ItemRenderable;
 import org.infernalstudios.questlog.util.texture.Texture;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 public class JsonUtils {
 
@@ -82,19 +83,26 @@ public class JsonUtils {
 
     @Nullable
     public static Blittable getIcon(@Nullable JsonObject icon) {
-        if (Objects.requireNonNull(icon).has("texture")) {
-            if (!icon.get("texture").isJsonPrimitive()) {
-                throw new IllegalArgumentException("Field icon.texture must be a string");
+        if (icon != null) {
+            if (icon.has("texture")) {
+                if (!icon.get("texture").isJsonPrimitive()) {
+                    throw new IllegalArgumentException("Field icon.texture must be a string");
+                }
+                return new Texture(new ResourceLocation(JsonUtils.getString(icon, "texture")), 16, 16, 0, 0, 16, 16);
+            } else if (icon.has("item")) {
+                if (icon.get("item").isJsonPrimitive()) {
+                    return new ItemRenderable(new ResourceLocation(JsonUtils.getString(icon, "item")));
+                } else if (icon.get("item").isJsonObject()) {
+                    ItemStack parsed = ItemReward.parseItemStack(icon.get("item"));
+                    if (!parsed.isEmpty()) {
+                        return new ItemRenderable(parsed);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Field icon.item must be a string or item object");
+                }
             }
-            return new Texture(new ResourceLocation(JsonUtils.getString(icon, "texture")), 16, 16, 0, 0, 16, 16);
-        } else if (icon.has("item")) {
-            if (!icon.get("item").isJsonPrimitive()) {
-                throw new IllegalArgumentException("Field icon.item must be a string");
-            }
-            return new ItemRenderable(new ResourceLocation(JsonUtils.getString(icon, "item")));
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static String getString(JsonObject obj, String name) {
