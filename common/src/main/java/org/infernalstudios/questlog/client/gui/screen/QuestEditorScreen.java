@@ -259,7 +259,7 @@ public class QuestEditorScreen extends Screen {
         }
 
         this.tempChapter = definition.has("chapter") ? definition.get("chapter").getAsString() : "main";
-        this.tempSortOrder = definition.has("sort_order") ? definition.get("sort_order").getAsInt() : 0;
+        this.tempSortOrder = definition.has("sort_order") ? definition.get("sort_order").getAsInt() : (definition.has("order") ? definition.get("order").getAsInt() : 0);
 
         for (BoolFieldDef def : BOOL_FIELDS) {
             this.tempBooleans.put(def.key(), definition.has(def.key()) ? definition.get(def.key()).getAsBoolean() : def.defaultValue());

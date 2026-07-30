@@ -71,7 +71,7 @@ public class ChapterEditorScreen extends Screen {
                 } else {
                     this.tempIconItem = "minecraft:knowledge_book";
                 }
-                this.tempSortOrder = definition.has("order") ? definition.get("order").getAsInt() : 0;
+                this.tempSortOrder = definition.has("order") ? definition.get("order").getAsInt() : (definition.has("sort_order") ? definition.get("sort_order").getAsInt() : 0);
                 this.tempDefault = definition.has("default_chapter") && definition.get("default_chapter").getAsBoolean();
                 this.tempHidden = definition.has("hidden") && definition.get("hidden").getAsBoolean();
             }

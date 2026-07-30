@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class RewardDisplayData {
 
     private final Component name;
+    private final boolean hasCustomName;
     @Nullable
     private final Blittable icon;
     @Nullable
@@ -27,6 +28,7 @@ public class RewardDisplayData {
     private Component lazyName;
 
     public RewardDisplayData(JsonObject data) {
+        this.hasCustomName = data.has("name");
         String name = JsonUtils.getOrDefault(data, "name", (String) null);
 
         if (name == null) {
@@ -99,7 +101,7 @@ public class RewardDisplayData {
 
     public Component getName() {
         if (this.lazyName == null) {
-            if (this.reward instanceof ItemReward itemReward) {
+            if (!this.hasCustomName && this.reward instanceof ItemReward itemReward) {
                 net.minecraft.world.item.ItemStack stack = itemReward.getStack();
                 if (!stack.isEmpty()) {
                     int count = stack.getCount();
