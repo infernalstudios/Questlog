@@ -26,7 +26,24 @@ public class DefinitionUtil {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public static List<ResourceLocation> getCachedQuestKeys() {
-        return new ArrayList<>(QUEST_DEFINITION_CACHE.keySet());
+        List<ResourceLocation> keys = new ArrayList<>(QUEST_DEFINITION_CACHE.keySet());
+        keys.sort((a, b) -> {
+            JsonObject jsonA = QUEST_DEFINITION_CACHE.get(a);
+            JsonObject jsonB = QUEST_DEFINITION_CACHE.get(b);
+            int orderA = JsonUtils.getOrDefault(jsonA, "sort_order", JsonUtils.getOrDefault(jsonA, "order", 0));
+            int orderB = JsonUtils.getOrDefault(jsonB, "sort_order", JsonUtils.getOrDefault(jsonB, "order", 0));
+            if (orderA != orderB) {
+                return Integer.compare(orderA, orderB);
+            }
+            String titleA = JsonUtils.getOrDefault(jsonA, "title", "");
+            String titleB = JsonUtils.getOrDefault(jsonB, "title", "");
+            int titleCompare = titleA.compareToIgnoreCase(titleB);
+            if (titleCompare != 0) {
+                return titleCompare;
+            }
+            return a.compareTo(b);
+        });
+        return keys;
     }
 
     public static JsonObject getCachedQuest(ResourceLocation path) {
@@ -53,8 +70,10 @@ public class DefinitionUtil {
             if (aMain && !bMain) return -1;
             if (!aMain && bMain) return 1;
 
-            int orderA = JsonUtils.getOrDefault(CHAPTER_DEFINITION_CACHE.get(a), "order", 0);
-            int orderB = JsonUtils.getOrDefault(CHAPTER_DEFINITION_CACHE.get(b), "order", 0);
+            JsonObject jsonA = CHAPTER_DEFINITION_CACHE.get(a);
+            JsonObject jsonB = CHAPTER_DEFINITION_CACHE.get(b);
+            int orderA = JsonUtils.getOrDefault(jsonA, "sort_order", JsonUtils.getOrDefault(jsonA, "order", 0));
+            int orderB = JsonUtils.getOrDefault(jsonB, "sort_order", JsonUtils.getOrDefault(jsonB, "order", 0));
 
             if (orderA != orderB) {
                 return Integer.compare(orderA, orderB);

@@ -50,31 +50,20 @@ public class QuestList extends AbstractContainerEventHandler implements Scrollab
             Quest qa = a.quest;
             Quest qb = b.quest;
 
-            if (QuestlogClient.isEditModeActive) {
-                int orderA = qa.getDisplay().getSortOrder();
-                int orderB = qb.getDisplay().getSortOrder();
-                if (orderA != orderB) {
-                    return Integer.compare(orderA, orderB);
-                }
-                int titleComp = qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
-                if (titleComp != 0) {
-                    return titleComp;
-                }
-                return qa.getId().compareTo(qb.getId());
-            }
-
-            int tierA = !qa.isCompleted() ? 0 : (!qa.isRewarded() ? 1 : 2);
-            int tierB = !qb.isCompleted() ? 0 : (!qb.isRewarded() ? 1 : 2);
-
-            if (tierA != tierB) {
-                return Integer.compare(tierA, tierB);
-            }
-
             int orderA = qa.getDisplay().getSortOrder();
             int orderB = qb.getDisplay().getSortOrder();
             if (orderA != orderB) {
                 return Integer.compare(orderA, orderB);
             }
+
+            if (!QuestlogClient.isEditModeActive) {
+                int tierA = !qa.isCompleted() ? 0 : (!qa.isRewarded() ? 1 : 2);
+                int tierB = !qb.isCompleted() ? 0 : (!qb.isRewarded() ? 1 : 2);
+                if (tierA != tierB) {
+                    return Integer.compare(tierA, tierB);
+                }
+            }
+
             int titleComp = qa.getDisplay().getTitle().getString().compareToIgnoreCase(qb.getDisplay().getTitle().getString());
             if (titleComp != 0) {
                 return titleComp;
