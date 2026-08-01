@@ -10,6 +10,9 @@ import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.infernalstudios.questlog.core.quests.objectives.Objective;
+import org.infernalstudios.questlog.core.quests.rewards.ChoiceReward;
+import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.AnimatedTexture;
 import org.infernalstudios.questlog.util.texture.Blittable;
@@ -17,7 +20,6 @@ import org.infernalstudios.questlog.util.texture.Texture;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -183,7 +185,7 @@ public class QuestDisplayData {
             } else if (descriptionElement.isJsonPrimitive()) {
                 String rawStr = descriptionElement.getAsString();
                 if ((rawStr.startsWith("[") && rawStr.endsWith("]") && !rawStr.contains("](")) ||
-                    (rawStr.startsWith("{") && rawStr.endsWith("}"))) {
+                        (rawStr.startsWith("{") && rawStr.endsWith("}"))) {
                     try {
                         parsedDescription = Component.Serializer.fromJson(rawStr, RegistryAccess.EMPTY);
                     } catch (Exception ignored) {
@@ -231,36 +233,36 @@ public class QuestDisplayData {
 
     public void setQuest(Quest quest) {
         this.objectiveDisplay = new java.util.ArrayList<>();
-        for (org.infernalstudios.questlog.core.quests.objectives.Objective obj : quest.objectives) {
+        for (Objective obj : quest.objectives) {
             addObjectiveDisplayData(obj, 0);
         }
         this.rewardDisplay = new java.util.ArrayList<>();
-        for (org.infernalstudios.questlog.core.quests.rewards.Reward reward : quest.rewards) {
+        for (Reward reward : quest.rewards) {
             addRewardDisplayData(reward, 0);
         }
     }
 
-    private void addRewardDisplayData(org.infernalstudios.questlog.core.quests.rewards.Reward reward, int indentLevel) {
+    private void addRewardDisplayData(Reward reward, int indentLevel) {
         RewardDisplayData displayData = reward.getDisplay();
         if (displayData != null) {
             displayData.setIndentLevel(indentLevel);
             this.rewardDisplay.add(displayData);
         }
-        if (reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward) {
-            for (org.infernalstudios.questlog.core.quests.rewards.Reward choice : choiceReward.getChoices()) {
+        if (reward instanceof ChoiceReward choiceReward) {
+            for (Reward choice : choiceReward.getChoices()) {
                 addRewardDisplayData(choice, indentLevel + 1);
             }
         }
     }
 
-    private void addObjectiveDisplayData(org.infernalstudios.questlog.core.quests.objectives.Objective obj, int indentLevel) {
+    private void addObjectiveDisplayData(Objective obj, int indentLevel) {
         if (obj.isHidden()) return;
         ObjectiveDisplayData displayData = obj.getDisplay();
         if (displayData != null) {
             displayData.setIndentLevel(indentLevel);
             this.objectiveDisplay.add(displayData);
         }
-        for (org.infernalstudios.questlog.core.quests.objectives.Objective child : obj.getChildren()) {
+        for (Objective child : obj.getChildren()) {
             addObjectiveDisplayData(child, indentLevel + 1);
         }
     }
