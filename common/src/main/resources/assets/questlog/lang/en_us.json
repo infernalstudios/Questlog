@@ -191,6 +191,7 @@
     "questlog.editor.tooltip.chapter": "The chapter ID this quest belongs to.",
     "questlog.editor.tooltip.order": "The sorting index. Quests with lower values appear first.",
     "questlog.editor.tooltip.hidden": "If enabled, this quest remains hidden in the log until unlocked or completed.",
+    "questlog.editor.tooltip.hide_when_completed": "If enabled, this quest is removed from the log once every objective is completed and all rewards have been collected.",
     "questlog.editor.tooltip.include_in_main": "If enabled, the quest will be shown in the main chapter list in addition to its assigned chapter.",
     "questlog.editor.tooltip.details_default": "If enabled, opening this quest's chapter will display this quest's details page by default.",
     "questlog.editor.tooltip.details_disabled": "If enabled, players will not be able to open the details page for this quest.",

@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.2] - 2026-08-01
+
+### Added
+
+- Added `hide_when_completed` to the quest definition, which removes a quest from the log once all of its objectives are
+  completed.
+    - Quests with uncollected rewards stay visible until those rewards are claimed.
+    - Defaults to `false`, which keeps the current behaviour.
+
 ## [3.3.1] - 2026-07-30
 
 ### Fixed
