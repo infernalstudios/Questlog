@@ -58,6 +58,11 @@ These JSON files should be placed in the `quests` directory of your config (`con
   // Hides the quest from the quest log entirely.
   "hidden": false,
 
+  // Hides the quest from the quest log once all of its objectives are completed.
+  // The quest stays visible until any rewards it has are collected, so rewards can't be lost.
+  // Defaults to false, which keeps completed quests in the log.
+  "hide_when_completed": false,
+
   // --- SOUND OPTIONS ---
   "completed_sound": "ResourceLocation (optional)",
   "triggered_sound": "ResourceLocation (optional)",

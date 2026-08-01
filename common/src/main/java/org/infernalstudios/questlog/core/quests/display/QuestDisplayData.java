@@ -40,6 +40,7 @@ public class QuestDisplayData {
     private final boolean toastOnComplete;
     private final boolean showPopupOnUnlock;
     private final boolean hidden;
+    private final boolean hideWhenCompleted;
     private final boolean includeInMain;
 
     private final boolean disableDetailsButton;
@@ -165,6 +166,7 @@ public class QuestDisplayData {
         this.toastOnComplete = JsonUtils.getOrDefault(data, "toast_on_complete", true);
         this.showPopupOnUnlock = JsonUtils.getOrDefault(data, "show_popup_on_unlock", false);
         this.hidden = JsonUtils.getOrDefault(data, "hidden", false);
+        this.hideWhenCompleted = JsonUtils.getOrDefault(data, "hide_when_completed", false);
 
         this.disableDetailsButton = JsonUtils.getOrDefault(data, "disable_details_button", false);
         this.detailsOpenByDefault = JsonUtils.getOrDefault(data, "details_open_by_default", false);
@@ -416,6 +418,10 @@ public class QuestDisplayData {
 
     public boolean isHidden() {
         return this.hidden;
+    }
+
+    public boolean shouldHideWhenCompleted() {
+        return this.hideWhenCompleted;
     }
 
     public boolean isRepeatable() {

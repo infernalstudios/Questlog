@@ -383,6 +383,10 @@ public class QuestlogScreen extends Screen {
         List<Quest> quests = this.manager.getAllQuests().stream()
                 .filter(quest -> QuestlogClient.isEditModeActive || (quest.isTriggered() && !quest.getDisplay().isHidden()))
                 .filter(quest -> !this.hideCompleted || !quest.isCompleted())
+                .filter(quest -> QuestlogClient.isEditModeActive
+                        || !quest.getDisplay().shouldHideWhenCompleted()
+                        || !quest.isCompleted()
+                        || !quest.isRewarded())
                 .filter(quest -> {
                     String chapterStr = quest.getDisplay().getChapter();
                     ResourceLocation questChapter = chapterStr.contains(":")

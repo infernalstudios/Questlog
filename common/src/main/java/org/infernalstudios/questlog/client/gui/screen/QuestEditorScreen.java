@@ -69,6 +69,7 @@ public class QuestEditorScreen extends Screen {
     private static final ResourceLocation TAB_SETTINGS_HIGHLIGHTED = new ResourceLocation(Questlog.MODID, "textures/gui/editor_tab_settings_highlighted.png");
     private static final List<BoolFieldDef> BOOL_FIELDS = List.of(
             new BoolFieldDef("hidden", false, "Hidden", "questlog.editor.tooltip.hidden"),
+            new BoolFieldDef("hide_when_completed", false, "Hide When Completed", "questlog.editor.tooltip.hide_when_completed"),
             new BoolFieldDef("include_in_main", true, "In Main Chapter", "questlog.editor.tooltip.include_in_main"),
             new BoolFieldDef("details_open_by_default", false, "Details Default", "questlog.editor.tooltip.details_default"),
             new BoolFieldDef("disable_details_button", false, "Details Disabled", "questlog.editor.tooltip.details_disabled"),
