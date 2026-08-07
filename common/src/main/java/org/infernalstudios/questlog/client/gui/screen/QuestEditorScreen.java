@@ -6,10 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.MultiLineEditBox;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
@@ -116,8 +113,8 @@ public class QuestEditorScreen extends Screen {
             new TextFieldDef("description_completed", "", false, true, "questlog.editor.advanced.description_completed", "questlog.editor.tooltip.advanced.description_variant"),
             new TextFieldDef("description_failed", "", false, true, "questlog.editor.advanced.description_failed", "questlog.editor.tooltip.advanced.description_variant")
     );
-    final List<net.minecraft.client.gui.components.AbstractWidget> leftFields = new ArrayList<>();
-    final List<net.minecraft.client.gui.components.AbstractWidget> settingsFields = new ArrayList<>();
+    final List<AbstractWidget> leftFields = new ArrayList<>();
+    final List<AbstractWidget> settingsFields = new ArrayList<>();
     final List<String> settingsLabels = new ArrayList<>();
     final List<Integer> settingsRowHeights = new ArrayList<>();
     private final Screen previousScreen;
@@ -171,7 +168,6 @@ public class QuestEditorScreen extends Screen {
     private ScrollableComponent leftScrollable;
     private ScrollableComponent rightScrollable;
     private ScrollableComponent settingsScrollable;
-    private ScrollableComponent editEntryScrollable;
     private NoShadowEditBox typeSearchBox;
     NoShadowEditBox entryNameBox;
     NoShadowEditBox entryAmountBox;
@@ -197,9 +193,16 @@ public class QuestEditorScreen extends Screen {
         return this.font;
     }
 
+    private boolean getBoolDefault(BoolFieldDef def) {
+        if ("include_in_main".equals(def.key())) {
+            return "questlog:main".equals(this.tempChapter) || "main".equals(this.tempChapter);
+        }
+        return def.defaultValue();
+    }
+
     private void loadQuestData() {
         for (BoolFieldDef def : BOOL_FIELDS) {
-            this.tempBooleans.put(def.key(), def.defaultValue());
+            this.tempBooleans.put(def.key(), getBoolDefault(def));
         }
         for (TextFieldDef def : TEXT_FIELDS) {
             this.tempTexts.put(def.key(), def.defaultValue());
@@ -234,6 +237,9 @@ public class QuestEditorScreen extends Screen {
             this.tempPrerequisites.clear();
             this.tempRewards.clear();
             this.originalDefinition = null;
+            for (BoolFieldDef def : BOOL_FIELDS) {
+                this.tempBooleans.put(def.key(), getBoolDefault(def));
+            }
         }
     }
 
@@ -263,7 +269,8 @@ public class QuestEditorScreen extends Screen {
         this.tempSortOrder = definition.has("sort_order") ? definition.get("sort_order").getAsInt() : (definition.has("order") ? definition.get("order").getAsInt() : 0);
 
         for (BoolFieldDef def : BOOL_FIELDS) {
-            this.tempBooleans.put(def.key(), definition.has(def.key()) ? definition.get(def.key()).getAsBoolean() : def.defaultValue());
+            boolean defaultVal = getBoolDefault(def);
+            this.tempBooleans.put(def.key(), definition.has(def.key()) ? definition.get(def.key()).getAsBoolean() : defaultVal);
         }
         for (TextFieldDef def : TEXT_FIELDS) {
             if (definition.has(def.key()) && !definition.get(def.key()).isJsonNull()) {
@@ -615,9 +622,10 @@ public class QuestEditorScreen extends Screen {
         this.settingsRowHeights.clear();
 
         for (BoolFieldDef def : BOOL_FIELDS) {
-            boolean current = this.tempBooleans.getOrDefault(def.key(), def.defaultValue());
+            boolean defaultVal = getBoolDefault(def);
+            boolean current = this.tempBooleans.getOrDefault(def.key(), defaultVal);
             Button toggle = Button.builder(Component.literal(def.label() + ": " + (current ? "True" : "False")), btn -> {
-                boolean next = !this.tempBooleans.getOrDefault(def.key(), def.defaultValue());
+                boolean next = !this.tempBooleans.getOrDefault(def.key(), defaultVal);
                 this.tempBooleans.put(def.key(), next);
                 btn.setMessage(Component.literal(def.label() + ": " + (next ? "True" : "False")));
             }).bounds(0, 0, 107, 16).build();
@@ -807,8 +815,8 @@ public class QuestEditorScreen extends Screen {
         this.entryIconBox.setValue(iconVal);
         this.entryIconBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_icon")));
 
-        this.editEntryScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 140, 130, new EditEntryPanelScrollable(this));
-        this.addRenderableWidget(this.editEntryScrollable);
+        ScrollableComponent editEntryScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 140, 130, new EditEntryPanelScrollable(this));
+        this.addRenderableWidget(editEntryScrollable);
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.cancel"), btn -> {
             this.saveTemporaryState();
@@ -1267,7 +1275,8 @@ public class QuestEditorScreen extends Screen {
         json.remove("order");
 
         for (BoolFieldDef def : BOOL_FIELDS) {
-            setBooleanFlag(json, def.key(), this.tempBooleans.getOrDefault(def.key(), def.defaultValue()), def.defaultValue());
+            boolean defaultVal = getBoolDefault(def);
+            setBooleanFlag(json, def.key(), this.tempBooleans.getOrDefault(def.key(), defaultVal), defaultVal);
         }
         for (TextFieldDef def : TEXT_FIELDS) {
             String value = this.tempTexts.getOrDefault(def.key(), def.defaultValue());
