@@ -5,16 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 
-public class QuestRemovePacket {
+public record QuestRemovePacket(ResourceLocation id) {
     public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.SERVER_TO_CLIENT;
-
-    private final ResourceLocation id;
-
-    public QuestRemovePacket(ResourceLocation id) {
-        this.id = id;
-    }
-
-    public ResourceLocation id() { return this.id; }
 
     public static QuestRemovePacket decode(FriendlyByteBuf buf) {
         ResourceLocation id = buf.readResourceLocation();

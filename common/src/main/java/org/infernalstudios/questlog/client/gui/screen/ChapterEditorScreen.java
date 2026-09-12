@@ -168,14 +168,18 @@ public class ChapterEditorScreen extends Screen {
         for (int i = startIdx; i < endIdx; i++) {
             ResourceLocation qKey = allQuests.get(i);
             JsonObject qJson = DefinitionUtil.getCachedQuest(qKey);
-            String qChap = qJson.has("chapter") ? qJson.get("chapter").getAsString() : "main";
-            if (qChap.contains(":")) {
-                ResourceLocation rl = ResourceLocation.tryParse(qChap);
+            String rawChap = qJson.has("chapter") ? qJson.get("chapter").getAsString() : "main";
+            if (rawChap.contains(":")) {
+                ResourceLocation rl = ResourceLocation.tryParse(rawChap);
                 if (rl != null) {
-                    qChap = rl.getPath();
+                    rawChap = rl.getPath();
                 }
             }
-            boolean inThisChapter = qChap.equals(currentChapPath);
+            final String qChap = rawChap;
+            boolean isMainChapter = currentChapPath.equals("main");
+            boolean questIsMainChap = qChap.equals("main");
+            boolean questIncludeInMain = qJson.has("include_in_main") ? qJson.get("include_in_main").getAsBoolean() : questIsMainChap;
+            boolean inThisChapter = isMainChapter ? (questIsMainChap || questIncludeInMain) : qChap.equals(currentChapPath);
 
             int rowY = panel2Y + 28 + (i - startIdx) * 22;
 
@@ -195,20 +199,37 @@ public class ChapterEditorScreen extends Screen {
                 public void onPress() {
                     ChapterEditorScreen.this.saveTemporaryState();
                     if (inThisChapter) {
-                        qJson.addProperty("chapter", currentChapPath.equals("main") ? "" : "main");
-                    } else {
-                        if (!currentChapPath.isEmpty()) {
-                            qJson.addProperty("chapter", currentChapPath);
+                        if (isMainChapter) {
+                            if (questIsMainChap) {
+                                qJson.addProperty("chapter", "");
+                                qJson.addProperty("include_in_main", false);
+                            } else {
+                                qJson.addProperty("include_in_main", false);
+                            }
                         } else {
-                            String futureId = ChapterEditorScreen.this.idBox.getValue().trim();
-                            try {
-                                ResourceLocation futureRl = futureId.contains(":") ?
-                                        ResourceLocation.tryParse(futureId) :
-                                        new ResourceLocation(Questlog.MODID, futureId);
-                                if (futureRl != null) {
-                                    qJson.addProperty("chapter", futureRl.getPath());
+                            qJson.addProperty("chapter", "main");
+                            qJson.addProperty("include_in_main", true);
+                        }
+                    } else {
+                        if (isMainChapter) {
+                            if (qChap.isEmpty()) {
+                                qJson.addProperty("chapter", "main");
+                            }
+                            qJson.addProperty("include_in_main", true);
+                        } else {
+                            if (!currentChapPath.isEmpty()) {
+                                qJson.addProperty("chapter", currentChapPath);
+                            } else {
+                                String futureId = ChapterEditorScreen.this.idBox.getValue().trim();
+                                try {
+                                    ResourceLocation futureRl = futureId.contains(":") ?
+                                            ResourceLocation.tryParse(futureId) :
+                                            new ResourceLocation(Questlog.MODID, futureId);
+                                    if (futureRl != null) {
+                                        qJson.addProperty("chapter", futureRl.getPath());
+                                    }
+                                } catch (Exception ignored) {
                                 }
-                            } catch (Exception ignored) {
                             }
                         }
                     }

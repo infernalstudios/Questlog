@@ -96,6 +96,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
         if (!hasDetails) {
             showDetails = false;
+        } else if (this.quest.isCompleted() && !this.quest.rewards.isEmpty()) {
+            showDetails = true;
         } else if (this.getDisplay().isDetailsButtonDisabled()) {
             showDetails = this.getDisplay().isDetailsOpenByDefault();
         } else if (this.getDisplay().isDetailsOpenByDefault()) {
@@ -138,7 +140,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
 
-        if (hasDetails && !this.getDisplay().isDetailsButtonDisabled()) {
+        if (hasDetails && !this.getDisplay().isDetailsButtonDisabled() && !this.getDisplay().isDetailsOpenByDefault()) {
             this.objectivesButton = new QuestlogButton(
                     0, buttonY,
                     this.getPalette().textColor(),
@@ -431,8 +433,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super.tick();
 
         boolean isShowingCollect = this.backButton != null &&
-                (this.backButton.getMessage().equals(this.getDisplay().getCollectButtonText()) ||
-                        this.backButton.getMessage().equals(Component.translatable("questlog.reward.make_choices")));
+                (this.backButton.getMessage().getString().equals(this.getDisplay().getCollectButtonText().getString()) ||
+                        this.backButton.getMessage().getString().equals(Component.translatable("questlog.reward.make_choices").getString()));
 
         if (isShowingCollect && this.quest.isRewarded()) {
             this.rebuildWidgets();
@@ -446,7 +448,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             }
             this.backButton.active = canClaim;
             Component expectedText = canClaim ? this.getDisplay().getCollectButtonText() : Component.translatable("questlog.reward.make_choices");
-            if (!this.backButton.getMessage().equals(expectedText)) {
+            if (!this.backButton.getMessage().getString().equals(expectedText.getString())) {
                 this.backButton.setMessage(expectedText);
                 int rightBoundary = this.panel1X + this.getDisplay().getLeftPanelWidth() + (showDetails ? this.getDisplay().getRightPanelWidth() : 0);
                 this.updateButtonLayout(rightBoundary);
@@ -454,18 +456,21 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         }
 
         if (this.backButton != null && !this.needsRead() &&
-                this.backButton.getMessage().equals(Component.translatable("questlog.button.read"))) {
+                this.backButton.getMessage().getString().equals(Component.translatable("questlog.button.read").getString())) {
             this.rebuildWidgets();
         }
 
         if (this.backButton != null && !this.quest.isCompleted() &&
-                this.backButton.getMessage().equals(Component.translatable("questlog.reward.reset"))) {
+                this.backButton.getMessage().getString().equals(Component.translatable("questlog.reward.reset").getString())) {
             this.rebuildWidgets();
         }
     }
 
     @Override
     public void removed() {
+        if (this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
+            Services.PLATFORM.sendPacketToServer(new org.infernalstudios.questlog.network.packet.QuestResetPacket(this.quest.getId()));
+        }
         if (this.changedCursor) {
             long window = this.minecraft.getWindow().getWindow();
             GLFW.glfwSetCursor(window, 0L);

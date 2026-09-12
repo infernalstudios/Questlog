@@ -3,7 +3,6 @@ package org.infernalstudios.questlog.network.packet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.network.ClientPacketHandler;
 import org.infernalstudios.questlog.network.IPacketContext;
 

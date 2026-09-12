@@ -14,23 +14,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class QuestEditRemovePacket {
+public record QuestEditRemovePacket(ResourceLocation id) {
     public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.CLIENT_TO_SERVER;
-
-    private final ResourceLocation id;
-
-    public QuestEditRemovePacket(ResourceLocation id) {
-        this.id = id;
-    }
-
-    public ResourceLocation id() { return this.id; }
 
     public static QuestEditRemovePacket decode(FriendlyByteBuf buf) {
         return new QuestEditRemovePacket(buf.readResourceLocation());
-    }
-
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(this.id);
     }
 
     public static void handle(QuestEditRemovePacket packet, IPacketContext ctx) {
@@ -62,5 +50,9 @@ public class QuestEditRemovePacket {
         } catch (IOException e) {
             Questlog.LOGGER.error("Failed to delete quest definition", e);
         }
+    }
+
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(this.id);
     }
 }

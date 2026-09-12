@@ -7,34 +7,16 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.infernalstudios.questlog.core.quests.rewards.ChoiceReward;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.network.IPacketContext;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class QuestRewardCollectPacket {
+public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex, List<Integer> selections) {
     public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.CLIENT_TO_SERVER;
-
-    private final ResourceLocation id;
-    private final int rewardIndex;
-    private final List<Integer> selections;
-
-    public QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) {
-        this(id, rewardIndex, Collections.emptyList());
-    }
-
-    public QuestRewardCollectPacket(ResourceLocation id, int rewardIndex, List<Integer> selections) {
-        this.id = id;
-        this.rewardIndex = rewardIndex;
-        this.selections = selections;
-    }
-
-    public ResourceLocation id() { return this.id; }
-    public int rewardIndex() { return this.rewardIndex; }
-    public List<Integer> selections() { return this.selections; }
 
     public static QuestRewardCollectPacket decode(FriendlyByteBuf buf) {
         ResourceLocation id = buf.readResourceLocation();
@@ -60,10 +42,11 @@ public class QuestRewardCollectPacket {
             return;
         }
         if (!reward.hasRewarded()) {
-            if (reward instanceof org.infernalstudios.questlog.core.quests.rewards.ChoiceReward choiceReward) {
+            if (reward instanceof ChoiceReward choiceReward) {
                 choiceReward.setSelectedIndices(packet.selections());
             }
             reward.applyReward((ServerPlayer) manager.player);
+            ServerPlayerManager.INSTANCE.save(manager);
         }
     }
 

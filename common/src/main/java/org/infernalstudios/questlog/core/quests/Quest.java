@@ -188,8 +188,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     public void writeInitialData(CompoundTag data) {
         data.putBoolean("completed", this.hasSentCompletion);
         data.putBoolean("triggered", this.hasSentTrigger);
-        data.putBoolean("repeatable", this.repeatable);
-        data.putBoolean("global", this.global);
 
         data.put(
                 "prerequisites",
@@ -232,12 +230,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
     public void deserialize(CompoundTag data) {
         this.hasSentCompletion = data.getBoolean("completed");
         this.hasSentTrigger = data.getBoolean("triggered");
-        if (data.contains("repeatable")) {
-            this.repeatable = data.getBoolean("repeatable");
-        }
-        if (data.contains("global")) {
-            this.global = data.getBoolean("global");
-        }
 
         if (this.prerequisites.isEmpty()) {
             this.hasSentTrigger = true;
@@ -270,8 +262,6 @@ public class Quest implements NbtSaveable, WithDisplayData<QuestDisplayData> {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("completed", this.hasSentCompletion);
         tag.putBoolean("triggered", this.hasSentTrigger);
-        tag.putBoolean("repeatable", this.repeatable);
-        tag.putBoolean("global", this.global);
         tag.put("prerequisites", Util.toNbtList(this.prerequisites, Objective::serialize));
         tag.put("objectives", Util.toNbtList(this.objectives, Objective::serialize));
         tag.put("failures", Util.toNbtList(this.failureConditions, Objective::serialize));

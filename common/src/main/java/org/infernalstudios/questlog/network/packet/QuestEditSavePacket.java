@@ -19,28 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class QuestEditSavePacket {
+public record QuestEditSavePacket(ResourceLocation id, String json) {
     public static final IPacketContext.Direction DIRECTION = IPacketContext.Direction.CLIENT_TO_SERVER;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private final ResourceLocation id;
-    private final String json;
-
-    public QuestEditSavePacket(ResourceLocation id, String json) {
-        this.id = id;
-        this.json = json;
-    }
-
-    public ResourceLocation id() { return this.id; }
-    public String json() { return this.json; }
-
     public static QuestEditSavePacket decode(FriendlyByteBuf buf) {
         return new QuestEditSavePacket(buf.readResourceLocation(), buf.readUtf());
-    }
-
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(this.id);
-        buf.writeUtf(this.json);
     }
 
     public static void handle(QuestEditSavePacket packet, IPacketContext ctx) {
@@ -73,5 +57,10 @@ public class QuestEditSavePacket {
         } catch (IOException e) {
             Questlog.LOGGER.error("Failed to save quest definition", e);
         }
+    }
+
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeResourceLocation(this.id);
+        buf.writeUtf(this.json);
     }
 }

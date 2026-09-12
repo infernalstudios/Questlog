@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.texture.Blittable;
@@ -84,6 +85,37 @@ public class ObjectiveDisplayData {
                         return Component.translatable("questlog.objective.default." + path, BuiltInRegistries.ENTITY_TYPE.get(entityId).getDescription());
                     }
                 }
+            } else if (data.has("effect") && data.get("effect").isJsonPrimitive()) {
+                String effectStr = data.get("effect").getAsString();
+                ResourceLocation effectId = ResourceLocation.tryParse(effectStr);
+                Component effectName = null;
+                if (effectId != null && BuiltInRegistries.MOB_EFFECT.containsKey(effectId)) {
+                    effectName = BuiltInRegistries.MOB_EFFECT.get(effectId).getDisplayName();
+                } else if (!effectStr.isEmpty()) {
+                    effectName = Component.literal(effectStr);
+                }
+                if (effectName != null) {
+                    return Component.translatable("questlog.objective.default." + type.getNamespace() + "." + path, effectName);
+                }
+            } else if (data.has("quest") && data.get("quest").isJsonPrimitive()) {
+                String questStr = data.get("quest").getAsString();
+                ResourceLocation questId = ResourceLocation.tryParse(questStr);
+                Component questTitle = null;
+                if (questId != null && DefinitionUtil.getCachedQuestKeys().contains(questId)) {
+                    JsonObject qJson = DefinitionUtil.getCachedQuest(questId);
+                    String title = JsonUtils.getOrDefault(qJson, "title", questStr);
+                    boolean translatable = JsonUtils.getOrDefault(qJson, "translatable", false);
+                    questTitle = translatable ? Component.translatable(title) : Component.literal(title);
+                } else if (!questStr.isEmpty()) {
+                    questTitle = Component.literal(questStr);
+                }
+                if (questTitle != null) {
+                    return Component.translatable("questlog.objective.default." + type.getNamespace() + "." + path, questTitle);
+                }
+            }
+
+            if ("effect_added".equals(path) || "quest_complete".equals(path)) {
+                return Component.translatable("questlog.objective.default." + type.getNamespace() + "." + path, "");
             }
 
             return Component.translatable("questlog.objective.default." + type.getNamespace() + "." + path);
