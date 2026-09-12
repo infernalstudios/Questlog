@@ -27,7 +27,8 @@ public class QuestlogEvents {
 
     public static void onPlayerSave(ServerPlayer player) {
         if (ServerPlayerManager.INSTANCE == null) return;
-        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerByPlayer(player);
+        QuestManager manager = ServerPlayerManager.INSTANCE.getManagerIfPresent(player);
+        if (manager == null || !manager.isLoaded()) return;
         ServerPlayerManager.INSTANCE.save(manager);
     }
 
