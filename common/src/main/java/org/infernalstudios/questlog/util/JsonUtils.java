@@ -34,6 +34,16 @@ public class JsonUtils {
         return defaultValue;
     }
 
+    public static double getOrDefault(JsonObject obj, String key, double defaultValue) {
+        if (obj.has(key)) {
+            if (!obj.get(key).isJsonPrimitive()) {
+                throw new IllegalArgumentException("Field " + key + " must be a number");
+            }
+            return obj.get(key).getAsDouble();
+        }
+        return defaultValue;
+    }
+
     public static boolean getOrDefault(JsonObject obj, String key, boolean defaultValue) {
         if (obj.has(key)) {
             if (!obj.get(key).isJsonPrimitive()) {

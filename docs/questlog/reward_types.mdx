@@ -36,6 +36,36 @@ Gives the player loot from a loot table. The loot context is set as such:
 #### Properties
 - `loot_table`: The loot table to give the player. If the table does not exist, it will log an error in the log.
 
+### `questlog:choice`
+Allows the player to choose a subset of rewards from a list of options.
+
+#### Properties
+- `choices`: A list of reward objects to choose from.
+- `pick_count` (optional, default: 1): The number of choices the player is required to select.
+
+### `questlog:random`
+Rolls one of its entries at random, weighted. Unlike `questlog:choice` the player does not pick
+— the roll happens when the reward is claimed, and the outcome is saved, so it stays the same
+across restarts.
+
+#### Properties
+- `entries`: A list of `{ "weight": number, "reward": Reward }` objects. `weight` defaults to 1.
+- `empty_weight` (optional, default: 0): The weight of rolling nothing at all.
+- `roll_count` (optional, default: 1): How many times to roll. Each roll is independent, so the
+  same entry can come up more than once.
+
+```json
+{
+  "type": "questlog:random",
+  "empty_weight": 1.0,
+  "entries": [
+    { "weight": 2.0, "reward": { "type": "questlog:item", "item": "minecraft:diamond", "count": 2 } },
+    { "weight": 5.0, "reward": { "type": "questlog:item", "item": "minecraft:emerald" } },
+    { "weight": 1.0, "reward": { "type": "questlog:experience", "experience": 100 } }
+  ]
+}
+```
+
 ### Base Reward Properties
 All reward types support the following optional properties:
 

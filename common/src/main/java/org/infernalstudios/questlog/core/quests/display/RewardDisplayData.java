@@ -74,6 +74,12 @@ public class RewardDisplayData {
             } else if (path.equals("choice")) {
                 int pickCount = JsonUtils.getOrDefault(data, "pick_count", 1);
                 return Component.translatable("questlog.reward.default.questlog.choice.pick", pickCount);
+            } else if (path.equals("random")) {
+                int rollCount = JsonUtils.getOrDefault(data, "roll_count", 1);
+                if (rollCount > 1) {
+                    return Component.translatable("questlog.reward.default.questlog.random.rolls", rollCount);
+                }
+                return Component.translatable("questlog.reward.default.questlog.random");
             }
 
             return Component.translatable("questlog.reward.default." + type.getNamespace() + "." + path);
@@ -82,13 +88,13 @@ public class RewardDisplayData {
         return Component.translatable("questlog.reward.default");
     }
 
-    public void setReward(@Nullable Reward reward) {
-        this.reward = reward;
-    }
-
     @Nullable
     public Reward getReward() {
         return this.reward;
+    }
+
+    public void setReward(@Nullable Reward reward) {
+        this.reward = reward;
     }
 
     public int getIndentLevel() {
@@ -124,7 +130,8 @@ public class RewardDisplayData {
                 int greenColor = 0x529E52;
                 try {
                     greenColor = Questlog.getConfig().colors.completedTextColor;
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 final int finalColor = greenColor;
                 Component xComponent = Component.literal("x").withStyle(style -> style.withColor(TextColor.fromRgb(finalColor)));
                 return Component.literal("[").append(xComponent).append("] ").append(this.lazyName);

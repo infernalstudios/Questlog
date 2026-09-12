@@ -1,0 +1,47 @@
+{
+  "title": "Mine 10 Iron Ore & Roll for Loot",
+  "description": "Example of a weighted random reward. The reward is rolled for you when you claim it.",
+  "icon": {
+    "item": "minecraft:iron_ore"
+  },
+  "objectives": [
+    {
+      "type": "questlog:block_mine",
+      "block": "minecraft:iron_ore",
+      "required_amount": 10,
+      "name": "Mine 10 Iron Ore"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:random",
+      "empty_weight": 1.0,
+      "roll_count": 1,
+      "entries": [
+        {
+          "weight": 2.0,
+          "reward": {
+            "type": "questlog:item",
+            "item": "minecraft:diamond",
+            "count": 2
+          }
+        },
+        {
+          "weight": 5.0,
+          "reward": {
+            "type": "questlog:item",
+            "item": "minecraft:emerald",
+            "count": 5
+          }
+        },
+        {
+          "weight": 1.0,
+          "reward": {
+            "type": "questlog:experience",
+            "experience": 100
+          }
+        }
+      ]
+    }
+  ]
+}
