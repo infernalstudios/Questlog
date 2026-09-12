@@ -22,9 +22,18 @@ public class QuestManager {
     private final Map<ResourceLocation, Quest> quests = new LinkedHashMap<>();
     public Player player;
     private boolean editMode = false;
+    private boolean loaded = false;
 
     public QuestManager(Player player) {
         this.player = player;
+    }
+
+    public boolean isLoaded() {
+        return this.loaded;
+    }
+
+    public void setLoaded(boolean loaded) {
+        this.loaded = loaded;
     }
 
     public boolean isEditMode() {

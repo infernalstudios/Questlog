@@ -16,13 +16,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex, java.util.List<Integer> selections) implements CustomPacketPayload {
+public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex,
+                                       java.util.List<Integer> selections) implements CustomPacketPayload {
     public static final Type<QuestRewardCollectPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Questlog.MODID, "reward_collect"));
-
-    public QuestRewardCollectPacket(ResourceLocation id, int rewardIndex) {
-        this(id, rewardIndex, java.util.Collections.emptyList());
-    }
-
     public static final StreamCodec<RegistryFriendlyByteBuf, QuestRewardCollectPacket> STREAM_CODEC = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC, QuestRewardCollectPacket::id,
             ByteBufCodecs.INT, QuestRewardCollectPacket::rewardIndex,
@@ -47,6 +43,7 @@ public record QuestRewardCollectPacket(ResourceLocation id, int rewardIndex, jav
                 choiceReward.setSelectedIndices(packet.selections());
             }
             reward.applyReward((ServerPlayer) manager.player);
+            ServerPlayerManager.INSTANCE.save(manager);
         }
     }
 

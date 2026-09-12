@@ -28,6 +28,7 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         int height = 0;
         if (screen.entryNameBox != null) height += 28;
         if (screen.entryTargetBox != null) height += 28;
+        if (screen.entrySlotBox != null) height += 28;
         if (screen.entryComponentsBox != null) height += 28;
         if (screen.entryAmountBox != null) height += 28;
         if (screen.entryIconBox != null) height += 28;
@@ -46,6 +47,9 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         }
         if (screen.entryTargetBox != null) {
             rows.add(new EntryRow(Component.literal(screen.getTargetFieldLabel()), screen.entryTargetBox));
+        }
+        if (screen.entrySlotBox != null) {
+            rows.add(new EntryRow(Component.literal("Slot (Optional):"), screen.entrySlotBox));
         }
         if (screen.entryComponentsBox != null) {
             String labelStr = screen.isEntityObjective(screen.editingType) ? "Predicate (Optional):" : "Components (Optional):";

@@ -62,10 +62,7 @@ public class QuestlogClientEvents {
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {
         mostRecentNotificationQuest = event.quest;
-        if (event.quest.getDisplay().shouldShowPopupOnUnlock() &&
-                Minecraft.getInstance().hasSingleplayerServer() &&
-                !Minecraft.getInstance().getSingleplayerServer().isPublished()
-        ) {
+        if (event.quest.getDisplay().shouldShowPopupOnUnlock()) {
             QuestToastState.resetCheckDelay();
             QuestToastState.queuedPopups.add(event.quest);
         } else if (event.quest.getDisplay().shouldToastOnUnlock()) {

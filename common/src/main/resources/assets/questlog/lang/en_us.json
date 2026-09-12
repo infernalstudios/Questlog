@@ -84,6 +84,8 @@
     "questlog.reward.default.item": "Item Reward",
     "questlog.reward.default.questlog.loot_table": "Loot Table",
     "questlog.reward.default.questlog.choice.pick": "Choose %s:",
+    "questlog.reward.default.questlog.random": "Random Reward",
+    "questlog.reward.default.questlog.random.rolls": "%s Random Rewards",
     "questlog.reward.make_choices": "Select Choice(s)",
 
     "questlog.chapter.questlog.main": "Main Quests",
@@ -202,6 +204,7 @@
     "questlog.editor.tooltip.entry_target": "The target registry key, tag, or value for this entry (e.g., minecraft:stone).",
     "questlog.editor.tooltip.entry_target.bounds": "Target block position (x, y, z) or bounding volume (minX, minY, minZ, maxX, maxY, maxZ).",
     "questlog.editor.tooltip.entry_amount": "The required count, amount, or experience points.",
+    "questlog.editor.tooltip.entry_slot": "The equipment slot to check: mainhand, offhand, head, chest, legs, feet. Leave blank for any slot.",
     "questlog.editor.tooltip.levels": "If enabled, the reward/objective value specifies levels instead of experience points.",
 
     "questlog.editor.advanced.left_panel_width": "Left Panel Width:",

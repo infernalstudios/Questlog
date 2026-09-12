@@ -14,11 +14,14 @@ import org.infernalstudios.questlog.util.JsonUtils;
 public class EffectAddedObjective extends Objective {
 
     private final CachedValue<MobEffect> effect;
+    private final ResourceLocation effectId;
 
     public EffectAddedObjective(JsonObject definition) {
         super(definition);
+        String effectStr = JsonUtils.getString(definition, "effect");
+        this.effectId = effectStr.contains(":") ? ResourceLocation.tryParse(effectStr) : ResourceLocation.fromNamespaceAndPath("minecraft", effectStr);
         this.effect = new CachedValue<>(() ->
-                BuiltInRegistries.MOB_EFFECT.get(ResourceLocation.parse(JsonUtils.getString(definition, "effect")))
+                this.effectId != null ? BuiltInRegistries.MOB_EFFECT.get(this.effectId) : null
         );
     }
 
@@ -31,7 +34,9 @@ public class EffectAddedObjective extends Objective {
     private void onEffectAdded(TriggerEntityEvent.EffectAdded event) {
         if (this.isCompleted() || this.getParent() == null) return;
         if (event.entity instanceof ServerPlayer player && this.getParent().manager.player.equals(player)) {
-            if (event.effect.getEffect().equals(this.effect.get())) {
+            MobEffect eventEffect = event.effect.getEffect().value();
+            if ((this.effect.get() != null && eventEffect.equals(this.effect.get())) ||
+                    (this.effectId != null && this.effectId.equals(BuiltInRegistries.MOB_EFFECT.getKey(eventEffect)))) {
                 this.setUnits(this.getUnits() + 1);
             }
         }

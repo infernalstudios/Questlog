@@ -27,6 +27,8 @@ public class QuestRewardRegistry {
                 new EditorMetadata("loot_table", "Loot Table ID:", null, EditorMetadata.SuggestionType.LOOT_TABLE));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "choice"), ChoiceReward::new,
                 new EditorMetadata(null, null, null));
+        register(ResourceLocation.fromNamespaceAndPath("questlog", "random"), RandomReward::new,
+                new EditorMetadata(null, null, "roll_count"));
     }
 
     public static Set<ResourceLocation> getRegisteredTypes() {

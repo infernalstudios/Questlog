@@ -12,10 +12,13 @@ import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.network.packet.QuestSyncPacket;
 import org.infernalstudios.questlog.network.packet.QuestEditModePacket;
 import org.infernalstudios.questlog.platform.Services;
+import net.minecraft.Util;
+import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.advancements.AdvancementHolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +43,16 @@ public class ServerPlayerManager {
     public void addPlayer(Player player) {
         QuestManager questManager = new QuestManager(player);
         this.questManagers.put(player.getUUID(), questManager);
+    }
+
+    public QuestManager getManagerIfPresent(Player player) {
+        if (!this.questManagers.containsKey(player.getUUID())) {
+            return null;
+        } else if (this.questManagers.get(player.getUUID()).player != player) {
+            this.questManagers.get(player.getUUID()).player = player;
+        }
+
+        return this.questManagers.get(player.getUUID());
     }
 
     public QuestManager getManagerByPlayer(Player player) {
@@ -69,6 +82,11 @@ public class ServerPlayerManager {
      * @param questManager The quest manager whose data will be saved.
      */
     public void save(QuestManager questManager) {
+        if (!questManager.isLoaded()) {
+            Questlog.LOGGER.warn("Skipping quest save for player {} because quest data has not been loaded yet", questManager.player.getGameProfile().getName());
+            return;
+        }
+
         Questlog.LOGGER.debug("Saving player data for {}", questManager.player.getGameProfile().getName());
         CompoundTag data = new CompoundTag();
         for (Quest quest : questManager.getAllQuests()) {
@@ -77,12 +95,24 @@ public class ServerPlayerManager {
 
         data.putBoolean("edit_mode", questManager.isEditMode());
 
-        File playerDataFile = this.getPlayerDataFile(questManager.player);
-
+        Path tempFile = null;
         try {
-            NbtIo.writeCompressed(data, playerDataFile.toPath());
+            Path playerDataDir = this.server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
+            Files.createDirectories(playerDataDir);
+            String uuid = questManager.player.getStringUUID();
+            tempFile = Files.createTempFile(playerDataDir, uuid + "-", ".questlog.dat");
+            NbtIo.writeCompressed(data, tempFile);
+            Path targetFile = playerDataDir.resolve(uuid + ".questlog.dat");
+            Path backupFile = playerDataDir.resolve(uuid + ".questlog.dat_old");
+            Util.safeReplaceFile(targetFile, tempFile, backupFile);
         } catch (IOException e) {
-            Questlog.LOGGER.error("Failed to save player data for {}", questManager.player.getGameProfile().getName());
+            Questlog.LOGGER.error("Failed to save player data for {}", questManager.player.getGameProfile().getName(), e);
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
@@ -108,23 +138,28 @@ public class ServerPlayerManager {
     public void load(QuestManager questManager) {
         Questlog.LOGGER.debug("Loading player data for {}", questManager.player.getGameProfile().getName());
         File playerDataFile = this.getPlayerDataFile(questManager.player);
+        File backupDataFile = this.getBackupPlayerDataFile(questManager.player);
 
-        if (!playerDataFile.exists()) {
+        CompoundTag data = null;
+        if (playerDataFile.exists()) {
             try {
-                NbtIo.writeCompressed(new CompoundTag(), playerDataFile.toPath());
+                data = NbtIo.readCompressed(playerDataFile.toPath(), NbtAccounter.unlimitedHeap());
             } catch (IOException e) {
-                Questlog.LOGGER.error("Failed to create player data for {}", questManager.player.getGameProfile().getName());
-                return;
+                Questlog.LOGGER.error("Failed to load player data for {}, attempting backup", questManager.player.getGameProfile().getName(), e);
             }
         }
 
-        CompoundTag data;
-        try {
-            data = NbtIo.readCompressed(playerDataFile.toPath(), NbtAccounter.unlimitedHeap());
-        } catch (IOException e) {
-            Questlog.LOGGER.error("Failed to load player data for {}", questManager.player.getGameProfile().getName());
-            Questlog.LOGGER.error(e);
-            return;
+        if (data == null && backupDataFile.exists()) {
+            try {
+                data = NbtIo.readCompressed(backupDataFile.toPath(), NbtAccounter.unlimitedHeap());
+                Questlog.LOGGER.info("Successfully loaded backup quest data for {}", questManager.player.getGameProfile().getName());
+            } catch (IOException e) {
+                Questlog.LOGGER.error("Failed to load backup player data for {}", questManager.player.getGameProfile().getName(), e);
+            }
+        }
+
+        if (data == null) {
+            data = new CompoundTag();
         }
 
         boolean shouldSave = false;
@@ -150,6 +185,8 @@ public class ServerPlayerManager {
             }
         }
 
+        questManager.setLoaded(true);
+
         if (shouldSave) {
             this.save(questManager);
         }
@@ -160,27 +197,48 @@ public class ServerPlayerManager {
     private boolean isSyncingGlobal = false;
 
     private File getGlobalDataFile() {
-        Path playerDataPath = this.server.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR);
+        Path playerDataPath = this.server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
         return new File(playerDataPath.toFile(), "global_quests.questlog.dat");
     }
 
     private CompoundTag loadGlobalData() {
         File file = getGlobalDataFile();
-        if (!file.exists()) return new CompoundTag();
-        try {
-            return NbtIo.readCompressed(file.toPath(), NbtAccounter.unlimitedHeap());
-        } catch (IOException e) {
-            Questlog.LOGGER.error("Failed to load global quest data", e);
-            return new CompoundTag();
+        File backupFile = new File(file.getParentFile(), "global_quests.questlog.dat_old");
+        if (file.exists()) {
+            try {
+                return NbtIo.readCompressed(file.toPath(), NbtAccounter.unlimitedHeap());
+            } catch (IOException e) {
+                Questlog.LOGGER.error("Failed to load global quest data, attempting backup", e);
+            }
         }
+        if (backupFile.exists()) {
+            try {
+                return NbtIo.readCompressed(backupFile.toPath(), NbtAccounter.unlimitedHeap());
+            } catch (IOException e) {
+                Questlog.LOGGER.error("Failed to load backup global quest data", e);
+            }
+        }
+        return new CompoundTag();
     }
 
     private void saveGlobalData(CompoundTag tag) {
-        File file = getGlobalDataFile();
+        Path tempFile = null;
         try {
-            NbtIo.writeCompressed(tag, file.toPath());
+            Path playerDataDir = this.server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
+            Files.createDirectories(playerDataDir);
+            tempFile = Files.createTempFile(playerDataDir, "global_quests-", ".questlog.dat");
+            NbtIo.writeCompressed(tag, tempFile);
+            Path targetFile = playerDataDir.resolve("global_quests.questlog.dat");
+            Path backupFile = playerDataDir.resolve("global_quests.questlog.dat_old");
+            Util.safeReplaceFile(targetFile, tempFile, backupFile);
         } catch (IOException e) {
             Questlog.LOGGER.error("Failed to save global quest data", e);
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
@@ -257,7 +315,12 @@ public class ServerPlayerManager {
     }
 
     private File getPlayerDataFile(Player player) {
-        Path playerDataPath = this.server.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR);
+        Path playerDataPath = this.server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
         return new File(playerDataPath.toFile(), player.getUUID() + ".questlog.dat");
+    }
+
+    private File getBackupPlayerDataFile(Player player) {
+        Path playerDataPath = this.server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
+        return new File(playerDataPath.toFile(), player.getUUID() + ".questlog.dat_old");
     }
 }
