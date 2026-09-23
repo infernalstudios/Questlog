@@ -56,10 +56,7 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
             rows.add(new EntryRow(Component.literal(labelStr), screen.entryNbtBox));
         }
         if (screen.entryAmountBox != null) {
-            String amtLabel = screen.activeTab == QuestEditorScreen.ActiveTab.REWARDS ?
-                    (("questlog:choice".equals(screen.editingType) || "choice".equals(screen.editingType)) ? "Pick Count:" : "Count/Exp:")
-                    : "Req Amount:";
-            rows.add(new EntryRow(Component.literal(amtLabel), screen.entryAmountBox));
+            rows.add(new EntryRow(Component.literal(screen.getAmountFieldLabel()), screen.entryAmountBox));
         }
         if (screen.entryIconBox != null) {
             rows.add(new EntryRow(Component.literal("Icon (Optional):"), screen.entryIconBox));

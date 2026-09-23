@@ -13,7 +13,7 @@ public class EntityApproachObjective extends AbstractEntityObjective {
 
     public EntityApproachObjective(JsonObject definition) {
         super(definition);
-        this.range = JsonUtils.getInt(definition, "range");
+        this.range = JsonUtils.getOrDefault(definition, "range", 5);
     }
 
     @Override

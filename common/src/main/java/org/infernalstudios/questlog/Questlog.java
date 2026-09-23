@@ -32,4 +32,11 @@ public class Questlog {
     public static QuestlogConfig getConfig() {
         return AutoConfig.getConfigHolder(QuestlogConfig.class).getConfig();
     }
+
+    /**
+     * Saves the current client configuration to disk.
+     */
+    public static void saveConfig() {
+        AutoConfig.getConfigHolder(QuestlogConfig.class).save();
+    }
 }

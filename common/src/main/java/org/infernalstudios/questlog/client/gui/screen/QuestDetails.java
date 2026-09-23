@@ -489,6 +489,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     @Override
+    public boolean keyPressed(int key, int scancode, int modifiers) {
+        if (key == GLFW.GLFW_KEY_ESCAPE || key == GLFW.GLFW_KEY_E || QuestlogClient.OPEN_SCREEN_KEY.matches(key, scancode)) {
+            if (this.minecraft != null) {
+                this.minecraft.setScreen(this.previousScreen);
+                return true;
+            }
+        }
+
+        return super.keyPressed(key, scancode, modifiers);
+    }
+
+    @Override
     public void updateNarration(@NotNull NarrationElementOutput output) {
     }
 }

@@ -47,11 +47,14 @@ public class QuestlogScreen extends Screen {
     private static final ResourceLocation EDITOR_CHAPTER_PLUS_TEXTURE = new ResourceLocation(Questlog.MODID, "textures/gui/editor_chapter_plus.png");
     private static final int MAX_TABS = 8;
     private final Screen previousScreen;
+    private static final Map<ResourceLocation, Double> CHAPTER_SCROLL_POSITIONS = new HashMap<>();
     private final QuestManager manager;
     private final Map<ResourceLocation, ChapterInfo> availableChapters = new LinkedHashMap<>();
+    public Component pendingTooltip = null;
     @Nullable
     private ScrollableComponent questList;
-    private ResourceLocation currentChapter = new ResourceLocation(Questlog.MODID, "main");
+    private ResourceLocation currentChapter = null;
+    private ResourceLocation displayedChapter = null;
     private String searchQuery = "";
     private NoShadowEditBox searchBox;
     private int tabOffset = 0;
@@ -59,7 +62,6 @@ public class QuestlogScreen extends Screen {
     private boolean descriptionsCondensed = false;
     private boolean hideCompleted = false;
     private ContextMenu contextMenu = null;
-    public Component pendingTooltip = null;
 
     public QuestlogScreen(@Nullable Screen previousScreen) {
         super(Component.empty());
@@ -95,6 +97,41 @@ public class QuestlogScreen extends Screen {
 
             this.availableChapters.put(chapterId, new ChapterInfo(icon, isPrimary, hidden, name));
         }
+
+        this.hideCompleted = Questlog.getConfig().preferences.hideCompleted;
+        this.descriptionsCondensed = Questlog.getConfig().preferences.descriptionsCondensed;
+
+        List<ResourceLocation> chapterKeys = new ArrayList<>();
+        for (Map.Entry<ResourceLocation, ChapterInfo> entry : this.availableChapters.entrySet()) {
+            if (QuestlogClient.isEditModeActive || !entry.getValue().hidden) {
+                chapterKeys.add(entry.getKey());
+            }
+        }
+
+        ResourceLocation defaultChapter = new ResourceLocation(Questlog.MODID, "main");
+        if (this.currentChapter == null || !chapterKeys.contains(this.currentChapter)) {
+            String lastOpenChapter = Questlog.getConfig().preferences.lastOpenChapter;
+            ResourceLocation savedChapter = (lastOpenChapter != null && !lastOpenChapter.isEmpty()) ? ResourceLocation.tryParse(lastOpenChapter) : null;
+            if (savedChapter != null && chapterKeys.contains(savedChapter)) {
+                this.currentChapter = savedChapter;
+            } else if (chapterKeys.contains(defaultChapter)) {
+                this.currentChapter = defaultChapter;
+            } else if (!chapterKeys.isEmpty()) {
+                this.currentChapter = chapterKeys.stream()
+                        .filter(id -> this.availableChapters.get(id) != null && this.availableChapters.get(id).isPrimary)
+                        .findFirst()
+                        .orElse(chapterKeys.get(0));
+            } else {
+                this.currentChapter = defaultChapter;
+            }
+        }
+
+        if (!this.currentChapter.toString().equals(Questlog.getConfig().preferences.lastOpenChapter)) {
+            Questlog.getConfig().preferences.lastOpenChapter = this.currentChapter.toString();
+            Questlog.saveConfig();
+        }
+
+        this.ensureTabVisible(chapterKeys, this.currentChapter);
 
         this.refreshList();
     }
@@ -209,11 +246,14 @@ public class QuestlogScreen extends Screen {
 
     private void refreshQuestListOnly() {
         if (this.questList != null) {
+            this.saveCurrentScrollPosition();
             this.removeWidget(this.questList);
         }
 
+        this.displayedChapter = this.currentChapter;
         this.questList = this.getList();
         if (this.questList != null) {
+            this.restoreCurrentScrollPosition();
             this.addRenderableWidget(this.questList);
         }
     }
@@ -295,6 +335,8 @@ public class QuestlogScreen extends Screen {
                 @Override
                 public void onPress() {
                     hideCompleted = !hideCompleted;
+                    Questlog.getConfig().preferences.hideCompleted = hideCompleted;
+                    Questlog.saveConfig();
                     refreshList();
                 }
 
@@ -319,6 +361,8 @@ public class QuestlogScreen extends Screen {
                 @Override
                 public void onPress() {
                     descriptionsCondensed = !descriptionsCondensed;
+                    Questlog.getConfig().preferences.descriptionsCondensed = descriptionsCondensed;
+                    Questlog.saveConfig();
                     refreshList();
                 }
 
@@ -360,7 +404,7 @@ public class QuestlogScreen extends Screen {
             boolean isSelected = chap.equals(this.currentChapter);
 
             this.addRenderableWidget(new ChapterTabButton(chap, tabX + (i * 30), tabY, info.icon, isSelected, info.isPrimary, () -> {
-                this.currentChapter = chap;
+                this.setCurrentChapter(chap);
                 this.refreshList();
             }, QuestlogGuiSet.DEFAULT, info.name));
         }
@@ -410,6 +454,7 @@ public class QuestlogScreen extends Screen {
                 x, y, width, height,
                 new QuestList(Minecraft.getInstance(), quests, displayData -> {
                     if (this.minecraft != null) {
+                        this.saveCurrentScrollPosition();
                         this.minecraft.setScreen(new QuestDetails(this, displayData));
                     }
                 }, this.descriptionsCondensed)
@@ -606,10 +651,8 @@ public class QuestlogScreen extends Screen {
                     }));
                 }
 
-                if (!items.isEmpty()) {
-                    this.openContextMenu((int) mouseX, (int) mouseY, items);
-                    return true;
-                }
+                this.openContextMenu((int) mouseX, (int) mouseY, items);
+                return true;
             }
         }
 
@@ -644,19 +687,19 @@ public class QuestlogScreen extends Screen {
 
         for (EditorUtils.EditorPreset preset : EditorUtils.getPresets("quests")) {
             items.add(new ContextMenuItem(
-                Component.literal(preset.title()),
-                () -> {
-                    if (this.minecraft != null) {
-                        try {
-                            JsonObject presetJsonCloned = preset.json().deepCopy();
-                            presetJsonCloned.addProperty("chapter", this.currentChapter.toString());
-                            this.minecraft.setScreen(new QuestEditorScreen(this, null, presetJsonCloned));
-                        } catch (Exception e) {
-                            Questlog.LOGGER.error("Failed to load preset json", e);
+                    Component.literal(preset.title()),
+                    () -> {
+                        if (this.minecraft != null) {
+                            try {
+                                JsonObject presetJsonCloned = preset.json().deepCopy();
+                                presetJsonCloned.addProperty("chapter", this.currentChapter.toString());
+                                this.minecraft.setScreen(new QuestEditorScreen(this, null, presetJsonCloned));
+                            } catch (Exception e) {
+                                Questlog.LOGGER.error("Failed to load preset json", e);
+                            }
                         }
-                    }
-                },
-                preset.description().isEmpty() ? null : Component.literal(preset.description())
+                    },
+                    preset.description().isEmpty() ? null : Component.literal(preset.description())
             ));
         }
 
@@ -666,14 +709,14 @@ public class QuestlogScreen extends Screen {
     private void confirmDeleteQuest(Quest quest) {
         if (this.minecraft != null) {
             this.minecraft.setScreen(new ConfirmScreen(
-                (boolean confirm) -> {
-                    if (confirm) {
-                        EditorUtils.deleteQuest(quest.getId());
-                    }
-                    this.minecraft.setScreen(this);
-                },
-                Component.translatable("questlog.menu.delete.confirm.title"),
-                Component.translatable("questlog.menu.delete.confirm.message", quest.getDisplay().getTitle())
+                    (boolean confirm) -> {
+                        if (confirm) {
+                            EditorUtils.deleteQuest(quest.getId());
+                        }
+                        this.minecraft.setScreen(this);
+                    },
+                    Component.translatable("questlog.menu.delete.confirm.title"),
+                    Component.translatable("questlog.menu.delete.confirm.message", quest.getDisplay().getTitle())
             ));
         }
     }
@@ -681,18 +724,66 @@ public class QuestlogScreen extends Screen {
     private void confirmDeleteChapter(ResourceLocation chapterId, Component name) {
         if (this.minecraft != null) {
             this.minecraft.setScreen(new ConfirmScreen(
-                (boolean confirm) -> {
-                    if (confirm) {
-                        EditorUtils.deleteChapter(chapterId);
-                        if (chapterId.equals(this.currentChapter)) {
-                            this.currentChapter = new ResourceLocation(Questlog.MODID, "main");
+                    (boolean confirm) -> {
+                        if (confirm) {
+                            CHAPTER_SCROLL_POSITIONS.remove(chapterId);
+                            EditorUtils.deleteChapter(chapterId);
+                            if (chapterId.equals(this.currentChapter)) {
+                                this.setCurrentChapter(new ResourceLocation(Questlog.MODID, "main"));
+                            }
                         }
-                    }
-                    this.minecraft.setScreen(this);
-                },
-                Component.translatable("questlog.menu.delete_chapter.confirm.title"),
-                Component.translatable("questlog.menu.delete_chapter.confirm.message", name)
+                        this.minecraft.setScreen(this);
+                    },
+                    Component.translatable("questlog.menu.delete_chapter.confirm.title"),
+                    Component.translatable("questlog.menu.delete_chapter.confirm.message", name)
             ));
+        }
+    }
+
+    public static void clearScrollPositions() {
+        CHAPTER_SCROLL_POSITIONS.clear();
+    }
+
+    private void saveCurrentScrollPosition() {
+        if (this.questList != null && this.displayedChapter != null && (this.searchQuery == null || this.searchQuery.isEmpty())) {
+            CHAPTER_SCROLL_POSITIONS.put(this.displayedChapter, this.questList.getScrollAmount());
+        }
+    }
+
+    private void restoreCurrentScrollPosition() {
+        if (this.questList != null && this.displayedChapter != null && (this.searchQuery == null || this.searchQuery.isEmpty())) {
+            Double savedScroll = CHAPTER_SCROLL_POSITIONS.get(this.displayedChapter);
+            if (savedScroll != null) {
+                this.questList.setScrollAmount(savedScroll);
+            }
+        }
+    }
+
+    @Override
+    public void removed() {
+        this.saveCurrentScrollPosition();
+        super.removed();
+    }
+
+    private void setCurrentChapter(ResourceLocation chapter) {
+        this.currentChapter = chapter;
+        Questlog.getConfig().preferences.lastOpenChapter = chapter.toString();
+        Questlog.saveConfig();
+    }
+
+    private void ensureTabVisible(List<ResourceLocation> chapterKeys, @Nullable ResourceLocation chapter) {
+        if (chapter == null) {
+            return;
+        }
+        int chapterIndex = chapterKeys.indexOf(chapter);
+        if (chapterIndex != -1) {
+            if (chapterIndex < this.tabOffset) {
+                this.tabOffset = chapterIndex;
+            } else if (chapterIndex >= this.tabOffset + MAX_TABS) {
+                this.tabOffset = chapterIndex - MAX_TABS + 1;
+            }
+            int maxOffset = Math.max(0, chapterKeys.size() - MAX_TABS);
+            this.tabOffset = Math.max(0, Math.min(this.tabOffset, maxOffset));
         }
     }
 

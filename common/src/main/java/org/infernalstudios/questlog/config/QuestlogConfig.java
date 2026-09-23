@@ -19,6 +19,10 @@ public class QuestlogConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public Colors colors = new Colors();
 
+    @ConfigEntry.Category("preferences")
+    @ConfigEntry.Gui.TransitiveObject
+    public Preferences preferences = new Preferences();
+
     public static class Button {
         @ConfigEntry.Gui.Tooltip()
         public boolean enabled = true;
@@ -101,6 +105,17 @@ public class QuestlogConfig implements ConfigData {
 
         @ConfigEntry.ColorPicker(allowAlpha = true)
         public int toastDescriptionColor = 0x4C381B;
+    }
+
+    public static class Preferences {
+        @ConfigEntry.Gui.Tooltip()
+        public boolean hideCompleted = false;
+
+        @ConfigEntry.Gui.Tooltip()
+        public boolean descriptionsCondensed = false;
+
+        @ConfigEntry.Gui.Excluded
+        public String lastOpenChapter = "";
     }
 
 }
