@@ -1,20 +1,12 @@
 ### Added
 
-- Added a `questlog:random` reward type, which rolls one of several weighted entries when the reward is claimed.
-
-### Changed
-
-- `slot` is now an optional field in the item equip quests.
+- The Questlog now reopens to the last opened chapter.
+- Saved chapter scroll position when navigating back from a quest or switching chapters.
 
 ### Fixed
 
-- Fixed player quest progress being wiped when another mod saves the player during login.
-- Fixed missing item equip slot field in the in-game editor.
-- Fixed repeatable quests not resetting when quest rewards are collected.
-- Fixed quest rewards and choices being hidden when the details button is disabled.
-- Fixed details button displaying when details are open by default.
-- Fixed raw `%s` placeholder displaying for effect and quest completed objectives.
-- Fixed "Toast on Unlock" triggering on objective progress instead of when requirements are met.
-- Fixed "Popup on Unlock" not triggering.
-- Fixed "Effect Added" objectives not completing.
-- Fixed quest membership desync in the chapter editor when "In Main Chapter" is enabled.
+- Fixed "Hide completed quests" and "Condensed view" display preferences resetting when reopening the Questlog.
+- Fixed misleading "Hidden" quest setting tooltip in the editor.
+- Fixed the Entity Approach objective in the editor generating a "required_amount" field instead of "range".
+- Defaulted missing "range" in Entity Approach objectives to 5 blocks to prevent broken quest errors.
+- Fixed the selection list in the quest editor where clicking the scrollbar clicked options underneath it and mouse wheel scrolling was occasionally unresponsive.

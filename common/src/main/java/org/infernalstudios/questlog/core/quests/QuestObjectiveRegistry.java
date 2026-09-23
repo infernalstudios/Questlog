@@ -42,7 +42,7 @@ public class QuestObjectiveRegistry {
         register(ResourceLocation.fromNamespaceAndPath("questlog", "entity_kill"), EntityKillObjective::new,
                 new EditorMetadata("entity", "Entity ID:", "required_amount", EditorMetadata.SuggestionType.ENTITY_TYPE));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "entity_approach"), EntityApproachObjective::new,
-                new EditorMetadata("entity", "Entity ID:", "required_amount", EditorMetadata.SuggestionType.ENTITY_TYPE));
+                new EditorMetadata("entity", "Entity ID:", "range", "Range (Blocks):", EditorMetadata.SuggestionType.ENTITY_TYPE));
         register(ResourceLocation.fromNamespaceAndPath("questlog", "entity_tame"), EntityTameObjective::new,
                 new EditorMetadata("entity", "Entity ID:", "required_amount", EditorMetadata.SuggestionType.ENTITY_TYPE));
 

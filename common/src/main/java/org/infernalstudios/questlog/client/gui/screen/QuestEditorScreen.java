@@ -162,6 +162,7 @@ public class QuestEditorScreen extends Screen {
     private NineSliceTexture bgLeft;
     private NineSliceTexture bgRight;
     private int typeListScroll = 0;
+    private boolean typeListScrolling = false;
     private String tempId = "";
     private String tempTitle = "";
     private String tempDescription = "";
@@ -298,6 +299,10 @@ public class QuestEditorScreen extends Screen {
     protected void init() {
         super.init();
 
+        this.typeListScrolling = false;
+        this.rightScrollable = null;
+        this.settingsScrollable = null;
+
         int PANEL_SPACING = 6;
         int leftWidth = 240;
         int rightWidth = 160;
@@ -306,41 +311,38 @@ public class QuestEditorScreen extends Screen {
         int baseX = (this.width - totalWidth) / 2;
         int baseY = (this.height - height) / 2;
 
-        int panel1X = baseX;
-        int panel1Y = baseY;
         int panel2X = baseX + leftWidth + PANEL_SPACING;
-        int panel2Y = baseY;
 
         this.bgLeft = new NineSliceTexture(QuestlogGuiSet.DEFAULT.backgroundLoc, leftWidth, height, 375, 174, 275, 166, 1024, 512, 16, 16);
         this.bgRight = new NineSliceTexture(QuestlogGuiSet.DEFAULT.rightPanelLoc, rightWidth, height, 375, 174, 275, 166, 1024, 512, 16, 16);
 
-        this.idBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 22, 195, 16, Component.empty());
+        this.idBox = new NoShadowEditBox(this.font, baseX + 15, baseY + 22, 195, 16, Component.empty());
         this.idBox.setMaxLength(64);
         this.idBox.setValue(this.tempId);
         this.idBox.setEditable(this.questToEdit == null);
         this.idBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.id")));
 
-        this.titleBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 54, 195, 16, Component.empty());
+        this.titleBox = new NoShadowEditBox(this.font, baseX + 15, baseY + 54, 195, 16, Component.empty());
         this.titleBox.setMaxLength(64);
         this.titleBox.setValue(this.tempTitle);
         this.titleBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.title")));
 
-        this.descriptionBox = new MultiLineEditBox(this.font, panel1X + 15, panel1Y + 86, 195, 54, Component.empty(), Component.empty());
+        this.descriptionBox = new MultiLineEditBox(this.font, baseX + 15, baseY + 86, 195, 54, Component.empty(), Component.empty());
         this.descriptionBox.setCharacterLimit(Integer.MAX_VALUE);
         this.descriptionBox.setValue(this.tempDescription);
         this.descriptionBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.description")));
 
-        this.iconBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 156, 195, 16, Component.empty());
+        this.iconBox = new NoShadowEditBox(this.font, baseX + 15, baseY + 156, 195, 16, Component.empty());
         this.iconBox.setMaxLength(128);
         this.iconBox.setValue(this.tempIconItem);
         this.iconBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.icon")));
 
-        this.chapterBox = new NoShadowEditBox(this.font, panel1X + 15, panel1Y + 188, 130, 16, Component.empty());
+        this.chapterBox = new NoShadowEditBox(this.font, baseX + 15, baseY + 188, 130, 16, Component.empty());
         this.chapterBox.setMaxLength(64);
         this.chapterBox.setValue(this.tempChapter);
         this.chapterBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.chapter")));
 
-        this.orderBox = new NoShadowEditBox(this.font, panel1X + 165, panel1Y + 188, 50, 16, Component.empty());
+        this.orderBox = new NoShadowEditBox(this.font, baseX + 165, baseY + 188, 50, 16, Component.empty());
         this.orderBox.setMaxLength(8);
         this.orderBox.setValue(String.valueOf(this.tempSortOrder));
         this.orderBox.setFilter(s -> s.isEmpty() || s.matches("-?\\d*"));
@@ -354,30 +356,30 @@ public class QuestEditorScreen extends Screen {
         this.leftFields.add(this.chapterBox);
         this.leftFields.add(this.orderBox);
 
-        this.leftScrollable = new ScrollableComponent(panel1X + 10, panel1Y + 12, 220, 170, new LeftPanelScrollable(this));
+        this.leftScrollable = new ScrollableComponent(baseX + 10, baseY + 12, 220, 170, new LeftPanelScrollable(this));
         this.addRenderableWidget(this.leftScrollable);
 
         if (this.rightPageState == RightPageState.LIST) {
-            this.buildRightPageList(panel2X, panel2Y);
+            this.buildRightPageList(panel2X, baseY);
         } else if (this.rightPageState == RightPageState.SELECT_TYPE) {
-            this.buildRightPageSelectType(panel2X, panel2Y);
+            this.buildRightPageSelectType(panel2X, baseY);
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY) {
-            this.buildRightPageEditEntry(panel2X, panel2Y);
+            this.buildRightPageEditEntry(panel2X, baseY);
         }
 
         int btnWidth = 100;
-        int bottomY = panel1Y + height + 10;
+        int bottomY = baseY + height + 10;
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.cancel"), btn -> {
             if (this.minecraft != null) {
                 this.minecraft.setScreen(this.previousScreen);
             }
-        }).bounds(panel1X, bottomY, btnWidth, 20).build());
+        }).bounds(baseX, bottomY, btnWidth, 20).build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.save"), btn -> {
             this.saveTemporaryState();
             this.saveQuestToServer();
-        }).bounds(panel1X + btnWidth + 5, bottomY, btnWidth, 20).build());
+        }).bounds(baseX + btnWidth + 5, bottomY, btnWidth, 20).build());
 
         if (this.questToEdit != null) {
             Button btnDuplicate = Button.builder(Component.translatable("questlog.editor.duplicate"), btn -> {
@@ -574,6 +576,8 @@ public class QuestEditorScreen extends Screen {
                 this.selectedEntryIndex = -1;
                 this.editingEntry = new JsonObject();
                 this.typeSearchQuery = "";
+                this.typeListScroll = 0;
+                this.typeListScrolling = false;
                 this.rightPageState = RightPageState.SELECT_TYPE;
                 this.rebuildWidgets();
             });
@@ -655,6 +659,7 @@ public class QuestEditorScreen extends Screen {
 
         this.addRenderableWidget(Button.builder(Component.translatable("questlog.editor.cancel"), btn -> {
             this.saveTemporaryState();
+            this.typeListScrolling = false;
             this.rightPageState = RightPageState.LIST;
             this.rebuildWidgets();
         }).bounds(panel2X + 15, panel2Y + 162, 130, 16).build());
@@ -668,6 +673,7 @@ public class QuestEditorScreen extends Screen {
         this.entryNameBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_name")));
 
         EditorMetadata meta = getMetadata(this.editingType);
+        String amountTooltipKey = (meta != null && "range".equals(meta.amountFieldKey())) ? "questlog.editor.tooltip.entry_range" : "questlog.editor.tooltip.entry_amount";
 
         boolean isLogical = "questlog:or".equals(this.editingType) || "questlog:and".equals(this.editingType) || "questlog:not".equals(this.editingType)
                 || "or".equals(this.editingType) || "and".equals(this.editingType) || "not".equals(this.editingType);
@@ -733,7 +739,7 @@ public class QuestEditorScreen extends Screen {
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
-                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
+                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable(amountTooltipKey)));
             } else {
                 this.entryAmountBox = null;
             }
@@ -778,7 +784,7 @@ public class QuestEditorScreen extends Screen {
                 this.entryAmountBox.setFilter(s -> s.isEmpty() || s.matches("\\d*"));
                 int amtVal = getAmountValue();
                 this.entryAmountBox.setValue(String.valueOf(amtVal));
-                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.entry_amount")));
+                this.entryAmountBox.setTooltip(Tooltip.create(Component.translatable(amountTooltipKey)));
             } else {
                 this.entryAmountBox = null;
             }
@@ -863,6 +869,19 @@ public class QuestEditorScreen extends Screen {
         return "Target Key:";
     }
 
+    String getAmountFieldLabel() {
+        EditorMetadata meta = getMetadata(this.editingType);
+        if (meta != null && meta.amountFieldLabel() != null) {
+            return meta.amountFieldLabel();
+        }
+        if (meta != null && "range".equals(meta.amountFieldKey())) {
+            return "Range (Blocks):";
+        }
+        return this.activeTab == ActiveTab.REWARDS ?
+                (("questlog:choice".equals(this.editingType) || "choice".equals(this.editingType)) ? "Pick Count:" : "Count/Exp:")
+                : "Req Amount:";
+    }
+
     private String getTargetFieldValue() {
         if (this.editingEntry == null) return "";
         EditorMetadata meta = getMetadata(this.editingType);
@@ -892,6 +911,9 @@ public class QuestEditorScreen extends Screen {
                 return this.editingEntry.get(key).getAsInt();
             }
         }
+        if (this.editingEntry.has("range")) {
+            return this.editingEntry.get("range").getAsInt();
+        }
         if (this.editingEntry.has("required_amount")) {
             return this.editingEntry.get("required_amount").getAsInt();
         }
@@ -900,6 +922,9 @@ public class QuestEditorScreen extends Screen {
         }
         if (this.editingEntry.has("experience")) {
             return this.editingEntry.get("experience").getAsInt();
+        }
+        if (meta != null && "range".equals(meta.amountFieldKey())) {
+            return 5;
         }
         return 1;
     }
@@ -1067,7 +1092,7 @@ public class QuestEditorScreen extends Screen {
         String[] allKeys = new String[]{
                 "block", "item", "entity", "biome", "dimension", "structure",
                 "advancement", "stat", "quest", "enchantment", "effect", "command", "loot_table", "bounds",
-                "required_amount", "count", "experience", "levels", "pick_count", "slot"
+                "required_amount", "count", "experience", "levels", "pick_count", "slot", "range"
         };
         for (String k : allKeys) {
             this.editingEntry.remove(k);
@@ -1544,15 +1569,14 @@ public class QuestEditorScreen extends Screen {
         int baseY = (this.height - height) / 2;
 
         int panel2X = baseX + leftWidth + PANEL_SPACING;
-        int panel2Y = baseY;
 
         int color = Questlog.getConfig().colors.textColor | 0xFF000000;
 
         if (this.rightPageState == RightPageState.SELECT_TYPE) {
-            ps.drawString(this.font, "Search Type:", panel2X + 15, panel2Y + 12, color, false);
+            ps.drawString(this.font, "Search Type:", panel2X + 15, baseY + 12, color, false);
 
             int listX = panel2X + 15;
-            int listY = panel2Y + 40;
+            int listY = baseY + 40;
             int listW = 130;
             int listH = 116;
 
@@ -1572,37 +1596,41 @@ public class QuestEditorScreen extends Screen {
             int end = Math.min(filteredList.size(), start + 7);
             int itemHeight = 16;
 
+            boolean hasScrollbar = filteredList.size() > 7;
+            int scrollbarWidth = 6;
+            int itemWidth = hasScrollbar ? listW - scrollbarWidth : listW;
+
             for (int i = start; i < end; i++) {
                 String type = filteredList.get(i);
                 String shortName = type.replace("questlog:", "");
                 int rowY = listY + (i - start) * itemHeight;
 
-                boolean hovered = renderMouseX >= listX && renderMouseX <= listX + listW && renderMouseY >= rowY && renderMouseY <= rowY + itemHeight;
+                boolean hovered = renderMouseX >= listX && renderMouseX < listX + itemWidth && renderMouseY >= rowY && renderMouseY < rowY + itemHeight;
                 if (hovered) {
-                    ps.fill(listX, rowY, listX + listW, rowY + itemHeight, 0xFF404040);
+                    ps.fill(listX, rowY, listX + itemWidth, rowY + itemHeight, 0xFF404040);
                 }
 
                 ps.drawString(this.font, shortName, listX + 4, rowY + 4, hovered ? 0xFFFFFF00 : 0xFFFFFFFF, false);
             }
 
-            if (filteredList.size() > 7) {
-                int scrollbarWidth = 6;
+            if (hasScrollbar) {
                 int scrollbarX = listX + listW - scrollbarWidth;
-                int scrollbarY = listY;
-                int scrollbarH = listH;
-                ps.fill(scrollbarX, scrollbarY, scrollbarX + scrollbarWidth, scrollbarY + scrollbarH, 0xFF202020);
-                int thumbH = Math.max(8, (7 * scrollbarH) / filteredList.size());
-                int thumbY = scrollbarY + (this.typeListScroll * (scrollbarH - thumbH)) / maxScroll;
-                ps.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarWidth - 1, thumbY + thumbH, 0xFF808080);
+                ps.fill(scrollbarX, listY, scrollbarX + scrollbarWidth, listY + listH, 0xFF202020);
+                int thumbH = Math.max(8, (7 * listH) / filteredList.size());
+                int thumbY = listY + (this.typeListScroll * (listH - thumbH)) / maxScroll;
+
+                boolean scrollbarHovered = (renderMouseX >= scrollbarX && renderMouseX <= scrollbarX + scrollbarWidth && renderMouseY >= listY && renderMouseY <= listY + listH) || this.typeListScrolling;
+                int thumbColor = scrollbarHovered ? 0xFFB0B0B0 : 0xFF808080;
+                ps.fill(scrollbarX + 1, thumbY, scrollbarX + scrollbarWidth - 1, thumbY + thumbH, thumbColor);
             }
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY) {
             String titleText = getEditingTypeTitle();
-            ps.drawString(this.font, titleText, panel2X + 15, panel2Y + 12, color, false);
+            ps.drawString(this.font, titleText, panel2X + 15, baseY + 12, color, false);
         } else if (this.rightPageState == RightPageState.LIST && this.activeTab != ActiveTab.SETTINGS) {
             if (!this.nestingStack.isEmpty()) {
                 String parentType = this.nestingStack.peek().editingType.replace("questlog:", "");
                 String title = parentType.toUpperCase() + " List";
-                ps.drawString(this.font, title, panel2X + 59, panel2Y + 16, color, false);
+                ps.drawString(this.font, title, panel2X + 59, baseY + 16, color, false);
             }
         }
 
@@ -1700,10 +1728,9 @@ public class QuestEditorScreen extends Screen {
             int totalWidth = leftWidth + 160 + PANEL_SPACING;
             int baseX = (this.width - totalWidth) / 2;
             int panel2X = baseX + leftWidth + PANEL_SPACING;
-            int panel2Y = (this.height - 190) / 2;
 
             int listX = panel2X + 15;
-            int listY = panel2Y + 40;
+            int listY = (this.height - 190) / 2 + 40;
             int listW = 130;
             int listH = 116;
 
@@ -1712,15 +1739,29 @@ public class QuestEditorScreen extends Screen {
                 filteredList.sort(String::compareTo);
 
                 int maxScroll = Math.max(0, filteredList.size() - 7);
-                int currentScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
+                boolean hasScrollbar = filteredList.size() > 7;
+                int scrollbarWidth = 6;
+                int scrollbarX = listX + listW - scrollbarWidth;
 
-                int clickedIdx = currentScroll + (int) ((mouseY - listY) / 16);
-                if (clickedIdx >= 0 && clickedIdx < filteredList.size()) {
-                    this.saveTemporaryState();
-                    this.editingType = filteredList.get(clickedIdx);
-                    this.rightPageState = RightPageState.EDIT_ENTRY;
-                    this.rebuildWidgets();
+                if (hasScrollbar && mouseX >= scrollbarX) {
+                    this.typeListScrolling = true;
+                    int thumbH = Math.max(8, (7 * listH) / filteredList.size());
+                    double relY = mouseY - listY - (thumbH / 2.0);
+                    double scrollRatio = relY / (double) (listH - thumbH);
+                    this.typeListScroll = (int) Math.round(scrollRatio * maxScroll);
+                    this.typeListScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
                     return true;
+                } else if (mouseX < (hasScrollbar ? scrollbarX : listX + listW)) {
+                    int currentScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
+                    int clickedIdx = currentScroll + (int) ((mouseY - listY) / 16);
+                    if (clickedIdx >= 0 && clickedIdx < filteredList.size()) {
+                        this.saveTemporaryState();
+                        this.typeListScrolling = false;
+                        this.editingType = filteredList.get(clickedIdx);
+                        this.rightPageState = RightPageState.EDIT_ENTRY;
+                        this.rebuildWidgets();
+                        return true;
+                    }
                 }
             }
         }
@@ -1728,10 +1769,62 @@ public class QuestEditorScreen extends Screen {
     }
 
     @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.typeListScrolling && this.rightPageState == RightPageState.SELECT_TYPE) {
+            List<String> filteredList = getFilteredList();
+            int maxScroll = Math.max(0, filteredList.size() - 7);
+            if (maxScroll > 0) {
+                int listY = (this.height - 190) / 2 + 40;
+                int listH = 116;
+                int thumbH = Math.max(8, (7 * listH) / filteredList.size());
+                double relY = mouseY - listY - (thumbH / 2.0);
+                double scrollRatio = relY / (double) (listH - thumbH);
+                this.typeListScroll = (int) Math.round(scrollRatio * maxScroll);
+                this.typeListScroll = Math.max(0, Math.min(this.typeListScroll, maxScroll));
+            }
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.typeListScrolling) {
+            this.typeListScrolling = false;
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.contextMenu != null) {
+        if (this.contextMenu != null && this.contextMenu.isMouseOver(mouseX, mouseY)) {
             if (this.contextMenu.mouseScrolled(scrollY)) {
                 return true;
+            }
+        }
+        if (this.rightPageState == RightPageState.SELECT_TYPE) {
+            int PANEL_SPACING = 6;
+            int leftWidth = 240;
+            int totalWidth = leftWidth + 160 + PANEL_SPACING;
+            int baseX = (this.width - totalWidth) / 2;
+            int panel2X = baseX + leftWidth + PANEL_SPACING;
+            int listX = panel2X + 15;
+            int listY = (this.height - 190) / 2 + 40;
+            int listW = 130;
+            int listH = 116;
+
+            if (mouseX >= listX && mouseX <= listX + listW && mouseY >= listY && mouseY <= listY + listH) {
+                List<String> filteredList = getFilteredList();
+                int maxScroll = Math.max(0, filteredList.size() - 7);
+                if (maxScroll > 0) {
+                    int scrollDelta = (int) Math.round(scrollY);
+                    if (scrollDelta == 0 && scrollY != 0) {
+                        scrollDelta = scrollY > 0 ? 1 : -1;
+                    }
+                    this.typeListScroll = Math.max(0, Math.min(this.typeListScroll - scrollDelta, maxScroll));
+                    return true;
+                }
             }
         }
         if (this.leftScrollable != null && this.leftScrollable.isMouseOver(mouseX, mouseY)) {
@@ -1749,32 +1842,7 @@ public class QuestEditorScreen extends Screen {
                 return true;
             }
         }
-        if (this.rightPageState == RightPageState.SELECT_TYPE) {
-            int count = getCount();
-            int maxScroll = Math.max(0, count - 7);
-            if (maxScroll > 0) {
-                this.typeListScroll = Math.max(0, Math.min(this.typeListScroll - (int) scrollY, maxScroll));
-                return true;
-            }
-        }
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
-    }
-
-    private int getCount() {
-        Set<ResourceLocation> registered;
-        if (this.activeTab == ActiveTab.REWARDS) {
-            registered = QuestRewardRegistry.getRegisteredTypes();
-        } else {
-            registered = QuestObjectiveRegistry.getRegisteredTypes();
-        }
-        int count = 0;
-        String lowerQuery = this.typeSearchQuery.toLowerCase();
-        for (ResourceLocation rl : registered) {
-            if (rl.toString().replace("questlog:", "").toLowerCase().contains(lowerQuery)) {
-                count++;
-            }
-        }
-        return count;
     }
 
     @Override
@@ -1782,6 +1850,7 @@ public class QuestEditorScreen extends Screen {
         if (key == GLFW.GLFW_KEY_ESCAPE) {
             if (this.rightPageState != RightPageState.LIST) {
                 this.saveTemporaryState();
+                this.typeListScrolling = false;
                 this.rightPageState = RightPageState.LIST;
                 this.rebuildWidgets();
                 return true;

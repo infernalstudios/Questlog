@@ -140,7 +140,7 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
         return this.scrollAmount;
     }
 
-    private void setScrollAmount(double amount) {
+    public void setScrollAmount(double amount) {
         if (amount < 0.0) {
             amount = 0.0;
         } else if (amount > this.getMaxScroll()) {

@@ -4,10 +4,19 @@ public record EditorMetadata(
         String targetFieldKey,
         String targetFieldLabel,
         String amountFieldKey,
+        String amountFieldLabel,
         SuggestionType suggestionType
 ) {
+    public EditorMetadata(String targetFieldKey, String targetFieldLabel, String amountFieldKey, SuggestionType suggestionType) {
+        this(targetFieldKey, targetFieldLabel, amountFieldKey, null, suggestionType);
+    }
+
+    public EditorMetadata(String targetFieldKey, String targetFieldLabel, String amountFieldKey, String amountFieldLabel) {
+        this(targetFieldKey, targetFieldLabel, amountFieldKey, amountFieldLabel, SuggestionType.NONE);
+    }
+
     public EditorMetadata(String targetFieldKey, String targetFieldLabel, String amountFieldKey) {
-        this(targetFieldKey, targetFieldLabel, amountFieldKey, SuggestionType.NONE);
+        this(targetFieldKey, targetFieldLabel, amountFieldKey, null, SuggestionType.NONE);
     }
 
     public enum SuggestionType {

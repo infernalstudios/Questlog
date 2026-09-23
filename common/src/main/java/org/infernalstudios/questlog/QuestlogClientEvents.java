@@ -58,6 +58,7 @@ public class QuestlogClientEvents {
         QuestToastState.completedToasts.clear();
         QuestToastState.queuedPopups.clear();
         mostRecentNotificationQuest = null;
+        QuestlogScreen.clearScrollPositions();
     }
 
     public static void onQuestTriggered(QuestEvent.Triggered event) {

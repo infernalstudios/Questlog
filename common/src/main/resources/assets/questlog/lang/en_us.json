@@ -138,6 +138,12 @@
     "text.autoconfig.questlog-client.option.colors.toastTitleColor": "Toast Title Color",
     "text.autoconfig.questlog-client.option.colors.toastDescriptionColor": "Toast Description Color",
 
+    "text.autoconfig.questlog-client.category.preferences": "Preferences",
+    "text.autoconfig.questlog-client.option.preferences.hideCompleted": "Hide Completed Quests",
+    "text.autoconfig.questlog-client.option.preferences.hideCompleted.@Tooltip": "Hides completed quests in the quest log",
+    "text.autoconfig.questlog-client.option.preferences.descriptionsCondensed": "Condensed View",
+    "text.autoconfig.questlog-client.option.preferences.descriptionsCondensed.@Tooltip": "Shows condensed quest entries in the quest log",
+
     "questlog.editor.title": "Questlog Editor",
     "questlog.editor.back": "Back to Questlog",
     "questlog.editor.active": "Questlog Edit Mode Enabled",
@@ -192,7 +198,7 @@
     "questlog.editor.tooltip.icon": "The ID of the item to display as the quest's icon (e.g., minecraft:diamond_sword).",
     "questlog.editor.tooltip.chapter": "The chapter ID this quest belongs to.",
     "questlog.editor.tooltip.order": "The sorting index. Quests with lower values appear first.",
-    "questlog.editor.tooltip.hidden": "If enabled, this quest remains hidden in the log until unlocked or completed.",
+    "questlog.editor.tooltip.hidden": "If enabled, this quest will be hidden from the questlog entirely.",
     "questlog.editor.tooltip.hide_when_completed": "If enabled, this quest is removed from the log once every objective is completed and all rewards have been collected.",
     "questlog.editor.tooltip.include_in_main": "If enabled, the quest will be shown in the main chapter list in addition to its assigned chapter.",
     "questlog.editor.tooltip.details_default": "If enabled, opening this quest's chapter will display this quest's details page by default.",
@@ -204,6 +210,7 @@
     "questlog.editor.tooltip.entry_target": "The target registry key, tag, or value for this entry (e.g., minecraft:stone).",
     "questlog.editor.tooltip.entry_target.bounds": "Target block position (x, y, z) or bounding volume (minX, minY, minZ, maxX, maxY, maxZ).",
     "questlog.editor.tooltip.entry_amount": "The required count, amount, or experience points.",
+    "questlog.editor.tooltip.entry_range": "The radius (in blocks) the player must be within to trigger the approach.",
     "questlog.editor.tooltip.entry_slot": "The equipment slot to check: mainhand, offhand, head, chest, legs, feet. Leave blank for any slot.",
     "questlog.editor.tooltip.levels": "If enabled, the reward/objective value specifies levels instead of experience points.",
 
