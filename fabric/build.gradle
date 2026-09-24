@@ -33,7 +33,11 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
     // EMI
+    modCompileOnly "dev.emi:emi-fabric:${emi_version}:api"
     modRuntimeOnly "dev.emi:emi-fabric:${emi_version}"
+
+    // JEI
+    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
 
     // Cloth Config
     modImplementation "me.shedaniel.cloth:cloth-config-fabric:${cloth_config_version}"

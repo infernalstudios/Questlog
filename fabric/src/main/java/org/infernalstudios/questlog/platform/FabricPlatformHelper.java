@@ -43,6 +43,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public boolean isModLoaded(String modId) {
+        return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
     public boolean hasOrigin(ServerPlayer player, ResourceLocation originId) {
         if (!FabricLoader.getInstance().isModLoaded("origins")) return false;
         try {

@@ -26,6 +26,10 @@ neoForge {
 }
 
 dependencies {
+    // Optional recipe viewers; neither API is bundled with Questlog.
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}:api"
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+
     // Cloth Config
     compileOnly "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
 

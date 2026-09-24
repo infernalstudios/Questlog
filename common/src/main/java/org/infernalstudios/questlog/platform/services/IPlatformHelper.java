@@ -13,6 +13,8 @@ public interface IPlatformHelper {
 
     Path getConfigDirectory();
 
+    boolean isModLoaded(String modId);
+
     /**
      * Returns {@code true} when {@code player} has the given origin assigned on any layer.
      * Returns {@code false} if Origins is not installed.
