@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundEvent;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
+import org.infernalstudios.questlog.client.integration.RecipeViewerIntegration;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.scrollable.ScrollableInfo;
@@ -379,6 +380,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
+                    if (click.getValue().startsWith("item:")) {
+                        ResourceLocation itemId = ResourceLocation.tryParse(click.getValue().substring(5));
+                        return itemId != null && RecipeViewerIntegration.openRecipes(itemId);
+                    }
                     Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));

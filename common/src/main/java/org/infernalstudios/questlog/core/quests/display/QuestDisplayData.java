@@ -232,6 +232,7 @@ public class QuestDisplayData {
                     continue;
                 }
                 style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(stack)));
+                style = style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, action));
             }
             component.append(part.withStyle(style));
             lastEnd = matcher.end();

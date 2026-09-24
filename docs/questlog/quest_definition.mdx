@@ -242,7 +242,7 @@ You can show an item's normal Minecraft tooltip when the player hovers over link
 **Format:** `[Display Text](item:namespace:item_id)`
 **Example:** `[Mechanical Press](item:create:mechanical_press)`
 
-If the item ID is invalid or the item is unavailable, only the display text is shown and a warning is logged. Item links do not open recipes when clicked.
+Clicking an item link opens its recipes in EMI or JEI when one of those viewers is installed. EMI is used when both are installed. If neither is installed, the tooltip still works. If the item ID is invalid or the item is unavailable, only the display text is shown and a warning is logged.
 
 ### Hover Images
 
