@@ -235,6 +235,15 @@ You can create clickable text that automatically redirects to another quest.
 **Format:** `[Display Text](quest:quest_id)`
 **Example:** `[Click here to view the next quest!](quest:my_quests:next_quest)`
 
+### Item Tooltips
+
+You can show an item's normal Minecraft tooltip when the player hovers over linked text. The label can be translated independently of the item ID. The tooltip uses a single item without custom components.
+
+**Format:** `[Display Text](item:namespace:item_id)`
+**Example:** `[Mechanical Press](item:create:mechanical_press)`
+
+If the item ID is invalid or the item is unavailable, only the display text is shown and a warning is logged. Item links do not open recipes when clicked.
+
 ### Hover Images
 
 You can create text that displays an image when hovered over.

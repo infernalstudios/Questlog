@@ -331,17 +331,18 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     private void renderHoverEffect(GuiGraphics ps, Style style, int mouseX, int mouseY) {
         HoverEvent hover = style.getHoverEvent();
-        if (hover != null && hover.getAction() == HoverEvent.Action.SHOW_TEXT) {
+        if (hover == null) return;
+        if (hover.getAction() == HoverEvent.Action.SHOW_TEXT) {
             Component hoverComponent = (Component) hover.getValue(hover.getAction());
             if (hoverComponent != null) {
                 String text = hoverComponent.getString();
                 if (text.startsWith("image:")) {
                     this.renderImageTooltip(ps, text, mouseX, mouseY);
-                } else {
-                    ps.renderComponentHoverEffect(this.font, style, mouseX, mouseY);
+                    return;
                 }
             }
         }
+        ps.renderComponentHoverEffect(this.font, style, mouseX, mouseY);
     }
 
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
