@@ -38,7 +38,11 @@ neoForge {
 
 dependencies {
     // EMI
+    compileOnly "dev.emi:emi-neoforge:${emi_version}:api"
     runtimeOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    // JEI
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
 
     // Origins
     implementation "maven.modrinth:origins-neoforge:${origins_neoforge_version}"
