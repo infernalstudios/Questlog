@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.ItemStack;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -220,6 +221,18 @@ public class QuestDisplayData {
                 style = style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, action.substring(6)));
             } else if (action.startsWith("image:")) {
                 style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(action)));
+            } else if (action.startsWith("item:")) {
+                ResourceLocation itemId = ResourceLocation.tryParse(action.substring(5));
+                ItemStack stack = itemId != null && BuiltInRegistries.ITEM.containsKey(itemId)
+                        ? BuiltInRegistries.ITEM.get(itemId).getDefaultInstance() : ItemStack.EMPTY;
+                if (stack.isEmpty()) {
+                    Questlog.LOGGER.warn("Unknown item link '{}' in quest description", action);
+                    component.append(Component.literal(display));
+                    lastEnd = matcher.end();
+                    continue;
+                }
+                style = style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(stack)));
+                style = style.withClickEvent(new ClickEvent(ClickEvent.Action.CHANGE_PAGE, action));
             }
             component.append(part.withStyle(style));
             lastEnd = matcher.end();

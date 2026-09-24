@@ -30,6 +30,11 @@ public class ForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public boolean isModLoaded(String modId) {
+        return ModList.get().isLoaded(modId);
+    }
+
+    @Override
     public boolean hasOrigin(ServerPlayer player, ResourceLocation originId) {
         if (!ModList.get().isLoaded("origins")) return false;
 

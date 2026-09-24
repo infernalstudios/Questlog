@@ -45,7 +45,11 @@ sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
     // EMI
+    modCompileOnly "dev.emi:emi-forge:${emi_version}:api"
     modRuntimeOnly "dev.emi:emi-forge:${emi_version}"
+
+    // JEI
+    modCompileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
 
     // Cloth Config
     modImplementation "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
