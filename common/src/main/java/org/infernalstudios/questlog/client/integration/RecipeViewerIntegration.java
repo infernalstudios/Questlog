@@ -10,6 +10,10 @@ public final class RecipeViewerIntegration {
     private RecipeViewerIntegration() {
     }
 
+    public static boolean isAvailable() {
+        return Services.PLATFORM.isModLoaded("emi") || Services.PLATFORM.isModLoaded("jei");
+    }
+
     public static boolean openRecipes(ResourceLocation itemId) {
         if (!BuiltInRegistries.ITEM.containsKey(itemId)) return false;
         ItemStack stack = BuiltInRegistries.ITEM.get(itemId).getDefaultInstance();

@@ -24,6 +24,9 @@
         ],
         "modmenu": [
             "org.infernalstudios.questlog.compat.modmenu.QuestlogModMenuIntegration"
+        ],
+        "jei_mod_plugin": [
+            "org.infernalstudios.questlog.client.integration.JeiRecipeViewer"
         ]
     },
     "mixins": [
@@ -37,4 +40,3 @@
         "java": ">=17"
     }
 }
-  

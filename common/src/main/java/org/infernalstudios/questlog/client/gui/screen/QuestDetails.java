@@ -11,6 +11,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
@@ -310,7 +311,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             Style style = scrollableText.getStyleAt(mouseX - this.description.getXOffset(), mouseY - this.description.getYOffset());
 
             if (style != null) {
-                if (style.getClickEvent() != null) {
+                ClickEvent click = style.getClickEvent();
+                if (click != null && (!click.getValue().startsWith("item:")
+                        || (Questlog.getConfig().itemLinks == null || Questlog.getConfig().itemLinks.openRecipes)
+                        && RecipeViewerIntegration.isAvailable())) {
                     isHoveringLink = true;
                     if (!this.changedCursor) {
                         if (this.handCursor == 0L) {
@@ -333,6 +337,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void renderHoverEffect(GuiGraphics ps, Style style, int mouseX, int mouseY) {
         HoverEvent hover = style.getHoverEvent();
         if (hover == null) return;
+        if (hover.getAction() == HoverEvent.Action.SHOW_ITEM
+                && Questlog.getConfig().itemLinks != null && !Questlog.getConfig().itemLinks.showTooltips) return;
         if (hover.getAction() == HoverEvent.Action.SHOW_TEXT) {
             Component hoverComponent = (Component) hover.getValue(hover.getAction());
             if (hoverComponent != null) {
@@ -347,11 +353,25 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     private void renderImageTooltip(GuiGraphics ps, String data, int mouseX, int mouseY) {
-        String[] parts = data.split(":");
+        String[] parts = data.split(":", -1);
         if (parts.length >= 3) {
-            ResourceLocation loc = new ResourceLocation(parts[1], parts[2]);
-            int w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
-            int h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
+            ResourceLocation loc = ResourceLocation.tryParse(parts[1] + ":" + parts[2]);
+            if (loc == null) return;
+            int w;
+            int h;
+            int frames = 0;
+            int frameTime = 0;
+            try {
+                w = parts.length >= 4 ? Integer.parseInt(parts[3]) : 16;
+                h = parts.length >= 5 ? Integer.parseInt(parts[4]) : 16;
+                if (parts.length >= 7) {
+                    frames = Integer.parseInt(parts[5]);
+                    frameTime = Integer.parseInt(parts[6]);
+                }
+            } catch (NumberFormatException ignored) {
+                return;
+            }
+            if (w <= 0 || h <= 0 || parts.length >= 7 && (frames <= 0 || frameTime <= 0)) return;
 
             ps.pose().pushPose();
             ps.pose().translate(0.0F, 0.0F, 400.0F);
@@ -360,8 +380,6 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
             Blittable textureToRender;
             if (parts.length >= 7) {
-                int frames = Integer.parseInt(parts[5]);
-                int frameTime = Integer.parseInt(parts[6]);
                 textureToRender = new AnimatedTexture(loc, w, h, 0, 0, w, h * frames, frames, frameTime);
             } else {
                 textureToRender = new Texture(loc, w, h, 0, 0, w, h);
@@ -381,10 +399,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
                     if (click.getValue().startsWith("item:")) {
+                        if (Questlog.getConfig().itemLinks != null && !Questlog.getConfig().itemLinks.openRecipes) return false;
                         ResourceLocation itemId = ResourceLocation.tryParse(click.getValue().substring(5));
                         return itemId != null && RecipeViewerIntegration.openRecipes(itemId);
                     }
-                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
+                    ResourceLocation questId = ResourceLocation.tryParse(click.getValue());
+                    Quest target = questId != null ? QuestlogClient.getLocal().getQuest(questId) : null;
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;

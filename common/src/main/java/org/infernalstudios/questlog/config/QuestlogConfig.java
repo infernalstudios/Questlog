@@ -23,6 +23,10 @@ public class QuestlogConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public Preferences preferences = new Preferences();
 
+    @ConfigEntry.Category("itemLinks")
+    @ConfigEntry.Gui.TransitiveObject
+    public ItemLinks itemLinks = new ItemLinks();
+
     public static class Button {
         @ConfigEntry.Gui.Tooltip()
         public boolean enabled = true;
@@ -116,6 +120,14 @@ public class QuestlogConfig implements ConfigData {
 
         @ConfigEntry.Gui.Excluded
         public String lastOpenChapter = "";
+    }
+
+    public static class ItemLinks {
+        @ConfigEntry.Gui.Tooltip()
+        public boolean showTooltips = true;
+
+        @ConfigEntry.Gui.Tooltip()
+        public boolean openRecipes = true;
     }
 
 }

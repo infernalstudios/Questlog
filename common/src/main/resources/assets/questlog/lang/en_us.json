@@ -144,6 +144,12 @@
     "text.autoconfig.questlog-client.option.preferences.descriptionsCondensed": "Condensed View",
     "text.autoconfig.questlog-client.option.preferences.descriptionsCondensed.@Tooltip": "Shows condensed quest entries in the quest log",
 
+    "text.autoconfig.questlog-client.category.itemLinks": "Item Links",
+    "text.autoconfig.questlog-client.option.itemLinks.showTooltips": "Show Item Tooltips",
+    "text.autoconfig.questlog-client.option.itemLinks.showTooltips.@Tooltip": "Show Minecraft item tooltips when hovering over item links in quest descriptions",
+    "text.autoconfig.questlog-client.option.itemLinks.openRecipes": "Open Item Recipes",
+    "text.autoconfig.questlog-client.option.itemLinks.openRecipes.@Tooltip": "Open recipes when clicking an item link, if EMI or JEI is installed",
+
     "questlog.editor.title": "Questlog Editor",
     "questlog.editor.back": "Back to Questlog",
     "questlog.editor.active": "Questlog Edit Mode Enabled",
