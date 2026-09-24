@@ -244,6 +244,8 @@ You can show an item's normal Minecraft tooltip when the player hovers over link
 
 Clicking an item link opens its recipes in EMI or JEI when one of those viewers is installed. EMI is used when both are installed. If neither is installed, the tooltip still works. If the item ID is invalid or the item is unavailable, only the display text is shown and a warning is logged.
 
+Both behaviors are enabled by default. Players can turn the tooltip and recipe click on or off independently in the client config file `config/questlog-client.toml` under `[itemLinks]` (`showTooltips` and `openRecipes`), or in Questlog's config screen.
+
 ### Hover Images
 
 You can create text that displays an image when hovered over.
