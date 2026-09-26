@@ -235,6 +235,17 @@ You can create clickable text that automatically redirects to another quest.
 **Format:** `[Display Text](quest:quest_id)`
 **Example:** `[Click here to view the next quest!](quest:my_quests:next_quest)`
 
+### Item Recipe Links
+
+You can open an item's recipes by clicking linked text. The label can be translated independently of the item ID.
+
+**Format:** `[Display Text](item:namespace:item_id)`
+**Example:** `[Mechanical Press](item:create:mechanical_press)`
+
+Clicking opens recipes in EMI or JEI when a viewer is installed. EMI is used when both are installed. If neither is installed, the link performs no action. Invalid or unavailable item IDs remain plain readable text and a warning is logged.
+
+Recipe clicks are enabled by default. Players can disable `openRecipes` under `[itemLinks]` in `config/questlog-client.toml`, or in Questlog's config screen.
+
 ### Hover Images
 
 You can create text that displays an image when hovered over.

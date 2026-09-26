@@ -11,9 +11,11 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.QuestlogClientEvents;
 import org.infernalstudios.questlog.client.gui.QuestlogGuiSet;
+import org.infernalstudios.questlog.client.integration.RecipeViewerIntegration;
 import org.infernalstudios.questlog.client.gui.components.QuestlogButton;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.scrollable.ScrollableInfo;
@@ -309,7 +311,10 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             Style style = scrollableText.getStyleAt(mouseX - this.description.getXOffset(), mouseY - this.description.getYOffset());
 
             if (style != null) {
-                if (style.getClickEvent() != null) {
+                ClickEvent click = style.getClickEvent();
+                if (click != null && (!click.getValue().startsWith("item:")
+                        || (Questlog.getConfig().itemLinks == null || Questlog.getConfig().itemLinks.openRecipes)
+                        && RecipeViewerIntegration.isAvailable())) {
                     isHoveringLink = true;
                     if (!this.changedCursor) {
                         if (this.handCursor == 0L) {
@@ -378,7 +383,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             if (style != null && style.getClickEvent() != null) {
                 ClickEvent click = style.getClickEvent();
                 if (click.getAction() == ClickEvent.Action.CHANGE_PAGE) {
-                    Quest target = QuestlogClient.getLocal().getQuest(new ResourceLocation(click.getValue()));
+                    if (click.getValue().startsWith("item:")) {
+                        if (Questlog.getConfig().itemLinks != null && !Questlog.getConfig().itemLinks.openRecipes) return false;
+                        ResourceLocation itemId = ResourceLocation.tryParse(click.getValue().substring(5));
+                        return itemId != null && RecipeViewerIntegration.openRecipes(itemId);
+                    }
+                    ResourceLocation questId = ResourceLocation.tryParse(click.getValue());
+                    Quest target = questId != null ? QuestlogClient.getLocal().getQuest(questId) : null;
                     if (target != null && this.minecraft != null) {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;

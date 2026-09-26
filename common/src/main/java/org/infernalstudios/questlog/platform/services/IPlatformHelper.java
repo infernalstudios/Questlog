@@ -13,6 +13,8 @@ public interface IPlatformHelper {
 
     Path getConfigDirectory();
 
+    boolean isModLoaded(String modId);
+
     boolean hasOrigin(ServerPlayer player, ResourceLocation originId);
 
     Collection<ResourceLocation> getOriginIds();

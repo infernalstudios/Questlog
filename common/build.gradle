@@ -18,6 +18,10 @@ legacyForge {
 }
 
 dependencies {
+    // Optional recipe viewers; neither API is bundled with Questlog.
+    compileOnly "dev.emi:emi-xplat-mojmap:${emi_version}:api"
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+
     // Cloth Config
     compileOnly "me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}"
 
@@ -32,6 +36,18 @@ dependencies {
 }
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
+
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+tasks.register('verifyRecipeLinks', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.infernalstudios.questlog.RecipeLinksVerification'
+    workingDir = layout.buildDirectory.dir('verification').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') { dependsOn 'verifyRecipeLinks' }
+tasks.named('test') { failOnNoDiscoveredTests = false }
 
 configurations {
     commonJava {
