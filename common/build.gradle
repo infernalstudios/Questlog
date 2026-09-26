@@ -33,6 +33,18 @@ dependencies {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+// Exercise the text parser against the mapped Minecraft classes without launching a game.
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+tasks.register('verifyQuestDetails', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.infernalstudios.questlog.QuestDetailsVerification'
+    workingDir = layout.buildDirectory.dir('verification').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') { dependsOn 'verifyQuestDetails' }
+
 configurations {
     commonJava {
         canBeResolved = false
@@ -50,3 +62,6 @@ artifacts {
         commonResources dir
     }
 }
+
+// Verification mains above run via JavaExec; no JUnit tests are registered yet.
+tasks.named('test') { failOnNoDiscoveredTests = false }

@@ -79,6 +79,7 @@ public class QuestEditorScreen extends Screen {
             new BoolFieldDef("show_popup_on_unlock", false, "Show Popup On Unlock", "questlog.editor.tooltip.advanced.show_popup_on_unlock")
     );
     private static final List<TextFieldDef> TEXT_FIELDS = List.of(
+            new TextFieldDef("details", "", false, true, "questlog.editor.advanced.details", "questlog.editor.tooltip.advanced.details"),
             new TextFieldDef("left_panel_width", "275", true, false, "questlog.editor.advanced.left_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
             new TextFieldDef("right_panel_width", "170", true, false, "questlog.editor.advanced.right_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
             new TextFieldDef("panel_height", "166", true, false, "questlog.editor.advanced.panel_height", "questlog.editor.tooltip.advanced.panel_size"),
@@ -1341,6 +1342,25 @@ public class QuestEditorScreen extends Screen {
             String value = this.tempTexts.getOrDefault(def.key(), def.defaultValue());
             if (def.numeric()) {
                 setIntOrRemove(json, def.key(), value, def.defaultValue());
+            } else if (def.key().equals("details")) {
+                String trimmed = value == null ? "" : value.trim();
+                if (trimmed.isEmpty()) {
+                    json.remove(def.key());
+                } else {
+                    JsonElement component = null;
+                    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+                        try {
+                            component = JsonParser.parseString(trimmed);
+                        } catch (RuntimeException ignored) {
+                            // Inline links and ordinary text are stored as strings.
+                        }
+                    }
+                    if (component != null && (component.isJsonObject() || component.isJsonArray())) {
+                        json.add(def.key(), component);
+                    } else {
+                        json.addProperty(def.key(), value);
+                    }
+                }
             } else {
                 setStringOrRemove(json, def.key(), value, def.defaultValue());
             }

@@ -43,7 +43,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private static final int CONTENT_Y = 36;
     private static final int HR_Y_OFFSET = -2;
 
-    private static boolean showDetails = true;
+    private final boolean detailsPage;
+    private boolean showInfo;
+    private boolean openingDetailsPage;
 
     public final Quest quest;
 
@@ -66,9 +68,25 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private boolean changedCursor = false;
 
     public QuestDetails(@Nullable Screen previousScreen, Quest quest) {
+        this(previousScreen, quest, quest.getDisplay().hasDetails() && quest.getDisplay().isDetailsOpenByDefault());
+    }
+
+    private QuestDetails(@Nullable Screen previousScreen, Quest quest, boolean detailsPage) {
         super(quest.getDisplay().getTitle());
-        this.previousScreen = previousScreen;
         this.quest = quest;
+        this.detailsPage = detailsPage;
+        this.previousScreen = detailsPage && !(previousScreen instanceof QuestDetails overview
+                && overview.quest == quest && !overview.detailsPage)
+                ? new QuestDetails(previousScreen, quest, false) : previousScreen;
+    }
+
+    public QuestDetails refreshed(Quest updatedQuest) {
+        Screen previous = this.previousScreen;
+        if (this.detailsPage && previous instanceof QuestDetails overview
+                && overview.quest.getId().equals(updatedQuest.getId())) {
+            previous = new QuestDetails(overview.getPreviousScreen(), updatedQuest, false);
+        }
+        return new QuestDetails(previous, updatedQuest, this.detailsPage);
     }
 
     @Nullable
@@ -93,22 +111,15 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super.init();
         QuestlogClientEvents.mostRecentNotificationQuest = null;
 
-        boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
-        if (!hasDetails) {
-            showDetails = false;
-        } else if (this.quest.isCompleted() && !this.quest.rewards.isEmpty()) {
-            showDetails = true;
-        } else if (this.getDisplay().isDetailsButtonDisabled()) {
-            showDetails = this.getDisplay().isDetailsOpenByDefault();
-        } else if (this.getDisplay().isDetailsOpenByDefault()) {
-            showDetails = true;
-        }
+        this.openingDetailsPage = false;
+        this.showInfo = !this.detailsPage && (!this.getDisplay().getObjectiveDisplayData().isEmpty()
+                || !this.getDisplay().getRewardDisplayData().isEmpty());
 
         int leftWidth = this.getDisplay().getLeftPanelWidth();
         int rightWidth = this.getDisplay().getRightPanelWidth();
         int height = this.getDisplay().getPanelHeight();
 
-        int totalWidth = showDetails ? (leftWidth + rightWidth + PANEL_SPACING) : leftWidth;
+        int totalWidth = this.showInfo ? (leftWidth + rightWidth + PANEL_SPACING) : leftWidth;
         int baseX = (this.width - totalWidth) / 2;
         int baseY = (this.height - height) / 2;
 
@@ -138,17 +149,17 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.getGuiSet()
         );
 
-        boolean hasDetails = !this.quest.objectives.isEmpty() || !this.quest.rewards.isEmpty();
-
-        if (hasDetails && !this.getDisplay().isDetailsButtonDisabled() && !this.getDisplay().isDetailsOpenByDefault()) {
+        if (!this.detailsPage && this.getDisplay().hasDetails() && !this.getDisplay().isDetailsButtonDisabled()) {
             this.objectivesButton = new QuestlogButton(
                     0, buttonY,
                     this.getPalette().textColor(),
                     this.getPalette().hoveredTextColor(),
                     Component.translatable("questlog.info.details"),
                     () -> {
-                        showDetails = !showDetails;
-                        this.rebuildWidgets();
+                        if (this.minecraft != null) {
+                            this.openingDetailsPage = true;
+                            this.minecraft.setScreen(new QuestDetails(this, this.quest, true));
+                        }
                     },
                     this.getGuiSet()
             );
@@ -167,6 +178,12 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     private void updateButtonLayout(int rightBoundary) {
         if (this.backButton == null) return;
         Component backText = this.getDisplay().getBackButtonText();
+
+        if (this.detailsPage) {
+            this.backButton.setMessage(Component.translatable("gui.back"));
+            this.backButton.setX(rightBoundary - this.backButton.getExpectedWidth());
+            return;
+        }
 
         if (this.quest.isCompleted() && !this.quest.isRewarded()) {
             boolean hasIncompleteChoices = false;
@@ -199,7 +216,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     }
 
     private void handlePrimaryAction() {
-        if (this.quest.isCompleted() && !this.quest.isRewarded()) {
+        if (this.detailsPage) {
+            if (this.minecraft != null) this.minecraft.setScreen(this.previousScreen);
+        } else if (this.quest.isCompleted() && !this.quest.isRewarded()) {
             this.claimAllRewards();
         } else if (this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
             Services.PLATFORM.sendPacketToServer(new org.infernalstudios.questlog.network.packet.QuestResetPacket(this.quest.getId()));
@@ -242,12 +261,13 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.panel1Y + CONTENT_Y,
                 leftWidth - 38,
                 height - 68,
-                new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(this.quest), this.getPalette().textColor())
+                new ScrollableText(this.minecraft.font, this.detailsPage ? this.getDisplay().getDetails()
+                        : this.getDisplay().getDescription(this.quest), this.getPalette().textColor())
         );
 
         this.addWidget(this.description);
 
-        if (showDetails) {
+        if (this.showInfo) {
             this.info = new ScrollableComponent(
                     this.panel2X + CONTENT_X,
                     this.panel2Y + CONTENT_Y,
@@ -269,7 +289,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
         super.render(ps, mouseX, mouseY, partialTicks);
         this.renderTitle(ps);
         if (this.description != null) this.description.render(ps, mouseX, mouseY, partialTicks);
-        if (showDetails) {
+        if (this.showInfo) {
             this.renderInfo(ps, mouseX, mouseY, partialTicks);
         }
 
@@ -284,7 +304,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     public void renderBackground(@NotNull GuiGraphics ps) {
         super.renderBackground(ps);
         this.getGuiSet().detailBackgroundLeft.blit(ps, this.panel1X, this.panel1Y);
-        if (showDetails) {
+        if (this.showInfo) {
             this.getGuiSet().detailBackgroundRight.blit(ps, this.panel2X, this.panel2Y);
         }
 
@@ -431,6 +451,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     public void tick() {
         super.tick();
+        if (this.detailsPage) return;
 
         boolean isShowingCollect = this.backButton != null &&
                 (this.backButton.getMessage().getString().equals(this.getDisplay().getCollectButtonText().getString()) ||
@@ -450,7 +471,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
             Component expectedText = canClaim ? this.getDisplay().getCollectButtonText() : Component.translatable("questlog.reward.make_choices");
             if (!this.backButton.getMessage().getString().equals(expectedText.getString())) {
                 this.backButton.setMessage(expectedText);
-                int rightBoundary = this.panel1X + this.getDisplay().getLeftPanelWidth() + (showDetails ? this.getDisplay().getRightPanelWidth() : 0);
+                int rightBoundary = this.panel1X + this.getDisplay().getLeftPanelWidth() - 12;
                 this.updateButtonLayout(rightBoundary);
             }
         }
@@ -468,7 +489,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
     @Override
     public void removed() {
-        if (this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
+        if (!this.detailsPage && !this.openingDetailsPage
+                && this.quest.isCompleted() && this.quest.isRewarded() && this.quest.isRepeatable()) {
             Services.PLATFORM.sendPacketToServer(new org.infernalstudios.questlog.network.packet.QuestResetPacket(this.quest.getId()));
         }
         if (this.changedCursor) {

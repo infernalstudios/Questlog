@@ -1,0 +1,7 @@
+{
+  "questlog.info.no_details": "Pas de détails supplémentaires.",
+  "questlog.editor.advanced.details": "Détails supplémentaires",
+  "questlog.editor.tooltip.advanced.details": "Texte facultatif affiché sur la page Détails. Accepte les clés de traduction, les liens et les composants de texte JSON. Laisser vide pour masquer le bouton Détails.",
+  "questlog.editor.tooltip.details_default": "Si des détails supplémentaires existent, ouvre leur page en premier. Retour ramène à la fiche de quête.",
+  "questlog.editor.tooltip.details_disabled": "Masque le bouton Détails. Les objectifs et récompenses restent visibles dans la fiche de quête."
+}

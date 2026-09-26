@@ -33,6 +33,11 @@ These JSON files should be placed in the `quests` directory of your config (`con
   // Can be a string using inline rich text, or a JSON text component.
   "description": "string | object | array",
 
+  // Optional additional text shown on a separate Details page.
+  // Uses the same inline rich text / JSON text component formats as description.
+  // If omitted, null, empty or whitespace-only, the Details button is hidden.
+  "details": "string | object | array (optional)",
+
   // An alternative description shown only when the quest is completed.
   "description_completed": "string | object | array (optional)",
 
@@ -46,7 +51,7 @@ These JSON files should be placed in the `quests` directory of your config (`con
   // The icon to display for the quest.
   "icon": "Renderable (optional)",
 
-  // Whether the title and descriptions are translatable string keys. Defaults to false.
+  // Whether the title, descriptions and details are translatable string keys. Defaults to false.
   "translatable": false,
 
   // The chapter this quest belongs to. Defaults to "questlog:main".
@@ -73,10 +78,12 @@ These JSON files should be placed in the `quests` directory of your config (`con
   "show_popup_on_unlock": false,
 
   // --- UI CUSTOMIZATION ---
-  // Disables the details button on the quest screen, locking the panel out entirely (unless opened by default).
+  // Hides the button opening the additional Details page.
+  // Does not hide objectives or rewards in the quest overview.
   "disable_details_button": false,
 
-  // Forces the details/objectives panel to be open by default.
+  // Opens the additional Details page first if details are present.
+  // Back returns to the overview. Ignored if details are absent.
   "details_open_by_default": false,
 
   // The background texture of the main (left) panel.

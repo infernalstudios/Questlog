@@ -26,6 +26,8 @@ public class QuestDisplayData {
     private final Component title;
     private final Component description;
     @Nullable
+    private final Component details;
+    @Nullable
     private final Component descriptionCompleted;
     @Nullable
     private final Component descriptionFailed;
@@ -96,6 +98,11 @@ public class QuestDisplayData {
             parsedDescription = parseInlineRichText(translatable ? Component.translatable(rawStr).getString() : rawStr);
         }
         this.description = parsedDescription;
+        JsonElement detailsElement = data.get("details");
+        Component parsedDetails = detailsElement == null || detailsElement.isJsonNull()
+                || detailsElement.isJsonArray() && detailsElement.getAsJsonArray().isEmpty()
+                ? null : parseDescription(detailsElement, translatable);
+        this.details = parsedDetails != null && !parsedDetails.getString().isBlank() ? parsedDetails : null;
         this.descriptionCompleted = parseDescription(data.get("description_completed"), translatable);
         this.descriptionFailed = parseDescription(data.get("description_failed"), translatable);
 
@@ -276,6 +283,7 @@ public class QuestDisplayData {
 
         if (this.title.getString().toLowerCase().contains(lowerQuery)) return true;
         if (this.description != null && this.description.getString().toLowerCase().contains(lowerQuery)) return true;
+        if (this.details != null && this.details.getString().toLowerCase().contains(lowerQuery)) return true;
         if (this.descriptionCompleted != null && this.descriptionCompleted.getString().toLowerCase().contains(lowerQuery))
             return true;
         if (this.descriptionFailed != null && this.descriptionFailed.getString().toLowerCase().contains(lowerQuery))
@@ -319,6 +327,15 @@ public class QuestDisplayData {
 
     public Component getDescription() {
         return this.description;
+    }
+
+    public boolean hasDetails() {
+        return this.details != null;
+    }
+
+    public Component getDetails() {
+        return this.details != null ? this.details
+                : Component.translatable("questlog.info.no_details").withStyle(style -> style.withItalic(true));
     }
 
     public List<ObjectiveDisplayData> getObjectiveDisplayData() {

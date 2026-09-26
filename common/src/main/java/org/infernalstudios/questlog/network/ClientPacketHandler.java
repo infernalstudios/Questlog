@@ -122,7 +122,7 @@ public class ClientPacketHandler {
         } else if (mc.screen instanceof QuestDetails detailsScreen) {
             Quest updatedQuest = QuestlogClient.getLocal().getQuest(detailsScreen.quest.getId());
             if (updatedQuest != null) {
-                mc.setScreen(new QuestDetails(detailsScreen.getPreviousScreen(), updatedQuest));
+                mc.setScreen(detailsScreen.refreshed(updatedQuest));
             } else {
                 mc.setScreen(new QuestlogScreen(detailsScreen.getPreviousScreen()));
             }

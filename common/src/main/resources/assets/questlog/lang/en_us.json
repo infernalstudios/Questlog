@@ -22,6 +22,9 @@
 
     "questlog.info.objectives": "Objectives",
     "questlog.info.details": "Details",
+    "questlog.info.no_details": "No additional details.",
+    "questlog.editor.advanced.details": "Additional details",
+    "questlog.editor.tooltip.advanced.details": "Optional text shown on the separate Details page. Supports translation keys, inline links and JSON text components. Leave empty to hide the Details button.",
     "questlog.info.rewards": "Rewards",
 
     "command.questlog.argument.quest.unknown": "Unknown quest",
@@ -201,8 +204,8 @@
     "questlog.editor.tooltip.hidden": "If enabled, this quest will be hidden from the questlog entirely.",
     "questlog.editor.tooltip.hide_when_completed": "If enabled, this quest is removed from the log once every objective is completed and all rewards have been collected.",
     "questlog.editor.tooltip.include_in_main": "If enabled, the quest will be shown in the main chapter list in addition to its assigned chapter.",
-    "questlog.editor.tooltip.details_default": "If enabled, opening this quest's chapter will display this quest's details page by default.",
-    "questlog.editor.tooltip.details_disabled": "If enabled, players will not be able to open the details page for this quest.",
+    "questlog.editor.tooltip.details_default": "If enabled and additional details exist, opening this quest shows its Details page first. Back returns to the quest overview.",
+    "questlog.editor.tooltip.details_disabled": "Hides the Details button. Objectives and rewards remain visible in the quest overview.",
     "questlog.editor.tooltip.repeatable": "If enabled, this quest can be reset and recompleted infinitely after completion.",
     "questlog.editor.tooltip.global": "If enabled, completing this quest will complete it for all players on the server.",
     "questlog.editor.tooltip.entry_name": "A custom display name for this specific objective or reward (optional).",
