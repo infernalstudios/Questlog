@@ -417,7 +417,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         int rightWidth = this.getDisplay().getRightPanelWidth();
 
-        Component title = this.quest.isCompleted() ? Component.translatable("questlog.info.rewards") : Component.translatable("questlog.info.objectives");
+        Component title = Component.translatable(this.getDisplay().getObjectiveDisplayData().isEmpty()
+                ? "questlog.info.rewards" : "questlog.info.objectives");
 
         float x = this.panel2X + (rightWidth - this.font.width(title)) / 2f;
         float y = this.panel2Y + TITLE_Y + (float) (TITLE_HEIGHT - this.font.lineHeight + 2) / 2;

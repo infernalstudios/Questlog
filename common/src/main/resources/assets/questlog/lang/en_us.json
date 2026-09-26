@@ -22,6 +22,7 @@
 
     "questlog.info.objectives": "Objectives",
     "questlog.info.details": "Details",
+    "questlog.reward.available_after_completion": "Available on completion",
     "questlog.info.rewards": "Rewards",
 
     "command.questlog.argument.quest.unknown": "Unknown quest",

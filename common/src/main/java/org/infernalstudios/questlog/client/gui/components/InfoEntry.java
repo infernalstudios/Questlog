@@ -87,7 +87,8 @@ public class InfoEntry implements Renderable, GuiEventListener {
         if (rewardData.getReward() != null && rewardData.getReward().getContainer() != null) {
             return;
         }
-        Component status = rewardData.hasRewarded() ?
+        Component status = !this.questDetails.quest.isCompleted()
+                ? Component.translatable("questlog.reward.available_after_completion") : rewardData.hasRewarded() ?
                 (display != null ? display.getCollectedText() : Component.translatable("questlog.reward.collected")) :
                 (display != null ? display.getUncollectedText() : Component.translatable("questlog.reward.uncollected"));
 

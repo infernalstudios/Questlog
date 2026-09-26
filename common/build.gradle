@@ -33,6 +33,18 @@ dependencies {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+// Exercise the reward panel against mapped Minecraft classes without launching a game.
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+tasks.register('verifyRewardOverview', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.infernalstudios.questlog.RewardOverviewVerification'
+    workingDir = layout.buildDirectory.dir('verification').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') { dependsOn 'verifyRewardOverview' }
+
 configurations {
     commonJava {
         canBeResolved = false
@@ -50,3 +62,5 @@ artifacts {
         commonResources dir
     }
 }
+
+tasks.named('test') { failOnNoDiscoveredTests = false }
