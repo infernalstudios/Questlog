@@ -11,7 +11,8 @@ import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
-import org.infernalstudios.questlog.core.quests.rewards.ExperienceReward;
+import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
+import net.minecraft.world.item.Items;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 
 import java.util.ArrayList;
@@ -39,7 +40,16 @@ public final class RewardOverviewVerification {
         check(info(quest(1, 0)).getHeight() == 28, "Objectives-only quests do not add a rewards heading");
         check(info(quest(0, 0)).getHeight() == 0, "Empty panels stay empty");
         check(info(quest(2, 3)).getHeight() == 164, "Multiple entries keep the section gap");
-        System.out.println("Reward overview: 12 checks passed (headless, no game launched).");
+        Quest multiple = quest(1, 2);
+        check(multiple.rewards.size() == 2, "Two separate rewards, without a choice container");
+        check(((ItemReward) multiple.rewards.get(0)).getStack().is(Items.EMERALD)
+                && ((ItemReward) multiple.rewards.get(0)).getStack().getCount() == 2, "Two emeralds");
+        check(((ItemReward) multiple.rewards.get(1)).getStack().is(Items.DIAMOND)
+                && ((ItemReward) multiple.rewards.get(1)).getStack().getCount() == 1, "One diamond");
+        check(!multiple.isRewarded(), "Both rewards start unclaimed");
+        check(info(multiple).getHeight() == 108, "Both item rewards are visible below the objective");
+        check(!info(multiple).mouseClicked(0, 55, 0), "No premature collection or choice");
+        System.out.println("Reward overview: 18 checks passed (headless, no game launched).");
     }
 
     private static ScrollableInfo info(Quest quest) {
@@ -60,8 +70,9 @@ public final class RewardOverviewVerification {
         for (int i = 0; i < rewardCount; i++) {
             JsonObject reward = new JsonObject();
             reward.addProperty("name", "Test reward");
-            reward.addProperty("experience", 5);
-            rewards.add(new ExperienceReward(reward));
+            reward.addProperty("item", i % 2 == 0 ? "minecraft:emerald" : "minecraft:diamond");
+            reward.addProperty("count", i % 2 == 0 ? 2 : 1);
+            rewards.add(new ItemReward(reward));
         }
         QuestManager manager = new QuestManager(null) {
             @Override public boolean isClient() { return true; }

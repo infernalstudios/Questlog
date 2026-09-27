@@ -1,3 +1,8 @@
 {
-  "questlog.reward.available_after_completion": "Disponible une fois la quête terminée"
+  "questlog.reward.available_after_completion": "Disponible une fois la quête terminée",
+  "questlog.info.rewards": "Récompenses",
+  "questlog.reward.collect": "Récupérer les récompenses",
+  "questlog.reward.collected": "Récupérée",
+  "questlog.reward.uncollected": "À récupérer",
+  "questlog.reward.make_choices": "Choisir les récompenses"
 }
