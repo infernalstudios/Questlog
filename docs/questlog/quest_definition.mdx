@@ -237,12 +237,21 @@ You can create clickable text that automatically redirects to another quest.
 
 ### Item Tooltips
 
-You can show an item's normal Minecraft tooltip when the player hovers over linked text. The label can be translated independently of the item ID. The tooltip uses a single item without custom components.
+Use inline item text to show the normal Minecraft item tooltip on hover.
+The visible label is independent of the item ID, so it can be written in any language.
 
 **Format:** `[Display Text](item:namespace:item_id)`
-**Example:** `[Mechanical Press](item:create:mechanical_press)`
+**Example:** `[Wooden Axe](item:minecraft:wooden_axe)`
 
-If the item ID is invalid or the item is unavailable, only the display text is shown and a warning is logged. Item links do not open recipes when clicked.
+This works in quest descriptions, including completion and failure descriptions.
+No tooltip markup is required in an objective's `name`: when its `item` property
+identifies one registered item, hovering the objective name shows that item's tooltip.
+The ID can be an item string or the `id`/`item` field of an item object.
+Tags such as `#minecraft:logs` describe several items and do not produce a single-item tooltip.
+
+Tooltips use a default stack of one item; custom item data is not included.
+An invalid or unavailable ID in inline text leaves the label readable and logs a warning.
+EMI and JEI are not required for item tooltips.
 
 ### Hover Images
 

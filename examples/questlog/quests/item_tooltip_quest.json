@@ -1,0 +1,14 @@
+{
+  "title": "Item Tooltip Quest",
+  "description": "Craft [a wooden axe](item:minecraft:wooden_axe). Hover the item text or objective name to inspect it.",
+  "icon": {
+    "item": "minecraft:wooden_axe"
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_craft",
+      "item": "minecraft:wooden_axe",
+      "required_amount": 1
+    }
+  ]
+}
