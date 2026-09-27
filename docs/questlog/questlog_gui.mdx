@@ -14,3 +14,10 @@ Additionally, a button is added to the player's inventory (near the recipe book)
 Hover item text in a quest description, or the name of an objective with one concrete
 `item` ID, to inspect the item's normal tooltip. This also works without a recipe viewer.
 An objective using an item tag has no single item to show.
+
+## Opening item recipes
+
+Left-click an item label in a description or an objective name with a concrete item ID
+to open that item's recipes in EMI or JEI. EMI takes priority when both are installed.
+Without a viewer, or with `itemLinks.openRecipes` disabled, the click has no action.
+The feature uses a default item stack, rather than custom item data.

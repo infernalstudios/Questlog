@@ -112,6 +112,13 @@ public class InfoEntry implements Renderable, GuiEventListener {
     public void setFocused(boolean var1) {
     }
 
+    public boolean handleObjectiveItemClick() {
+        if (this.objectiveData == null || this.objectiveData.getItemId() == null) return false;
+        if (org.infernalstudios.questlog.Questlog.getConfig().itemLinks != null
+                && !org.infernalstudios.questlog.Questlog.getConfig().itemLinks.openRecipes) return false;
+        return org.infernalstudios.questlog.client.integration.RecipeViewerIntegration.openRecipes(this.objectiveData.getItemId());
+    }
+
     public boolean handleChoiceClick() {
         if (this.rewardData != null) {
             org.infernalstudios.questlog.core.quests.rewards.Reward reward = this.rewardData.getReward();
