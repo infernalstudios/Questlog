@@ -21,7 +21,7 @@ public final class RecipeLinksVerification {
         check(link.getStyle().isUnderlined(), "Mark the recipe link");
         check(link.getStyle().getClickEvent().getAction() == ClickEvent.Action.CHANGE_PAGE, "Use the existing click route");
         check(link.getStyle().getClickEvent().getValue().equals("item:minecraft:emerald"), "Keep the recipe target");
-        check(link.getStyle().getHoverEvent() == null, "Recipe links do not depend on item tooltips");
+        check(link.getStyle().getHoverEvent().getAction() == HoverEvent.Action.SHOW_ITEM, "Combined links keep the item tooltip");
         Component missing = description("[Missing](item:questlog:missing_item)");
         check(missing.getString().equals("Missing"), "Unknown items remain readable");
         check(missing.getSiblings().get(1).getStyle().getClickEvent() == null, "Unknown items do not become links");
