@@ -8,9 +8,28 @@ This key can be reconfigured in the game's controls settings.
 This screen displays a list of available quests, along with their details and progress.
 Players can view the details of each quest by clicking on it.
 
-Clicking a quest opens its overview: the description and the objective/reward panel.
+Clicking a quest opens its overview: the description and quest progress.
 If the quest defines non-empty `details`, the **Details** button opens a separate page
 containing that additional text. This page has only a **Back** button, which returns
 to the overview. It never repeats `description` as a fallback. Quests without `details`
 have no Details button. Existing quest links and hover images also work in `details`.
 Additionally, a button is added to the player's inventory (near the recipe book) to open the Questlog.
+
+## Editing description and details
+
+With command permission level 2, enable `/questlog edit_mode true`, open Questlog,
+and use the quest's gear button or its right-click Edit action. The optional Details
+text field is directly below Description in the editor's left panel.
+
+Use the wheel over a long text field to scroll its text, or drag that field's Questlog-style
+scrollbar. The two text fields scroll independently. Releasing the click ends a drag,
+including when the pointer has moved outside the field. Use the panel's own scrollbar
+or its margins to scroll the whole left panel; a short text field also yields the wheel
+to the panel. These controls preserve normal text editing.
+
+Save the quest, then disable `/questlog edit_mode false`. Emptying Details removes that
+optional field and hides its button. Formatted JSON object/array details are preserved
+when loading and saving through the field.
+
+Edit mode can show quests whose prerequisites are not yet satisfied. After leaving
+edit mode, those quests are hidden until the prerequisites are met; saving has not deleted them.

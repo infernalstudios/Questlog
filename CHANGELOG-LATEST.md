@@ -10,3 +10,8 @@
 - Fixed the Entity Approach objective in the editor generating a "required_amount" field instead of "range".
 - Defaulted missing "range" in Entity Approach objectives to 5 blocks to prevent broken quest errors.
 - Fixed the selection list in the quest editor where clicking the scrollbar clicked options underneath it and mouse wheel scrolling was occasionally unresponsive.
+
+## Optional quest details and editor scrolling
+
+- Added optional quest details with a separate page and documented empty values, translation keys and editor access.
+- Fixed nested Description/Details scrolling and used Questlog scrollbar textures in the editor.

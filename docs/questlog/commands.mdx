@@ -40,3 +40,15 @@ Instantly fulfills the requirements (formerly triggers) of the targeted quest(s)
 
 ### `/questlog trigger all [players]`
 Instantly fulfills the requirements for ALL quests for the specified player(s).
+
+### `/questlog edit_mode [enabled] [player]`
+
+Toggle quest editing with no arguments, or explicitly enable/disable it with `true`/`false`.
+The optional player argument follows an explicit boolean. This command requires the
+permission level described above. In edit mode, use a quest's gear button or right-click
+Edit action to open its editor, including the Description and optional Details fields.
+
+```text
+/questlog edit_mode true
+/questlog edit_mode false
+```

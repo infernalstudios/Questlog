@@ -44,3 +44,8 @@ The followup quest will only appear and start tracking once `linear_1_start` is 
 - `chapters/`: Examples for custom UI tabs.
 - `quests/`: Examples for different objective types, rewards, fail states, and quest patterns.
 
+### Optional details example
+
+`quests/optional_details_quest.json` keeps a short description on the overview and extra
+instructions on the Details page. Omit or clear `details` to hide its button.
+The in-game editor places Details below Description; both fields have independent scrolling.
