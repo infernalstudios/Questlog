@@ -44,3 +44,8 @@ The followup quest will only appear and start tracking once `linear_1_start` is 
 - `chapters/`: Examples for custom UI tabs.
 - `quests/`: Examples for different objective types, rewards, fail states, and quest patterns.
 
+### Item recipe example
+
+`quests/item_recipe_quest.json` opens wooden axe recipes from the description label
+or the objective name. Install EMI or JEI to try it; without either, clicks have no action.
+`itemLinks.openRecipes` in the client config can disable these clicks.

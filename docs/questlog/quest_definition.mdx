@@ -237,14 +237,31 @@ You can create clickable text that automatically redirects to another quest.
 
 ### Item Recipe Links
 
-You can open an item's recipes by clicking linked text. The label can be translated independently of the item ID.
+Use inline item text to open recipes with an installed recipe viewer.
+The visible label is independent of the item ID.
 
 **Format:** `[Display Text](item:namespace:item_id)`
-**Example:** `[Mechanical Press](item:create:mechanical_press)`
+**Example:** `[Wooden Axe](item:minecraft:wooden_axe)`
 
-Clicking opens recipes in EMI or JEI when a viewer is installed. EMI is used when both are installed. If neither is installed, the link performs no action. Invalid or unavailable item IDs remain plain readable text and a warning is logged.
+Left-click the label in a quest description, including completion or failure descriptions.
+An objective whose `item` property identifies one registered item also opens recipes
+when its name is clicked, without additional markup in `name`.
+An item string or the `id`/`item` field of an item object is supported; item tags such as
+`#minecraft:logs` do not identify one recipe target.
 
-Recipe clicks are enabled by default. Players can disable `openRecipes` under `[itemLinks]` in `config/questlog-client.toml`, or in Questlog's config screen.
+EMI is used when installed; otherwise JEI is used. If both are installed, EMI takes priority.
+Neither viewer is a required dependency. Without either viewer, clicking has no action.
+Invalid or unavailable inline IDs remain readable text and log a warning.
+
+Recipe clicks are enabled by default. Disable them in Questlog's config screen,
+or set the following in `config/questlog-client.toml`:
+
+```toml
+[itemLinks]
+openRecipes = false
+```
+
+This setting applies to both description links and objective names.
 
 ### Hover Images
 
