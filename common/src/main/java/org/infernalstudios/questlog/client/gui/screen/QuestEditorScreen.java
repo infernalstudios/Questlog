@@ -79,7 +79,6 @@ public class QuestEditorScreen extends Screen {
             new BoolFieldDef("show_popup_on_unlock", false, "Show Popup On Unlock", "questlog.editor.tooltip.advanced.show_popup_on_unlock")
     );
     private static final List<TextFieldDef> TEXT_FIELDS = List.of(
-            new TextFieldDef("details", "", false, true, "questlog.editor.advanced.details", "questlog.editor.tooltip.advanced.details"),
             new TextFieldDef("left_panel_width", "275", true, false, "questlog.editor.advanced.left_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
             new TextFieldDef("right_panel_width", "170", true, false, "questlog.editor.advanced.right_panel_width", "questlog.editor.tooltip.advanced.panel_size"),
             new TextFieldDef("panel_height", "166", true, false, "questlog.editor.advanced.panel_height", "questlog.editor.tooltip.advanced.panel_size"),
@@ -141,6 +140,7 @@ public class QuestEditorScreen extends Screen {
     NoShadowEditBox idBox;
     NoShadowEditBox titleBox;
     MultiLineEditBox descriptionBox;
+    MultiLineEditBox detailsBox;
     NoShadowEditBox iconBox;
     NoShadowEditBox chapterBox;
     NoShadowEditBox orderBox;
@@ -163,6 +163,7 @@ public class QuestEditorScreen extends Screen {
     private String tempId = "";
     private String tempTitle = "";
     private String tempDescription = "";
+    private String tempDetails = "";
     private String tempIconItem = "";
     @Nullable
     private JsonElement originalIconItem = null;
@@ -265,6 +266,9 @@ public class QuestEditorScreen extends Screen {
     private void loadFromDefinition(JsonObject definition) {
         this.tempTitle = definition.has("title") ? definition.get("title").getAsString() : "";
         this.tempDescription = definition.has("description") ? definition.get("description").getAsString() : "";
+        JsonElement details = definition.get("details");
+        this.tempDetails = details == null || details.isJsonNull() ? ""
+                : details.isJsonPrimitive() ? details.getAsString() : details.toString();
 
         this.originalIconItem = null;
         if (definition.has("icon") && definition.get("icon").isJsonObject()) {
@@ -355,6 +359,11 @@ public class QuestEditorScreen extends Screen {
         this.descriptionBox.setValue(this.tempDescription);
         this.descriptionBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.description")));
 
+        this.detailsBox = new MultiLineEditBox(this.font, baseX + 15, baseY + 156, 195, 54, Component.empty(), Component.empty());
+        this.detailsBox.setCharacterLimit(Integer.MAX_VALUE);
+        this.detailsBox.setValue(this.tempDetails);
+        this.detailsBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.advanced.details")));
+
         this.iconBox = new NoShadowEditBox(this.font, baseX + 15, baseY + 156, 195, 16, Component.empty());
         this.iconBox.setMaxLength(128);
         this.iconBox.setValue(this.tempIconItem);
@@ -375,6 +384,7 @@ public class QuestEditorScreen extends Screen {
         this.leftFields.add(this.idBox);
         this.leftFields.add(this.titleBox);
         this.leftFields.add(this.descriptionBox);
+        this.leftFields.add(this.detailsBox);
         this.leftFields.add(this.iconBox);
         this.leftFields.add(this.chapterBox);
         this.leftFields.add(this.orderBox);
@@ -1246,6 +1256,9 @@ public class QuestEditorScreen extends Screen {
         if (this.descriptionBox != null) {
             this.tempDescription = this.descriptionBox.getValue();
         }
+        if (this.detailsBox != null) {
+            this.tempDetails = this.detailsBox.getValue();
+        }
         if (this.iconBox != null) {
             this.tempIconItem = this.iconBox.getValue();
         }
@@ -1321,6 +1334,25 @@ public class QuestEditorScreen extends Screen {
 
         json.addProperty("title", this.tempTitle);
         json.addProperty("description", this.tempDescription);
+        String trimmed = this.tempDetails == null ? "" : this.tempDetails.trim();
+        if (trimmed.isEmpty()) {
+            json.remove("details");
+        } else {
+            JsonElement component = null;
+            if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+                try {
+                    component = JsonParser.parseString(trimmed);
+                } catch (RuntimeException ignored) {
+                    // Inline links and ordinary text are stored as strings.
+                }
+            }
+            if (component != null && (component.isJsonObject() || component.isJsonArray())) {
+                json.add("details", component);
+            } else {
+                json.addProperty("details", this.tempDetails);
+            }
+        }
+
 
         JsonObject iconObj = json.has("icon") && json.get("icon").isJsonObject() ? json.getAsJsonObject("icon") : new JsonObject();
         if (this.originalIconItem != null && this.tempIconItem.equals(extractItemIdString(this.originalIconItem))) {
@@ -1342,25 +1374,6 @@ public class QuestEditorScreen extends Screen {
             String value = this.tempTexts.getOrDefault(def.key(), def.defaultValue());
             if (def.numeric()) {
                 setIntOrRemove(json, def.key(), value, def.defaultValue());
-            } else if (def.key().equals("details")) {
-                String trimmed = value == null ? "" : value.trim();
-                if (trimmed.isEmpty()) {
-                    json.remove(def.key());
-                } else {
-                    JsonElement component = null;
-                    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
-                        try {
-                            component = JsonParser.parseString(trimmed);
-                        } catch (RuntimeException ignored) {
-                            // Inline links and ordinary text are stored as strings.
-                        }
-                    }
-                    if (component != null && (component.isJsonObject() || component.isJsonArray())) {
-                        json.add(def.key(), component);
-                    } else {
-                        json.addProperty(def.key(), value);
-                    }
-                }
             } else {
                 setStringOrRemove(json, def.key(), value, def.defaultValue());
             }

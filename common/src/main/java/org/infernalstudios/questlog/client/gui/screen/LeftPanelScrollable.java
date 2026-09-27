@@ -22,7 +22,7 @@ class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEnt
 
     @Override
     public int getHeight() {
-        return 200;
+        return 270;
     }
 
     @Override
@@ -55,14 +55,17 @@ class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEnt
         screen.descriptionBox.setX(startX + 5);
         screen.descriptionBox.setY(startY + 74 - scroll);
 
+        screen.detailsBox.setX(startX + 5);
+        screen.detailsBox.setY(startY + 144 - scroll);
+
         screen.iconBox.setX(startX + 5);
-        screen.iconBox.setY(startY + 144 - scroll);
+        screen.iconBox.setY(startY + 214 - scroll);
 
         screen.chapterBox.setX(startX + 5);
-        screen.chapterBox.setY(startY + 176 - scroll);
+        screen.chapterBox.setY(startY + 246 - scroll);
 
         screen.orderBox.setX(startX + 155);
-        screen.orderBox.setY(startY + 176 - scroll);
+        screen.orderBox.setY(startY + 246 - scroll);
 
         int absMouseX = mouseX + (int) this.scroller.getXOffset();
         int absMouseY = mouseY + (int) this.scroller.getYOffset();
@@ -75,9 +78,10 @@ class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEnt
         ps.drawString(screen.getFont(), Component.translatable("questlog.editor.id"), startX + 5, startY - scroll, color, false);
         ps.drawString(screen.getFont(), Component.translatable("questlog.editor.title_label"), startX + 5, startY + 32 - scroll, color, false);
         ps.drawString(screen.getFont(), Component.translatable("questlog.editor.description_label"), startX + 5, startY + 64 - scroll, color, false);
-        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.icon_label"), startX + 5, startY + 134 - scroll, color, false);
-        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.chapter_label"), startX + 5, startY + 166 - scroll, color, false);
-        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.order_label"), startX + 155, startY + 166 - scroll, color, false);
+        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.advanced.details"), startX + 5, startY + 134 - scroll, color, false);
+        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.icon_label"), startX + 5, startY + 204 - scroll, color, false);
+        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.chapter_label"), startX + 5, startY + 236 - scroll, color, false);
+        ps.drawString(screen.getFont(), Component.translatable("questlog.editor.order_label"), startX + 155, startY + 236 - scroll, color, false);
 
         for (AbstractWidget widget : screen.leftFields) {
             widget.render(ps, renderMouseX, renderMouseY, partialTicks);
