@@ -12,3 +12,20 @@ The overview shows objectives followed by rewards in the same scrollable panel,
 including before completion. Rewards cannot be collected or chosen until the quest
 is completed. Completed quests keep both sections visible.
 Additionally, a button is added to the player's inventory (near the recipe book) to open the Questlog.
+
+## Reward previews and collection
+
+The overview lists rewards below objectives in the right panel, even before the quest
+is completed. This is a preview: incomplete quests cannot collect rewards or select choices.
+After completion, a choice reward requires selecting the requested number of entries before
+collection. Already collected entries keep their collected status. `auto_claim` rewards
+continue to follow their existing automatic-collection rules.
+
+Separate entries in the top-level `rewards` array are cumulative: two emeralds and a diamond
+are all given when the quest's rewards are collected. To offer a selection instead, put
+the alternatives inside one `questlog:choice` reward and set its `pick_count`.
+No extra quest option is required to display reward previews.
+
+The default French reward heading is "Récompenses", with short action labels "Récupérer"
+and "Choisir". These follow the game's selected language. Custom quest reward names
+continue to use their own literal text or translation keys.

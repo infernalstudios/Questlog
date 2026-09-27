@@ -1,0 +1,32 @@
+{
+  "title": "Choice Rewards Quest",
+  "description": "Craft a wooden axe, then choose two emeralds OR one diamond.",
+  "icon": {
+    "item": "minecraft:wooden_axe"
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_craft",
+      "item": "minecraft:wooden_axe",
+      "required_amount": 1
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:choice",
+      "pick_count": 1,
+      "choices": [
+        {
+          "type": "questlog:item",
+          "item": "minecraft:emerald",
+          "count": 2
+        },
+        {
+          "type": "questlog:item",
+          "item": "minecraft:diamond",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}
