@@ -50,6 +50,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Nullable
     private final Screen previousScreen;
     public Component pendingTooltip = null;
+    public net.minecraft.world.item.ItemStack pendingItemTooltip = null;
     private int panel1X;
     private int panel2X;
     private int panel1Y;
@@ -265,6 +266,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
     @Override
     public void render(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTicks) {
         this.pendingTooltip = null;
+        this.pendingItemTooltip = null;
         this.renderBackground(ps);
         super.render(ps, mouseX, mouseY, partialTicks);
         this.renderTitle(ps);
@@ -275,7 +277,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         this.handleMouseOverLinks(mouseX, mouseY, ps);
 
-        if (this.pendingTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
+        if (this.pendingItemTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
+            ps.renderTooltip(this.font, this.pendingItemTooltip, mouseX, mouseY);
+        } else if (this.pendingTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
             ps.renderTooltip(this.font, this.pendingTooltip, mouseX, mouseY);
         }
     }
