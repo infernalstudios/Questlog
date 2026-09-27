@@ -279,7 +279,9 @@ public class QuestDetails extends Screen implements NarrationSupplier {
 
         this.handleMouseOverLinks(mouseX, mouseY, ps);
 
-        if (this.pendingItemTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
+        if (this.pendingItemTooltip != null
+                && (Questlog.getConfig().itemLinks == null || Questlog.getConfig().itemLinks.showTooltips)
+                && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
             ps.renderTooltip(this.font, this.pendingItemTooltip, mouseX, mouseY);
         } else if (this.pendingTooltip != null && this.info != null && this.info.isMouseOver(mouseX, mouseY)) {
             ps.renderTooltip(this.font, this.pendingTooltip, mouseX, mouseY);
