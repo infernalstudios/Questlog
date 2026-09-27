@@ -78,7 +78,14 @@ public class ScrollableInfo implements Scrollable, GuiEventListener {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button != GLFW.GLFW_MOUSE_BUTTON_1) return false;
-        if (!questDetails.quest.isCompleted()) return false;
+        if (!questDetails.quest.isCompleted()) {
+            List<InfoEntry> entries = this.getEntries();
+            int index = (int) (mouseY / InfoEntry.INFO_ENTRY_HEIGHT);
+            int width = (this.parent != null ? this.parent.width : this.display.getRightPanelWidth() - 36) - 15;
+            return mouseY >= 0 && mouseY % InfoEntry.INFO_ENTRY_HEIGHT >= 2
+                    && mouseY % InfoEntry.INFO_ENTRY_HEIGHT < 11 && mouseX >= 0 && mouseX < width
+                    && index < entries.size() && entries.get(index).handleObjectiveItemClick();
+        }
 
         List<InfoEntry> entries = this.getEntries();
         int index = (int) (mouseY / InfoEntry.INFO_ENTRY_HEIGHT);

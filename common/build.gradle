@@ -37,6 +37,18 @@ dependencies {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+sourceSets.test.compileClasspath += sourceSets.main.compileClasspath
+sourceSets.test.runtimeClasspath += sourceSets.main.compileClasspath
+tasks.register('verifyRecipeLinks', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.infernalstudios.questlog.RecipeLinksVerification'
+    workingDir = layout.buildDirectory.dir('verification').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') { dependsOn 'verifyRecipeLinks' }
+tasks.named('test') { failOnNoDiscoveredTests = false }
+
 configurations {
     commonJava {
         canBeResolved = false
