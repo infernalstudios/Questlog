@@ -45,6 +45,15 @@ tasks.register('verifyQuestDetails', JavaExec) {
 }
 tasks.named('check') { dependsOn 'verifyQuestDetails' }
 
+tasks.register('verifyEditorScrolling', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.infernalstudios.questlog.client.gui.screen.EditorScrollingVerification'
+    workingDir = layout.buildDirectory.dir('verification').get().asFile
+    doFirst { workingDir.mkdirs() }
+}
+tasks.named('check') { dependsOn 'verifyEditorScrolling' }
+
 configurations {
     commonJava {
         canBeResolved = false

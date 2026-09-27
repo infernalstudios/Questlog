@@ -19,6 +19,8 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogClient;
 import org.infernalstudios.questlog.client.gui.*;
 import org.infernalstudios.questlog.client.gui.components.NoShadowEditBox;
+import org.infernalstudios.questlog.client.gui.components.QuestTextEditBox;
+import org.infernalstudios.questlog.client.gui.components.EditorScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.compat.origins.OriginsClientHelper;
 import org.infernalstudios.questlog.core.DefinitionUtil;
@@ -354,12 +356,12 @@ public class QuestEditorScreen extends Screen {
         this.titleBox.setValue(this.tempTitle);
         this.titleBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.title")));
 
-        this.descriptionBox = new MultiLineEditBox(this.font, baseX + 15, baseY + 86, 195, 54, Component.empty(), Component.empty());
+        this.descriptionBox = new QuestTextEditBox(this.font, baseX + 15, baseY + 86, 195, 54);
         this.descriptionBox.setCharacterLimit(Integer.MAX_VALUE);
         this.descriptionBox.setValue(this.tempDescription);
         this.descriptionBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.description")));
 
-        this.detailsBox = new MultiLineEditBox(this.font, baseX + 15, baseY + 156, 195, 54, Component.empty(), Component.empty());
+        this.detailsBox = new QuestTextEditBox(this.font, baseX + 15, baseY + 156, 195, 54);
         this.detailsBox.setCharacterLimit(Integer.MAX_VALUE);
         this.detailsBox.setValue(this.tempDetails);
         this.detailsBox.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.advanced.details")));
@@ -389,7 +391,7 @@ public class QuestEditorScreen extends Screen {
         this.leftFields.add(this.chapterBox);
         this.leftFields.add(this.orderBox);
 
-        this.leftScrollable = new ScrollableComponent(baseX + 10, baseY + 12, 220, 170, new LeftPanelScrollable(this));
+        this.leftScrollable = new EditorScrollableComponent(baseX + 10, baseY + 12, 220, 170, new LeftPanelScrollable(this));
         this.addRenderableWidget(this.leftScrollable);
 
         if (this.rightPageState == RightPageState.LIST) {

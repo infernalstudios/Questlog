@@ -122,10 +122,11 @@ class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEnt
         double absoluteX = mouseX + this.scroller.getXOffset();
         double absoluteY = mouseY + this.scroller.getYOffset();
 
+        boolean handled = false;
         for (AbstractWidget widget : screen.leftFields) {
-            if (widget.mouseReleased(absoluteX, absoluteY, button)) return true;
+            handled = widget.mouseReleased(absoluteX, absoluteY, button) || handled;
         }
-        return false;
+        return handled;
     }
 
     @Override
@@ -134,8 +135,20 @@ class LeftPanelScrollable implements Scrollable, GuiEventListener, NarratableEnt
         double absoluteX = mouseX + this.scroller.getXOffset();
         double absoluteY = mouseY + this.scroller.getYOffset();
 
+        return this.focusedBox != null
+                && this.focusedBox.mouseDragged(absoluteX, absoluteY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+        if (this.scroller == null) return false;
+        double absoluteX = mouseX + this.scroller.getXOffset();
+        double absoluteY = mouseY + this.scroller.getYOffset();
+        if (!this.scroller.isMouseOver(absoluteX, absoluteY)) return false;
         for (AbstractWidget widget : screen.leftFields) {
-            if (widget.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
+            if ((widget == screen.descriptionBox || widget == screen.detailsBox)
+                    && widget.isMouseOver(absoluteX, absoluteY)
+                    && widget.mouseScrolled(absoluteX, absoluteY, amount)) return true;
         }
         return false;
     }
