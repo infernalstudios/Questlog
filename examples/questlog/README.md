@@ -44,3 +44,8 @@ The followup quest will only appear and start tracking once `linear_1_start` is 
 - `chapters/`: Examples for custom UI tabs.
 - `quests/`: Examples for different objective types, rewards, fail states, and quest patterns.
 
+### Item tooltip example
+
+`quests/item_tooltip_quest.json` shows inline item text and an item objective.
+Hover either the linked item label or the objective name to see the default item tooltip.
+No recipe viewer or additional objective-name markup is required.

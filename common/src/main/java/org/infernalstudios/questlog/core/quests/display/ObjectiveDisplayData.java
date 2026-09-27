@@ -16,6 +16,8 @@ public class ObjectiveDisplayData {
     private final Blittable icon;
     private final Component name;
     @Nullable
+    private final ResourceLocation itemId;
+    @Nullable
     private Objective objective;
     private int indentLevel = 0;
 
@@ -29,6 +31,7 @@ public class ObjectiveDisplayData {
         }
 
         this.icon = JsonUtils.getIcon(data, "icon");
+        this.itemId = resolveItemId(data);
     }
 
     public int getIndentLevel() {
@@ -37,6 +40,26 @@ public class ObjectiveDisplayData {
 
     public void setIndentLevel(int indentLevel) {
         this.indentLevel = indentLevel;
+    }
+
+    @Nullable
+    private static ResourceLocation resolveItemId(JsonObject data) {
+        com.google.gson.JsonElement item = data.get("item");
+        if (item == null) return null;
+        if (item.isJsonObject()) {
+            JsonObject object = item.getAsJsonObject();
+            item = object.has("id") ? object.get("id") : object.get("item");
+        }
+        if (item == null || !item.isJsonPrimitive() || !item.getAsJsonPrimitive().isString()) return null;
+        String value = item.getAsString();
+        if (value.startsWith("#")) return null;
+        return ResourceLocation.tryParse(value);
+    }
+
+    @Nullable
+    public ResourceLocation getItemId() {
+        return this.itemId != null && BuiltInRegistries.ITEM.containsKey(this.itemId)
+                && BuiltInRegistries.ITEM.get(this.itemId) != net.minecraft.world.item.Items.AIR ? this.itemId : null;
     }
 
     private Component generateSmartName(JsonObject data) {

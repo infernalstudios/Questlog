@@ -72,6 +72,13 @@ public class InfoEntry implements Renderable, GuiEventListener {
             this.questDetails.pendingTooltip = name;
         }
 
+        if (this.objectiveData != null && this.objectiveData.getItemId() != null
+                && mouseX >= textX && mouseX < textX + maxWidth
+                && mouseY >= nameY && mouseY < nameY + font.lineHeight) {
+            this.questDetails.pendingItemTooltip = new net.minecraft.world.item.ItemStack(
+                    net.minecraft.core.registries.BuiltInRegistries.ITEM.get(this.objectiveData.getItemId()));
+        }
+
         if (isReward) {
             this.drawRewardStatus(ps, textX);
         } else {

@@ -10,3 +10,7 @@
 - Fixed the Entity Approach objective in the editor generating a "required_amount" field instead of "range".
 - Defaulted missing "range" in Entity Approach objectives to 5 blocks to prevent broken quest errors.
 - Fixed the selection list in the quest editor where clicking the scrollbar clicked options underneath it and mouse wheel scrolling was occasionally unresponsive.
+
+## Item tooltips
+
+- Added item tooltips for inline description text and concrete item objectives; no recipe viewer is required.
