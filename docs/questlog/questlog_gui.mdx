@@ -8,24 +8,18 @@ This key can be reconfigured in the game's controls settings.
 This screen displays a list of available quests, along with their details and progress.
 Players can view the details of each quest by clicking on it.
 
-The overview shows objectives followed by rewards in the same scrollable panel,
-including before completion. Rewards cannot be collected or chosen until the quest
-is completed. Completed quests keep both sections visible.
 Additionally, a button is added to the player's inventory (near the recipe book) to open the Questlog.
 
-## Reward previews and collection
+## Optional reward previews
 
-The overview lists rewards below objectives in the right panel, even before the quest
-is completed. This is a preview: incomplete quests cannot collect rewards or select choices.
-After completion, a choice reward requires selecting the requested number of entries before
-collection. Already collected entries keep their collected status. `auto_claim` rewards
-continue to follow their existing automatic-collection rules.
+Set `showRewardPreviews = true` in the `[preferences]` section of
+`config/questlog-client.toml` (or enable **Show Reward Previews** in the client
+config screen) to list rewards below objectives before completing a quest.
+The setting is off by default so existing quest presentations keep their
+current behavior. Previewed rewards cannot be selected or collected early.
+Once a quest is complete, its right panel shows rewards as usual.
 
-Separate entries in the top-level `rewards` array are cumulative: two emeralds and a diamond
-are all given when the quest's rewards are collected. To offer a selection instead, put
-the alternatives inside one `questlog:choice` reward and set its `pick_count`.
-No extra quest option is required to display reward previews.
-
-The default French reward heading is "Récompenses", with short action labels "Récupérer"
-and "Choisir". These follow the game's selected language. Custom quest reward names
-continue to use their own literal text or translation keys.
+A quest can override this default with `show_rewards_before_completion` in its
+JSON definition: `true` shows the preview, `false` hides it, and omitting the
+field uses the client setting. The quest editor's **Rewards: Default / Show /
+Hide** control uses the same three choices.

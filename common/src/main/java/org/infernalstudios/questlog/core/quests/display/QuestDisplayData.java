@@ -45,6 +45,8 @@ public class QuestDisplayData {
 
     private final boolean disableDetailsButton;
     private final boolean detailsOpenByDefault;
+    @Nullable
+    private final Boolean rewardPreviewOverride;
     private final boolean repeatable;
     private final boolean global;
 
@@ -170,6 +172,8 @@ public class QuestDisplayData {
 
         this.disableDetailsButton = JsonUtils.getOrDefault(data, "disable_details_button", false);
         this.detailsOpenByDefault = JsonUtils.getOrDefault(data, "details_open_by_default", false);
+        this.rewardPreviewOverride = data.has("show_rewards_before_completion")
+                ? JsonUtils.getBoolean(data, "show_rewards_before_completion") : null;
         this.repeatable = JsonUtils.getOrDefault(data, "repeatable", false);
         this.global = JsonUtils.getOrDefault(data, "global", false);
 
@@ -387,6 +391,10 @@ public class QuestDisplayData {
 
     public boolean isDetailsOpenByDefault() {
         return this.detailsOpenByDefault;
+    }
+
+    public boolean shouldShowRewardPreviews(boolean clientDefault) {
+        return this.rewardPreviewOverride != null ? this.rewardPreviewOverride : clientDefault;
     }
 
     public QuestlogGuiSet getGuiSet() {

@@ -114,6 +114,9 @@ public class QuestlogConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip()
         public boolean descriptionsCondensed = false;
 
+        @ConfigEntry.Gui.Tooltip()
+        public boolean showRewardPreviews = false;
+
         @ConfigEntry.Gui.Excluded
         public String lastOpenChapter = "";
     }

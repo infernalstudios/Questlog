@@ -7,12 +7,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.Bootstrap;
 import org.infernalstudios.questlog.client.gui.components.scrollable.ScrollableInfo;
 import org.infernalstudios.questlog.client.gui.screen.QuestDetails;
+import org.infernalstudios.questlog.config.QuestlogConfig;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.quests.Quest;
 import org.infernalstudios.questlog.core.quests.display.QuestDisplayData;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
 import org.infernalstudios.questlog.core.quests.rewards.ItemReward;
-import net.minecraft.world.item.Items;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 
 import java.util.ArrayList;
@@ -23,43 +23,50 @@ public final class RewardOverviewVerification {
     public static void main(String[] args) {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        check(!new QuestlogConfig().preferences.showRewardPreviews, "Existing installations keep previews disabled");
         Quest quest = quest(1, 1);
-        ScrollableInfo info = info(quest);
-        check(info.getHeight() == 80, "Show both sections and their heading before completion");
-        check(!info.mouseClicked(0, 55, 0), "Cannot choose rewards before completion");
+        ScrollableInfo defaultInfo = info(quest, false);
+        ScrollableInfo previewInfo = info(quest, true);
+        check(defaultInfo.getHeight() == 28, "Existing quests show only objectives by default");
+        check(previewInfo.getHeight() == 90, "Opt-in preview adds rewards and their heading");
+        check(info(quest(1, 1, true), false).getHeight() == 90,
+                "Quest override can enable previews when the client default is off");
+        check(info(quest(1, 1, false), true).getHeight() == 28,
+                "Quest override can hide previews when the client default is on");
+        check(!previewInfo.mouseClicked(0, 55, 0), "Cannot choose rewards before completion");
         CompoundTag completed = new CompoundTag();
         completed.putInt("units", 1);
         quest.objectives.get(0).deserialize(completed);
         check(quest.isCompleted(), "Test quest is completed");
-        check(info.getHeight() == 80, "Completion keeps objectives and rewards visible");
-        check(!info.mouseClicked(0, 30, 0), "Clicking the rewards heading does not select a reward");
-        check(!info.mouseClicked(0, -1, 0), "Reject negative reward coordinates");
-        check(!info.mouseClicked(0, 500, 0), "Reject coordinates below the list");
-        check(!info.mouseClicked(0, 55, 1), "Right click does not choose a reward");
-        check(info(quest(0, 1)).getHeight() == 28, "Rewards-only quests do not duplicate their heading");
-        check(info(quest(1, 0)).getHeight() == 28, "Objectives-only quests do not add a rewards heading");
-        check(info(quest(0, 0)).getHeight() == 0, "Empty panels stay empty");
-        check(info(quest(2, 3)).getHeight() == 164, "Multiple entries keep the section gap");
-        Quest multiple = quest(1, 2);
-        check(multiple.rewards.size() == 2, "Two separate rewards, without a choice container");
-        check(((ItemReward) multiple.rewards.get(0)).getStack().is(Items.EMERALD)
-                && ((ItemReward) multiple.rewards.get(0)).getStack().getCount() == 2, "Two emeralds");
-        check(((ItemReward) multiple.rewards.get(1)).getStack().is(Items.DIAMOND)
-                && ((ItemReward) multiple.rewards.get(1)).getStack().getCount() == 1, "One diamond");
-        check(!multiple.isRewarded(), "Both rewards start unclaimed");
-        check(info(multiple).getHeight() == 108, "Both item rewards are visible below the objective");
-        check(!info(multiple).mouseClicked(0, 55, 0), "No premature collection or choice");
-        System.out.println("Reward overview: 18 checks passed (headless, no game launched).");
+        check(defaultInfo.getHeight() == 28, "Completion switches to the original rewards-only panel");
+        check(previewInfo.getHeight() == 28, "Opt-in preview also keeps the original completed panel");
+        check(!previewInfo.mouseClicked(0, -1, 0), "Reject negative reward coordinates");
+        check(!previewInfo.mouseClicked(0, 500, 0), "Reject coordinates below the list");
+        check(!previewInfo.mouseClicked(0, 5, 1), "Right click does not choose a reward");
+        check(info(quest(0, 1), true).getHeight() == 28, "Rewards-only quests do not duplicate their heading");
+        check(info(quest(1, 0), true).getHeight() == 28, "Objectives-only quests do not add a rewards heading");
+        check(info(quest(0, 0), true).getHeight() == 0, "Empty panels stay empty");
+        check(info(quest(2, 3), true).getHeight() == 174, "Multiple entries keep the section gap");
+        check(info(quest(1, 2), true).getHeight() == 118, "Multiple reward rows fit below one objective");
+        System.out.println("Reward overview: headless checks passed; in-game selection and visuals remain to test.");
     }
 
-    private static ScrollableInfo info(Quest quest) {
-        return new ScrollableInfo(new QuestDetails(null, quest), quest.getDisplay());
+    private static ScrollableInfo info(Quest quest, boolean showRewardPreviews) {
+        return new ScrollableInfo(new QuestDetails(null, quest), quest.getDisplay(),
+                quest.getDisplay().shouldShowRewardPreviews(showRewardPreviews));
     }
 
     private static Quest quest(int objectiveCount, int rewardCount) {
+        return quest(objectiveCount, rewardCount, null);
+    }
+
+    private static Quest quest(int objectiveCount, int rewardCount, Boolean rewardPreviewOverride) {
         JsonObject definition = new JsonObject();
         definition.addProperty("title", "Test");
         definition.addProperty("description", "Overview");
+        if (rewardPreviewOverride != null) {
+            definition.addProperty("show_rewards_before_completion", rewardPreviewOverride);
+        }
         List<Objective> objectives = new ArrayList<>();
         for (int i = 0; i < objectiveCount; i++) {
             JsonObject objective = new JsonObject();

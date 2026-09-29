@@ -44,10 +44,3 @@ The followup quest will only appear and start tracking once `linear_1_start` is 
 - `chapters/`: Examples for custom UI tabs.
 - `quests/`: Examples for different objective types, rewards, fail states, and quest patterns.
 
-### Reward overview examples
-
-- `quests/cumulative_rewards_quest.json` gives two emeralds **and** one diamond.
-- `quests/choice_rewards_quest.json` asks the player to choose two emeralds **or** one diamond.
-
-Both show a preview below the objectives before completion; collection and choices remain
-locked until the quest is completed. Separate top-level rewards are cumulative.
