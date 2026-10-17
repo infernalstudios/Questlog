@@ -383,6 +383,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;
                     }
+                } else if (this.handleComponentClicked(style)) { // Handle json click actions
+                    return true;
                 }
             }
         }
