@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerEntityEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -28,7 +27,7 @@ public class EffectAddedObjective extends Objective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onEffectAdded);
+        this.addListener(TriggerEntityEvent.EffectAdded.class, this::onEffectAdded);
     }
 
     private void onEffectAdded(TriggerEntityEvent.EffectAdded event) {

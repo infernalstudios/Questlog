@@ -13,7 +13,7 @@ public class EntityBreedObjective extends AbstractEntityObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        com.evandev.triggers.Triggers.EVENTS.addListener(this::onEntityBreed);
+        this.addListener(TriggerEntityEvent.Breed.class, this::onEntityBreed);
     }
 
     private void onEntityBreed(TriggerEntityEvent.Breed event) {

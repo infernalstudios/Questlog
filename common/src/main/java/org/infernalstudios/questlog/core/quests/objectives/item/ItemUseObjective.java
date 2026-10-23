@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerEntityEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,7 +13,7 @@ public class ItemUseObjective extends AbstractItemObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onItemUse);
+        this.addListener(TriggerEntityEvent.UseItem.class, this::onItemUse);
     }
 
     private void onItemUse(TriggerEntityEvent.UseItem event) {

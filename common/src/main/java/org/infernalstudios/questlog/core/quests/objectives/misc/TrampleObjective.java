@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerBlockEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +14,7 @@ public class TrampleObjective extends Objective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onBlockTrample);
+        this.addListener(TriggerBlockEvent.FarmlandTrample.class, this::onBlockTrample);
     }
 
     private void onBlockTrample(TriggerBlockEvent.FarmlandTrample event) {

@@ -3,7 +3,6 @@ package org.infernalstudios.questlog.core.quests.rewards;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -51,9 +50,8 @@ public class ItemReward extends Reward {
         if (element.isJsonObject()) {
             HolderLookup.Provider opsRegistries = registries;
             if (opsRegistries == null || opsRegistries == RegistryAccess.EMPTY) {
-                if (Minecraft.getInstance().level != null) {
-                    opsRegistries = Minecraft.getInstance().level.registryAccess();
-                } else {
+                opsRegistries = Util.getFallbackRegistries();
+                if (opsRegistries == null) {
                     opsRegistries = RegistryAccess.EMPTY;
                 }
             }

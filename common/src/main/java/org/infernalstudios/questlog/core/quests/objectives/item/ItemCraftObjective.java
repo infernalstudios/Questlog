@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.item;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.server.level.ServerPlayer;
@@ -14,7 +13,7 @@ public class ItemCraftObjective extends AbstractItemObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onItemCraft);
+        this.addListener(TriggerPlayerEvent.Craft.class, this::onItemCraft);
     }
 
     private void onItemCraft(TriggerPlayerEvent.Craft event) {

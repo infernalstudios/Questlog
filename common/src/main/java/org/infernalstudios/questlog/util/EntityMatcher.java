@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.advancements.critereon.EntityPredicate;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -117,9 +116,7 @@ public class EntityMatcher {
         if (this.cachedEntityPredicate == null && !this.failedParsingPredicate && this.predicateJson != null) {
             HolderLookup.Provider opsRegistries = registries;
             if (opsRegistries == null || opsRegistries == RegistryAccess.EMPTY) {
-                if (Minecraft.getInstance().level != null) {
-                    opsRegistries = Minecraft.getInstance().level.registryAccess();
-                }
+                opsRegistries = Util.getFallbackRegistries();
             }
             if (opsRegistries == null || opsRegistries == RegistryAccess.EMPTY) {
                 return null;

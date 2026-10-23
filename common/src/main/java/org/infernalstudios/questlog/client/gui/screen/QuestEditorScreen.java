@@ -1253,6 +1253,29 @@ public class QuestEditorScreen extends Screen {
         }
     }
 
+    @Override
+    protected void repositionElements() {
+        // Resizing the window rebuilds every widget, so keep what has been typed but not yet saved
+        this.saveTemporaryState();
+        String entryName = this.entryNameBox != null ? this.entryNameBox.getValue() : null;
+        String entryTarget = this.entryTargetBox != null ? this.entryTargetBox.getValue() : null;
+        String entrySlot = this.entrySlotBox != null ? this.entrySlotBox.getValue() : null;
+        String entryComponents = this.entryComponentsBox != null ? this.entryComponentsBox.getValue() : null;
+        String entryAmount = this.entryAmountBox != null ? this.entryAmountBox.getValue() : null;
+        String entryIcon = this.entryIconBox != null ? this.entryIconBox.getValue() : null;
+
+        super.repositionElements();
+
+        if (this.rightPageState == RightPageState.EDIT_ENTRY) {
+            if (this.entryNameBox != null && entryName != null) this.entryNameBox.setValue(entryName);
+            if (this.entryTargetBox != null && entryTarget != null) this.entryTargetBox.setValue(entryTarget);
+            if (this.entrySlotBox != null && entrySlot != null) this.entrySlotBox.setValue(entrySlot);
+            if (this.entryComponentsBox != null && entryComponents != null) this.entryComponentsBox.setValue(entryComponents);
+            if (this.entryAmountBox != null && entryAmount != null) this.entryAmountBox.setValue(entryAmount);
+            if (this.entryIconBox != null && entryIcon != null) this.entryIconBox.setValue(entryIcon);
+        }
+    }
+
     private void setBooleanFlag(JsonObject json, String key, boolean value, boolean defaultValue) {
         if (value == defaultValue) {
             json.remove(key);

@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.Registries;
@@ -27,7 +26,7 @@ public class VisitStructureObjective extends Objective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onPlayerMove);
+        this.addListener(TriggerPlayerEvent.Tick.class, this::onPlayerMove);
     }
 
     private void onPlayerMove(TriggerPlayerEvent.Tick event) {

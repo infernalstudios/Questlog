@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.block;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerBlockEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.HolderLookup;
@@ -39,7 +38,7 @@ public class BlockMineObjective extends AbstractBlockObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onBlockDestroy);
+        this.addListener(TriggerBlockEvent.Break.class, this::onBlockDestroy);
     }
 
     private void onBlockDestroy(TriggerBlockEvent.Break event) {

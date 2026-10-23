@@ -3,6 +3,7 @@ package org.infernalstudios.questlog.platform;
 import io.github.apace100.origins.origin.Origin;
 import io.github.apace100.origins.origin.OriginManager;
 import io.github.apace100.origins.registry.ModComponents;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
@@ -40,6 +41,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public Path getConfigDirectory() {
         return FabricLoader.getInstance().getConfigDir();
+    }
+
+    @Override
+    public boolean isPhysicalClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
     }
 
     @Override

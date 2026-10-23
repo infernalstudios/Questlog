@@ -1,6 +1,5 @@
 package org.infernalstudios.questlog.core.quests.objectives.misc;
 
-import com.evandev.triggers.Triggers;
 import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,7 +32,7 @@ public class StatisticObjective extends Objective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        Triggers.EVENTS.addListener(this::onPlayerTick);
+        this.addListener(TriggerPlayerEvent.Tick.class, this::onPlayerTick);
     }
 
     private void onPlayerTick(TriggerPlayerEvent.Tick event) {

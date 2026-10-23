@@ -13,7 +13,7 @@ public class BlockPlaceObjective extends AbstractBlockObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        com.evandev.triggers.Triggers.EVENTS.addListener(this::onBlockPlace);
+        this.addListener(TriggerBlockEvent.Place.class, this::onBlockPlace);
     }
 
     private void onBlockPlace(TriggerBlockEvent.Place event) {

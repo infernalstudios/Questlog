@@ -98,6 +98,13 @@ public class ChapterEditorScreen extends Screen {
     }
 
     @Override
+    protected void repositionElements() {
+        // Resizing the window rebuilds every widget, so keep what has been typed but not yet saved
+        this.saveTemporaryState();
+        super.repositionElements();
+    }
+
+    @Override
     protected void init() {
         super.init();
 

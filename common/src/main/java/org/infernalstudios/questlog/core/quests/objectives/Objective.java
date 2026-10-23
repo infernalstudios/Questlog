@@ -1,5 +1,6 @@
 package org.infernalstudios.questlog.core.quests.objectives;
 
+import com.evandev.triggers.event.events.TriggerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.nbt.CompoundTag;
 import org.infernalstudios.questlog.core.quests.Quest;
@@ -8,6 +9,8 @@ import org.infernalstudios.questlog.core.quests.display.WithDisplayData;
 import org.infernalstudios.questlog.util.JsonUtils;
 import org.infernalstudios.questlog.util.NbtSaveable;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public abstract class Objective implements NbtSaveable, WithDisplayData<ObjectiveDisplayData> {
 
@@ -26,6 +29,10 @@ public abstract class Objective implements NbtSaveable, WithDisplayData<Objectiv
     }
 
     public void registerEventListeners() {
+    }
+
+    protected <T extends TriggerEvent> void addListener(Class<T> eventClass, Consumer<T> listener) {
+        ObjectiveListeners.add(this, eventClass, listener);
     }
 
     public void markAsPrerequisite() {

@@ -3,7 +3,6 @@ package org.infernalstudios.questlog.util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentPredicate;
@@ -84,9 +83,7 @@ public class ItemMatcher {
         if (this.cachedComponentsPredicate == null && !this.failedParsingComponents && this.componentsJson != null) {
             HolderLookup.Provider opsRegistries = registries;
             if (opsRegistries == null || opsRegistries == RegistryAccess.EMPTY) {
-                if (Minecraft.getInstance().level != null) {
-                    opsRegistries = Minecraft.getInstance().level.registryAccess();
-                }
+                opsRegistries = Util.getFallbackRegistries();
             }
             if (opsRegistries == null || opsRegistries == RegistryAccess.EMPTY) {
                 return null;

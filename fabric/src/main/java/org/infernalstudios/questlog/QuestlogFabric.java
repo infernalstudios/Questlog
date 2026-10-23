@@ -8,6 +8,7 @@ import org.infernalstudios.questlog.networking.QuestlogPacketsFabric;
 public class QuestlogFabric implements ModInitializer, ClientModInitializer {
     @Override
     public void onInitialize() {
+        Questlog.init();
         QuestlogPacketsFabric.registerCommon();
         QuestlogFabricEventForwarder.init();
     }

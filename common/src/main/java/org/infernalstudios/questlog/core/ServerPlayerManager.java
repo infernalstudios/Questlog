@@ -40,6 +40,10 @@ public class ServerPlayerManager {
         }
     }
 
+    public MinecraftServer getServer() {
+        return this.server;
+    }
+
     public void addPlayer(Player player) {
         QuestManager questManager = new QuestManager(player);
         this.questManagers.put(player.getUUID(), questManager);

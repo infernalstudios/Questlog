@@ -241,7 +241,7 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                 this.panel1X + CONTENT_X,
                 this.panel1Y + CONTENT_Y,
                 leftWidth - 38,
-                height - 68,
+                height - 67,
                 new ScrollableText(this.minecraft.font, this.getDisplay().getDescription(this.quest), this.getPalette().textColor())
         );
 
@@ -382,6 +382,8 @@ public class QuestDetails extends Screen implements NarrationSupplier {
                         this.minecraft.setScreen(new QuestDetails(this, target));
                         return true;
                     }
+                } else if (button == GLFW.GLFW_MOUSE_BUTTON_1 && this.handleComponentClicked(style)) {
+                    return true;
                 }
             }
         }

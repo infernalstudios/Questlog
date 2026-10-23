@@ -9,6 +9,7 @@ import org.infernalstudios.questlog.commands.QuestlogCommands;
 import org.infernalstudios.questlog.core.DefinitionUtil;
 import org.infernalstudios.questlog.core.QuestManager;
 import org.infernalstudios.questlog.core.ServerPlayerManager;
+import org.infernalstudios.questlog.core.quests.objectives.ObjectiveListeners;
 import org.infernalstudios.questlog.core.quests.rewards.Reward;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.packet.QuestCompletedPacket;
@@ -38,6 +39,7 @@ public class QuestlogEvents {
             ServerPlayerManager.INSTANCE = null;
         }
         Questlog.EVENTS.removeAllListeners();
+        ObjectiveListeners.clear();
     }
 
     public static void onServerPlayerLogin(ServerPlayer player) {

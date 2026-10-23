@@ -3,7 +3,9 @@ package org.infernalstudios.questlog;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.HolderLookup;
 import org.infernalstudios.questlog.core.QuestManager;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 public class QuestlogClient {
@@ -49,5 +51,10 @@ public class QuestlogClient {
 
     public static void destroyLocal() {
         QUEST_MANAGER_INSTANCE = null;
+    }
+
+    @Nullable
+    public static HolderLookup.Provider getLevelRegistries() {
+        return Minecraft.getInstance().level != null ? Minecraft.getInstance().level.registryAccess() : null;
     }
 }

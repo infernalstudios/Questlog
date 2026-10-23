@@ -14,6 +14,11 @@ public interface IPlatformHelper {
     Path getConfigDirectory();
 
     /**
+     * Returns {@code true} when running on a physical client (including singleplayer), {@code false} on a dedicated server.
+     */
+    boolean isPhysicalClient();
+
+    /**
      * Returns {@code true} when {@code player} has the given origin assigned on any layer.
      * Returns {@code false} if Origins is not installed.
      */

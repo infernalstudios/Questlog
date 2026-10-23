@@ -1,12 +1,8 @@
-### Added
-
-- The Questlog now reopens to the last opened chapter.
-- Saved chapter scroll position when navigating back from a quest or switching chapters.
-
 ### Fixed
 
-- Fixed "Hide completed quests" and "Condensed view" display preferences resetting when reopening the Questlog.
-- Fixed misleading "Hidden" quest setting tooltip in the editor.
-- Fixed the Entity Approach objective in the editor generating a "required_amount" field instead of "range".
-- Defaulted missing "range" in Entity Approach objectives to 5 blocks to prevent broken quest errors.
-- Fixed the selection list in the quest editor where clicking the scrollbar clicked options underneath it and mouse wheel scrolling was occasionally unresponsive.
+- Fixed the player sometimes getting stuck (unable to move or look around) after reloading quests, toggling edit mode, or another player joining a LAN world.
+- Fixed quest objectives from before a reload or relog continuing to listen for events in the background.
+- Fixed `clickEvent` in JSON text component descriptions doing nothing when clicked (e.g. `run_command`, `open_url`, `copy_to_clipboard`) (@Theawsomelamp).
+- Fixed resizing the game window wiping unsaved changes in the quest and chapter editors (sorry Chakyl!).
+- Fixed scrollbar appearing on quest descriptions that are exactly 11 lines long.
+- Fixed quests using item `components`, entity predicates or component item rewards failing to load on dedicated servers.

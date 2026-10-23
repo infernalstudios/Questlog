@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.QuestlogEvents;
 import org.infernalstudios.questlog.core.quests.Quest;
+import org.infernalstudios.questlog.core.quests.objectives.ObjectiveListeners;
 import org.infernalstudios.questlog.event.events.QuestEvent;
 import org.infernalstudios.questlog.network.packet.QuestDataPacket;
 import org.infernalstudios.questlog.network.packet.QuestRemovePacket;
@@ -49,6 +50,7 @@ public class QuestManager {
     }
 
     public void clearQuests() {
+        ObjectiveListeners.removeAll(this.quests.values());
         this.quests.clear();
     }
 
@@ -58,6 +60,7 @@ public class QuestManager {
             savedData.put(quest.getId().toString(), quest.serialize());
         }
 
+        ObjectiveListeners.removeAll(this.quests.values());
         this.quests.clear();
         this.createAllQuests();
 
@@ -72,7 +75,10 @@ public class QuestManager {
      * Removes a quest from the player's tracked quest list.
      */
     public void removeQuest(ResourceLocation id) {
-        this.quests.remove(id);
+        Quest removed = this.quests.remove(id);
+        if (removed != null) {
+            ObjectiveListeners.removeAll(List.of(removed));
+        }
     }
 
     public Quest getQuest(ResourceLocation id) {
@@ -101,7 +107,7 @@ public class QuestManager {
         for (ResourceLocation id : ids) {
             if (!this.quests.containsKey(id)) {
                 JsonObject definition = DefinitionUtil.getCachedQuest(id);
-                Quest quest;
+                Quest quest = null;
                 try {
                     quest = Quest.create(definition, id, this);
                     CompoundTag data = new CompoundTag();
@@ -109,6 +115,9 @@ public class QuestManager {
                     quest.deserialize(data);
                     this.addQuest(quest);
                 } catch (Exception e) {
+                    if (quest != null) {
+                        ObjectiveListeners.removeAll(List.of(quest));
+                    }
                     Questlog.LOGGER.error("=====================================================");
                     Questlog.LOGGER.error(" QUESTLOG ERROR: Failed to load quest '{}'", id);
                     Questlog.LOGGER.error(" The JSON file has a syntax error, typo, or missing field.");

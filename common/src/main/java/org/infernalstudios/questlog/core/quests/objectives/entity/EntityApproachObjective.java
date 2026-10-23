@@ -19,7 +19,7 @@ public class EntityApproachObjective extends AbstractEntityObjective {
     @Override
     public void registerEventListeners() {
         super.registerEventListeners();
-        com.evandev.triggers.Triggers.EVENTS.addListener(this::onPlayerMove);
+        this.addListener(TriggerPlayerEvent.Tick.class, this::onPlayerMove);
     }
 
     private void onPlayerMove(TriggerPlayerEvent.Tick event) {

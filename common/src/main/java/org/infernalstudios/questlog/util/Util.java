@@ -2,6 +2,7 @@ package org.infernalstudios.questlog.util;
 
 import com.google.gson.*;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,6 +14,10 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import org.infernalstudios.questlog.QuestlogClient;
+import org.infernalstudios.questlog.core.ServerPlayerManager;
+import org.infernalstudios.questlog.platform.Services;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +42,17 @@ public final class Util {
         }
 
         return null;
+    }
+
+    @Nullable
+    public static HolderLookup.Provider getFallbackRegistries() {
+        if (Services.PLATFORM.isPhysicalClient()) {
+            HolderLookup.Provider registries = QuestlogClient.getLevelRegistries();
+            if (registries != null) {
+                return registries;
+            }
+        }
+        return ServerPlayerManager.INSTANCE != null ? ServerPlayerManager.INSTANCE.getServer().registryAccess() : null;
     }
 
     public static <T> List<T> invertList(List<T> list) {
