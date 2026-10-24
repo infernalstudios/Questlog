@@ -1,0 +1,9 @@
+{
+  "title": "Obtain Magic Feather",
+  "description": "Objective requiring a feather with a custom name NBT tag",
+  "type": "questlog:item_obtain",
+  "item": "minecraft:feather",
+  "nbt": "{display:{Name:'{\"text\":\"Magic Feather\"}'}}",
+  "required_amount": 1,
+  "name": "Obtain Magic Feather"
+}

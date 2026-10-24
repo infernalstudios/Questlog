@@ -1,0 +1,30 @@
+{
+  "title": "Magic Feather",
+  "description": "Obtain a special renamed feather with NBT requirements",
+  "icon": {
+    "item": {
+      "id": "minecraft:feather",
+      "tag": {
+        "display": {
+          "Name": "{\"text\":\"Magic Feather\"}"
+        }
+      }
+    }
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:feather",
+      "nbt": "{display:{Name:'{\"text\":\"Magic Feather\"}'}}",
+      "required_amount": 1,
+      "name": "Obtain Magic Feather"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 100,
+      "levels": false
+    }
+  ]
+}

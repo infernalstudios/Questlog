@@ -1,0 +1,33 @@
+{
+  "title": "Sword of Power",
+  "description": "Obtain a Diamond Sword enchanted with Sharpness V",
+  "icon": {
+    "item": {
+      "id": "minecraft:diamond_sword",
+      "tag": {
+        "Enchantments": [
+          {
+            "id": "minecraft:sharpness",
+            "lvl": 5
+          }
+        ]
+      }
+    }
+  },
+  "objectives": [
+    {
+      "type": "questlog:item_obtain",
+      "item": "minecraft:diamond_sword",
+      "nbt": "{Enchantments:[{id:\"minecraft:sharpness\",lvl:5s}]}",
+      "required_amount": 1,
+      "name": "Obtain Sharpness V Diamond Sword"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "questlog:experience",
+      "experience": 300,
+      "levels": true
+    }
+  ]
+}

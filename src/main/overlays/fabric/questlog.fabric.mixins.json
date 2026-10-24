@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "minVersion": "0.8",
+    "package": "org.infernalstudios.questlog.mixin.fabric",
+    "compatibilityLevel": "JAVA_${java_version}",
+    "mixins": [
+        "ServerPlayerMixin",
+        "ServerGamePacketListenerImplAccessor"
+    ],
+    "client": [
+      "client.ClientPacketListenerAccessor"
+    ],
+    "server": [
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+  }

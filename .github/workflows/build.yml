@@ -2,9 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [ "1.20.1", "1.21.1" ]
+    branches: [ "1.20.1", "1.21.1", "stonecutter" ]
   pull_request:
-    branches: [ "1.20.1", "1.21.1" ]
+    branches: [ "1.20.1", "1.21.1", "stonecutter" ]
 
 jobs:
   build:
@@ -17,11 +17,11 @@ jobs:
       - name: Validate Gradle Wrapper
         uses: gradle/actions/wrapper-validation@v5
 
-      - name: Setup Java 21
+      - name: Setup Java 25
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
 
       - name: Make Gradle Wrapper Executable
         run: chmod +x gradlew
@@ -36,5 +36,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ github.event.repository.name }}-${{ github.ref_name }}
           path: |
             **/build/libs/*.jar
+            !**/build/libs/*-sources.jar
+            !**/build/libs/*-dev.jar
