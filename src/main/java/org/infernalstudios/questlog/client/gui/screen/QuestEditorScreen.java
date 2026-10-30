@@ -158,6 +158,8 @@ public class QuestEditorScreen extends Screen {
     NoShadowEditBox entryNameBox;
     NoShadowEditBox entryAmountBox;
     NoShadowEditBox entryIconBox;
+    Button entryNestedButton;
+    Button entryLevelsButton;
     private List<JsonObject> currentNestedList = null;
     @Nullable
     private JsonObject presetJson;
@@ -684,9 +686,12 @@ public class QuestEditorScreen extends Screen {
 
         boolean isChoice = "questlog:choice".equals(this.editingType) || "choice".equals(this.editingType);
 
+        this.entryNestedButton = null;
+        this.entryLevelsButton = null;
+
         if (isLogical) {
             String btnText = ("questlog:not".equals(this.editingType) || "not".equals(this.editingType)) ? "Edit Child" : "Edit Children";
-            this.addRenderableWidget(Button.builder(Component.literal(btnText), btn -> {
+            this.entryNestedButton = Button.builder(Component.literal(btnText), btn -> {
                 this.saveTemporaryState();
                 this.saveEditingEntry();
                 this.nestingStack.push(new NestingFrame(
@@ -705,14 +710,14 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 62, 130, 16).build());
+            }).size(125, 16).build();
 
             this.entryTargetBox = null;
             this.entrySlotBox = null;
             this.entryComponentsBox = null;
             this.entryAmountBox = null;
         } else if (isChoice) {
-            this.addRenderableWidget(Button.builder(Component.literal("Edit Choices"), btn -> {
+            this.entryNestedButton = Button.builder(Component.literal("Edit Choices"), btn -> {
                 this.saveTemporaryState();
                 this.saveEditingEntry();
                 this.nestingStack.push(new NestingFrame(
@@ -731,7 +736,7 @@ public class QuestEditorScreen extends Screen {
                 this.editingEntry = null;
                 this.currentNestedList = null;
                 this.rebuildWidgets();
-            }).bounds(panel2X + 15, panel2Y + 62, 130, 16).build());
+            }).size(125, 16).build();
 
             this.entryTargetBox = null;
             this.entrySlotBox = null;
@@ -795,12 +800,11 @@ public class QuestEditorScreen extends Screen {
         }
 
         if ("questlog:experience".equals(this.editingType)) {
-            Button btnLevels = Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
+            this.entryLevelsButton = Button.builder(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")), btn -> {
                 this.entryLevelsToggle = !this.entryLevelsToggle;
                 btn.setMessage(Component.literal("Levels: " + (this.entryLevelsToggle ? "True" : "False")));
-            }).bounds(panel2X + 75, panel2Y + 84, 70, 14).build();
-            btnLevels.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.levels")));
-            this.addRenderableWidget(btnLevels);
+            }).size(70, 14).build();
+            this.entryLevelsButton.setTooltip(Tooltip.create(Component.translatable("questlog.editor.tooltip.levels")));
         }
 
         this.entryIconBox = new NoShadowEditBox(this.font, 0, 0, 125, 14, Component.empty());

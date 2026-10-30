@@ -6,11 +6,14 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.StringDecomposer;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ScrollableText implements Scrollable, GuiEventListener {
 
@@ -35,10 +38,33 @@ public class ScrollableText implements Scrollable, GuiEventListener {
 
     private List<FormattedCharSequence> getLines() {
         if (this.lines == null) {
-            this.lines = this.font.split(this.text, this.getWidth());
+            this.lines = this.font.split(decompose(this.text), this.getWidth());
         }
 
         return lines;
+    }
+
+    // this is effectively a hack, blame Mojang
+    private static FormattedText decompose(FormattedText text) {
+        List<FormattedText> parts = new ArrayList<>();
+        StringBuilder run = new StringBuilder();
+        Style[] runStyle = {Style.EMPTY};
+        text.visit((style, string) -> {
+            StringDecomposer.iterateFormatted(string, style, (index, charStyle, codePoint) -> {
+                if (charStyle != runStyle[0] && !run.isEmpty()) {
+                    parts.add(FormattedText.of(run.toString(), runStyle[0]));
+                    run.setLength(0);
+                }
+                runStyle[0] = charStyle;
+                run.appendCodePoint(codePoint);
+                return true;
+            });
+            return Optional.empty();
+        }, Style.EMPTY);
+        if (!run.isEmpty()) {
+            parts.add(FormattedText.of(run.toString(), runStyle[0]));
+        }
+        return FormattedText.composite(parts);
     }
 
     @Override

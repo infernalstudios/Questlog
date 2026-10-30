@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.2] - 2026-10-30
+
+### Fixed
+
+- Fixed the "Edit Child", "Edit Children", "Edit Choices" and "Levels" buttons overlapping the icon field in the entry editor (#184).
+- Fixed quest descriptions wrapping mid-word and breaking inline symbols added by mods like Hex Casting (#138).
+
 ## [3.5.1] - 2026-10-30
 
 ### Fixed

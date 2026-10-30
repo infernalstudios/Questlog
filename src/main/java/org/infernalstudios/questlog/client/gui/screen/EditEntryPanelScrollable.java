@@ -10,6 +10,7 @@ import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.client.gui.components.ScrollableComponent;
 import org.infernalstudios.questlog.client.gui.components.scrollable.Scrollable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,7 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
     @Override
     public int getHeight() {
         int height = 0;
-        if (screen.entryNameBox != null) height += 28;
-        if (screen.entryTargetBox != null) height += 28;
-        if (screen.entrySlotBox != null) height += 28;
-        if (screen.entryComponentsBox != null) height += 28;
-        if (screen.entryAmountBox != null) height += 28;
-        if (screen.entryIconBox != null) height += 28;
+        for (EntryRow row : getRows()) height += row.height();
         return height + 8;
     }
 
@@ -44,6 +40,9 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         List<EntryRow> rows = new ArrayList<>();
         if (screen.entryNameBox != null) {
             rows.add(new EntryRow(Component.literal("Name (Optional):"), screen.entryNameBox));
+        }
+        if (screen.entryNestedButton != null) {
+            rows.add(new EntryRow(null, screen.entryNestedButton));
         }
         if (screen.entryTargetBox != null) {
             rows.add(new EntryRow(Component.literal(screen.getTargetFieldLabel()), screen.entryTargetBox));
@@ -59,12 +58,21 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
             rows.add(new EntryRow(Component.literal(labelStr), screen.entryComponentsBox));
         }
         if (screen.entryAmountBox != null) {
-            rows.add(new EntryRow(Component.literal(screen.getAmountFieldLabel()), screen.entryAmountBox));
+            rows.add(new EntryRow(Component.literal(screen.getAmountFieldLabel()), screen.entryAmountBox, screen.entryLevelsButton));
         }
         if (screen.entryIconBox != null) {
             rows.add(new EntryRow(Component.literal("Icon (Optional):"), screen.entryIconBox));
         }
         return rows;
+    }
+
+    private List<AbstractWidget> getWidgets() {
+        List<AbstractWidget> widgets = new ArrayList<>();
+        for (EntryRow row : getRows()) {
+            widgets.add(row.widget);
+            if (row.sideWidget != null) widgets.add(row.sideWidget);
+        }
+        return widgets;
     }
 
     @Override
@@ -97,11 +105,19 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         int currentY = 0;
         for (EntryRow row : rows) {
             int y = startY + currentY - scroll;
-            ps.drawString(screen.getFont(), row.label, startX, y, color, false);
+            if (row.label != null) {
+                ps.drawString(screen.getFont(), row.label, startX, y, color, false);
+                y += 10;
+            }
             row.widget.setX(startX);
-            row.widget.setY(y + 10);
+            row.widget.setY(y);
             row.widget.render(ps, renderMouseX, renderMouseY, partialTicks);
-            currentY += 28;
+            if (row.sideWidget != null) {
+                row.sideWidget.setX(startX + row.widget.getWidth() + 5);
+                row.sideWidget.setY(y);
+                row.sideWidget.render(ps, renderMouseX, renderMouseY, partialTicks);
+            }
+            currentY += row.height();
         }
     }
 
@@ -117,15 +133,15 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
 
         boolean anyClicked = false;
         AbstractWidget clickedWidget = null;
-        for (EntryRow row : getRows()) {
-            if (row.widget.mouseClicked(absoluteX, absoluteY, button)) {
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.mouseClicked(absoluteX, absoluteY, button)) {
                 anyClicked = true;
-                clickedWidget = row.widget;
+                clickedWidget = widget;
             }
         }
 
-        for (EntryRow row : getRows()) {
-            row.widget.setFocused(row.widget == clickedWidget);
+        for (AbstractWidget widget : getWidgets()) {
+            widget.setFocused(widget == clickedWidget);
         }
         this.focusedWidget = clickedWidget;
 
@@ -138,8 +154,8 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         double absoluteX = mouseX + this.scroller.getXOffset();
         double absoluteY = mouseY + this.scroller.getYOffset();
 
-        for (EntryRow row : getRows()) {
-            if (row.widget.mouseReleased(absoluteX, absoluteY, button)) return true;
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.mouseReleased(absoluteX, absoluteY, button)) return true;
         }
         return false;
     }
@@ -150,32 +166,32 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
         double absoluteX = mouseX + this.scroller.getXOffset();
         double absoluteY = mouseY + this.scroller.getYOffset();
 
-        for (EntryRow row : getRows()) {
-            if (row.widget.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.mouseDragged(absoluteX, absoluteY, button, dragX, dragY)) return true;
         }
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (EntryRow row : getRows()) {
-            if (row.widget.isFocused() && row.widget.keyPressed(keyCode, scanCode, modifiers)) return true;
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.isFocused() && widget.keyPressed(keyCode, scanCode, modifiers)) return true;
         }
         return false;
     }
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        for (EntryRow row : getRows()) {
-            if (row.widget.isFocused() && row.widget.keyReleased(keyCode, scanCode, modifiers)) return true;
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.isFocused() && widget.keyReleased(keyCode, scanCode, modifiers)) return true;
         }
         return false;
     }
 
     @Override
     public boolean charTyped(char codePoint, int modifiers) {
-        for (EntryRow row : getRows()) {
-            if (row.widget.isFocused() && row.widget.charTyped(codePoint, modifiers)) return true;
+        for (AbstractWidget widget : getWidgets()) {
+            if (widget.isFocused() && widget.charTyped(codePoint, modifiers)) return true;
         }
         return false;
     }
@@ -188,8 +204,8 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
     @Override
     public void setFocused(boolean focused) {
         if (!focused) {
-            for (EntryRow row : getRows()) {
-                row.widget.setFocused(false);
+            for (AbstractWidget widget : getWidgets()) {
+                widget.setFocused(false);
             }
         } else if (this.focusedWidget != null) {
             this.focusedWidget.setFocused(true);
@@ -205,6 +221,13 @@ public class EditEntryPanelScrollable implements Scrollable, GuiEventListener, N
     public void updateNarration(@NotNull NarrationElementOutput output) {
     }
 
-    private record EntryRow(Component label, AbstractWidget widget) {
+    private record EntryRow(@Nullable Component label, AbstractWidget widget, @Nullable AbstractWidget sideWidget) {
+        EntryRow(@Nullable Component label, AbstractWidget widget) {
+            this(label, widget, null);
+        }
+
+        int height() {
+            return this.label != null ? 28 : 22;
+        }
     }
 }
