@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.util.JsonUtils;
@@ -20,6 +20,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class LootTableReward extends Reward {
+
+    private static final LootContextParamSet PARAM_SET = LootContextParamSet.builder()
+            .optional(LootContextParams.THIS_ENTITY)
+            .optional(LootContextParams.ORIGIN)
+            //? if >=1.21 {
+            .optional(LootContextParams.ATTACKING_ENTITY)
+            //?} else
+            //.optional(LootContextParams.KILLER_ENTITY)
+            .build();
 
     private final ResourceLocation lootTable;
 
@@ -48,7 +57,7 @@ public class LootTableReward extends Reward {
                         .withParameter(LootContextParams.ATTACKING_ENTITY, player)
                         //?} else
                         //.withParameter(LootContextParams.KILLER_ENTITY, player)
-                        .create(LootContextParamSets.EMPTY)
+                        .create(PARAM_SET)
         );
 
         for (ItemStack stack : stacks) {

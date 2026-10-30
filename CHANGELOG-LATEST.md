@@ -1,2 +1,3 @@
-- Backported recent 1.21 fixes.
-- Ported to stonecutter.
+### Fixed
+
+- Fixed loot table rewards failing to be collected on Fabric.
