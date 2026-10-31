@@ -200,12 +200,11 @@ May be the item itself or a tag prefixed with `#`.
 - `components` (optional): Data component matching rules (e.g., `"minecraft:custom_name"`).
 
 ### `questlog:visit_biome`
-Tracks the number of times the player visits a specific biome.
+Tracks the number of times the player visits a specific biome. Supports biome tags (e.g. `#minecraft:is_ocean`).
 
 Additional definition fields:
 
 - `biome`: The biome to track.
-Does not support tags yet.
 
 ### `questlog:visit_dimension`
 Tracks the number of times the player visits a specific dimension.
@@ -251,7 +250,7 @@ Additional definition fields:
 - `effect`: The effect to track.
 
 ### `questlog:visit_structure`
-Tracks the number of times the player is in a structure. Does not support tags yet.
+Tracks the number of times the player is in a structure. Supports structure tags (e.g. `#minecraft:village`).
 Additional definition fields:
 
 - `structure`: The structure to check.

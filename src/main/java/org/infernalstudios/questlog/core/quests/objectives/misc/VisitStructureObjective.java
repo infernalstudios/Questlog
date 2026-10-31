@@ -4,8 +4,9 @@ import com.evandev.triggers.event.events.TriggerPlayerEvent;
 import com.google.gson.JsonObject;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import org.infernalstudios.questlog.Questlog;
 import org.infernalstudios.questlog.core.quests.objectives.Objective;
@@ -14,14 +15,19 @@ import org.infernalstudios.questlog.util.JsonUtils;
 public class VisitStructureObjective extends Objective {
 
     private final ResourceKey<Structure> structureKey;
+    private final TagKey<Structure> structureTag;
     private int ticksUntilCheck = 0;
 
     public VisitStructureObjective(JsonObject definition) {
         super(definition);
-        this.structureKey = ResourceKey.create(
-                Registries.STRUCTURE,
-                Questlog.parseId(JsonUtils.getString(definition, "structure"))
-        );
+        String structure = JsonUtils.getString(definition, "structure");
+        if (structure.startsWith("#")) {
+            this.structureKey = null;
+            this.structureTag = TagKey.create(Registries.STRUCTURE, Questlog.parseId(structure.substring(1)));
+        } else {
+            this.structureKey = ResourceKey.create(Registries.STRUCTURE, Questlog.parseId(structure));
+            this.structureTag = null;
+        }
     }
 
     @Override
@@ -36,16 +42,18 @@ public class VisitStructureObjective extends Objective {
             ticksUntilCheck = 20;
             if (!player.serverLevel().isLoaded(player.blockPosition())) return;
 
-            Structure structure = player.serverLevel().registryAccess()
-                    .registryOrThrow(Registries.STRUCTURE)
-                    .get(this.structureKey);
+            StructureManager structureManager = player.serverLevel().structureManager();
+            boolean inside;
+            if (this.structureTag != null) {
+                inside = structureManager.getStructureWithPieceAt(player.blockPosition(), this.structureTag).isValid();
+            } else {
+                Structure structure = player.serverLevel().registryAccess()
+                        .registryOrThrow(Registries.STRUCTURE)
+                        .get(this.structureKey);
+                inside = structure != null && structureManager.getStructureWithPieceAt(player.blockPosition(), structure).isValid();
+            }
 
-            if (structure == null) return;
-
-            if (!player.serverLevel().structureManager().getStructureWithPieceAt(player.blockPosition(), structure).isValid())
-                return;
-
-            this.setUnits(this.getUnits() + 1);
+            if (inside) this.setUnits(this.getUnits() + 1);
         }
     }
 }

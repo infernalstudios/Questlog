@@ -1452,6 +1452,14 @@ public class QuestEditorScreen extends Screen {
                 case BLOCK -> registry = BuiltInRegistries.BLOCK;
                 case ITEM -> registry = BuiltInRegistries.ITEM;
                 case ENTITY_TYPE -> registry = BuiltInRegistries.ENTITY_TYPE;
+                case STRUCTURE, BIOME -> {
+                    Minecraft mc = Minecraft.getInstance();
+                    if (mc.level != null) {
+                        registry = mc.level.registryAccess().registry(
+                                meta.suggestionType() == SuggestionType.BIOME ? Registries.BIOME : Registries.STRUCTURE
+                        ).orElse(null);
+                    }
+                }
             }
             if (registry != null) {
                 String lower = query.toLowerCase();
