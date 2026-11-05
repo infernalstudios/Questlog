@@ -149,6 +149,15 @@ public class ScrollableComponent implements Renderable, NarratableEntry, GuiEven
         this.scrollAmount = amount;
     }
 
+    public void scrollToReveal(int y, int h) {
+        int viewHeight = this.bottom - this.top;
+        if (y < this.scrollAmount) {
+            this.setScrollAmount(y);
+        } else if (y + h > this.scrollAmount + viewHeight) {
+            this.setScrollAmount(y + h - viewHeight);
+        }
+    }
+
     private int getMaxScroll() {
         return Math.max(0, this.scrollable.getHeight() - (this.bottom - this.top));
     }

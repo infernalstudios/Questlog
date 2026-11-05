@@ -20,8 +20,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEntry {
+    static final int ROW_HEIGHT = 22;
+
     private final QuestEditorScreen screen;
     private ScrollableComponent scroller;
+
+    static int rowY(int index) {
+        return 4 + index * ROW_HEIGHT;
+    }
 
     public RightPanelScrollable(QuestEditorScreen screen) {
         this.screen = screen;
@@ -29,7 +35,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
 
     @Override
     public int getHeight() {
-        return screen.getActiveList().size() * 22 + 8;
+        return screen.getActiveList().size() * ROW_HEIGHT + 8;
     }
 
     @Override
@@ -60,7 +66,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
 
         for (int i = 0; i < list.size(); i++) {
             JsonObject entry = list.get(i);
-            int localRowY = 4 + i * 22;
+            int localRowY = rowY(i);
             int rowY = startY + localRowY - scroll;
 
             boolean rowHovered = mouseX >= 0 && mouseX <= 220 && mouseY >= localRowY && mouseY < localRowY + 22;
@@ -155,7 +161,7 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
 
         for (int i = 0; i < list.size(); i++) {
             JsonObject entry = list.get(i);
-            int rowY = 4 + i * 22;
+            int rowY = rowY(i);
             int btnY = rowY + 2;
 
             if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
@@ -174,14 +180,14 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
                     JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
                     list.add(i + 1, copy);
                     screen.updateParentEntryWithChildren();
-                    screen.refreshScreen();
+                    screen.refreshEntryList(i + 1);
                     return true;
                 }
                 if (mouseX >= 184 && mouseX <= 200 && mouseY >= btnY && mouseY <= btnY + 16) {
                     screen.saveTemporaryState();
                     list.remove(i);
                     screen.updateParentEntryWithChildren();
-                    screen.refreshScreen();
+                    screen.refreshEntryList(-1);
                     return true;
                 }
             } else if (button == GLFW.GLFW_MOUSE_BUTTON_2) {
@@ -222,13 +228,13 @@ class RightPanelScrollable implements Scrollable, GuiEventListener, NarratableEn
             JsonObject copy = JsonParser.parseString(entry.toString()).getAsJsonObject();
             list.add(index + 1, copy);
             screen.updateParentEntryWithChildren();
-            screen.refreshScreen();
+            screen.refreshEntryList(index + 1);
         }));
         menuItems.add(new ContextMenuItem(Component.translatable("questlog.menu.delete_entry"), () -> {
             screen.saveTemporaryState();
             list.remove(index);
             screen.updateParentEntryWithChildren();
-            screen.refreshScreen();
+            screen.refreshEntryList(-1);
         }));
         return menuItems;
     }

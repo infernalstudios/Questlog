@@ -4,10 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-//? if >=1.21 {
-import net.minecraft.advancements.AdvancementNode;
-//?} else
-//import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -45,6 +41,11 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.function.Supplier;
+
+//? if >=1.21 {
+import net.minecraft.advancements.AdvancementNode;
+//?} else
+//import net.minecraft.advancements.Advancement;
 
 public class QuestEditorScreen extends Screen {
     static final ResourceLocation GEAR_ICON = Questlog.id("textures/gui/editor_gear.png");
@@ -181,6 +182,8 @@ public class QuestEditorScreen extends Screen {
     private ScrollableComponent leftScrollable;
     private ScrollableComponent rightScrollable;
     private ScrollableComponent settingsScrollable;
+    private double pendingRightScroll = -1;
+    private int pendingRevealIndex = -1;
     private NoShadowEditBox typeSearchBox;
 
     public QuestEditorScreen(Screen previousScreen) {
@@ -372,6 +375,8 @@ public class QuestEditorScreen extends Screen {
         } else if (this.rightPageState == RightPageState.EDIT_ENTRY) {
             this.buildRightPageEditEntry(panel2X, baseY);
         }
+        this.pendingRightScroll = -1;
+        this.pendingRevealIndex = -1;
 
         int btnWidth = 100;
         int bottomY = baseY + height + 10;
@@ -576,6 +581,12 @@ public class QuestEditorScreen extends Screen {
         } else {
             this.rightScrollable = new ScrollableComponent(panel2X + 10, panel2Y + 28, 220, 126, new RightPanelScrollable(this));
             this.addRenderableWidget(this.rightScrollable);
+            if (this.pendingRightScroll >= 0) {
+                this.rightScrollable.setScrollAmount(this.pendingRightScroll);
+            }
+            if (this.pendingRevealIndex >= 0) {
+                this.rightScrollable.scrollToReveal(RightPanelScrollable.rowY(this.pendingRevealIndex), RightPanelScrollable.ROW_HEIGHT);
+            }
 
             AbstractButton btnAddEntry = createImageButton(panel2X + 60, panel2Y + 162, PLUS_ICON, PLUS_HIGHLIGHTED, () -> {
                 this.saveTemporaryState();
@@ -1104,7 +1115,6 @@ public class QuestEditorScreen extends Screen {
                     this.editingEntry.addProperty("predicate", components);
                 }
             } else {
-                // NBT predicates are SNBT strings, which lenient JSON parsing would mangle
                 this.editingEntry.addProperty(ItemMatcher.COMPONENTS_KEY, components);
             }
             *///?}
@@ -1276,7 +1286,6 @@ public class QuestEditorScreen extends Screen {
 
     @Override
     protected void repositionElements() {
-        // Resizing the window rebuilds every widget, so keep what has been typed but not yet saved
         this.saveTemporaryState();
         String entryName = this.entryNameBox != null ? this.entryNameBox.getValue() : null;
         String entryTarget = this.entryTargetBox != null ? this.entryTargetBox.getValue() : null;
@@ -1291,7 +1300,8 @@ public class QuestEditorScreen extends Screen {
             if (this.entryNameBox != null && entryName != null) this.entryNameBox.setValue(entryName);
             if (this.entryTargetBox != null && entryTarget != null) this.entryTargetBox.setValue(entryTarget);
             if (this.entrySlotBox != null && entrySlot != null) this.entrySlotBox.setValue(entrySlot);
-            if (this.entryComponentsBox != null && entryComponents != null) this.entryComponentsBox.setValue(entryComponents);
+            if (this.entryComponentsBox != null && entryComponents != null)
+                this.entryComponentsBox.setValue(entryComponents);
             if (this.entryAmountBox != null && entryAmount != null) this.entryAmountBox.setValue(entryAmount);
             if (this.entryIconBox != null && entryIcon != null) this.entryIconBox.setValue(entryIcon);
         }
@@ -1596,10 +1606,10 @@ public class QuestEditorScreen extends Screen {
     }
 
     @Override
-    //? if >=1.21 {
+            //? if >=1.21 {
     public void renderBackground(@NotNull GuiGraphics ps, int mouseX, int mouseY, float partialTick) {
-    //?} else
-    //public void renderBackground(@NotNull GuiGraphics ps) {
+        //?} else
+        //public void renderBackground(@NotNull GuiGraphics ps) {
         //? if >=1.21 {
         super.renderBackground(ps, mouseX, mouseY, partialTick);
         //?} else
@@ -1868,10 +1878,10 @@ public class QuestEditorScreen extends Screen {
     }
 
     @Override
-    //? if >=1.21 {
+            //? if >=1.21 {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-    //?} else
-    //public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
+        //?} else
+        //public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {
         if (this.contextMenu != null && this.contextMenu.isMouseOver(mouseX, mouseY)) {
             if (this.contextMenu.mouseScrolled(scrollY)) {
                 return true;
@@ -1904,24 +1914,24 @@ public class QuestEditorScreen extends Screen {
         if (this.leftScrollable != null && this.leftScrollable.isMouseOver(mouseX, mouseY)) {
             //? if >=1.21 {
             if (this.leftScrollable.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
-            //?} else
-            //if (this.leftScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
+                //?} else
+                //if (this.leftScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
                 return true;
             }
         }
         if (this.rightScrollable != null && this.rightScrollable.isMouseOver(mouseX, mouseY)) {
             //? if >=1.21 {
             if (this.rightScrollable.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
-            //?} else
-            //if (this.rightScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
+                //?} else
+                //if (this.rightScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
                 return true;
             }
         }
         if (this.settingsScrollable != null && this.settingsScrollable.isMouseOver(mouseX, mouseY)) {
             //? if >=1.21 {
             if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, scrollX, scrollY)) {
-            //?} else
-            //if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
+                //?} else
+                //if (this.settingsScrollable.mouseScrolled(mouseX, mouseY, scrollY)) {
                 return true;
             }
         }
@@ -1970,6 +1980,12 @@ public class QuestEditorScreen extends Screen {
     }
 
     public void refreshScreen() {
+        this.rebuildWidgets();
+    }
+
+    public void refreshEntryList(int revealIndex) {
+        this.pendingRightScroll = this.rightScrollable != null ? this.rightScrollable.getScrollAmount() : -1;
+        this.pendingRevealIndex = revealIndex;
         this.rebuildWidgets();
     }
 

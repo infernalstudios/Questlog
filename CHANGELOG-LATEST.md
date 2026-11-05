@@ -1,3 +1,3 @@
 ### Fixed
 
-- Fixed structure and biome tags not working in "Visit Structure" and "Visit Biome" objectives  (#185).
+- Fixed the entry list in the quest editor scrolling back to the top when duplicating or deleting an entry.
